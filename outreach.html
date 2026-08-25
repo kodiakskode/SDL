@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Outreach · SDL Creations</title>
+<meta name="description" content="SDL Creations outreach — placeholder.">
+<link rel="icon" href="assets/logo-light.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap">
+<link rel="stylesheet" href="assets/theme.css">
+<script>
+/* Resolve the theme before first paint so the page never flashes the wrong one. */
+(function(){try{var m=localStorage.getItem("sdl-theme");
+if(m!=="dark"&&m!=="light"){m=window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";}
+document.documentElement.setAttribute("data-theme",m);}catch(e){}})();
+</script>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <nav class="nav" aria-label="Primary">
+    <a class="navlink" href="index.html">Home</a>
+    <a class="navlink" href="leads.html">Leads</a>
+    <a class="navlink" href="pool.html">Pool Finder</a>
+    <a class="navlink" href="outreach.html">Outreach</a>
+  </nav>
+  <a class="brandmark" href="index.html" aria-label="SDL Creations — home">
+    <img class="logo-light" src="assets/logo-light.svg" alt="" aria-hidden="true" width="319" height="382">
+    <img class="logo-dark" src="assets/logo-dark.svg" alt="" aria-hidden="true" width="319" height="382">
+    <span class="wordmark"><b>SDL</b><i>Creations</i></span>
+  </a>
+  <div class="nav-right">
+    <button type="button" class="toggle" id="theme-toggle" aria-pressed="false"
+            aria-label="Switch to dark mode"><span class="knob" aria-hidden="true">☀</span></button>
+  </div>
+</header>
+<div class="pagehead">
+  <p class="eyebrow">Outreach</p>
+  <h1>Campaigns</h1>
+  <p class="lede">Left empty for now, as asked. The page, nav slot and styling are in
+    place &mdash; drop content into <code>outreach.html</code> and it inherits the theme,
+    the toggle and every component below.</p>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <span class="panel-title">Nothing here yet</span>
+    <span class="panel-note"></span>
+  </div>
+  <div class="empty" style="padding:96px 40px">
+    This page is a placeholder.<br>
+    Tell me what belongs here &mdash; sequences, templates, a send log &mdash; and it gets built.
+  </div>
+</div>
+<footer class="site-foot">
+  SDL Creations &middot; internal dashboard. Everything runs in your browser &mdash; lead
+  tracking, notes and the theme you pick are stored on this device only, nothing is
+  uploaded.<br>
+  Lead data compiled from public professional listings. Pool data: OpenStreetMap
+  contributors (ODbL) &middot; NSW Spatial Services, Department of Customer Service (CC BY 4.0).
+</footer>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

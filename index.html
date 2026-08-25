@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard · SDL Creations</title>
+<meta name="description" content="SDL Creations internal dashboard — leads, pool finder and outreach.">
+<link rel="icon" href="assets/logo-light.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap">
+<link rel="stylesheet" href="assets/theme.css">
+<script>
+/* Resolve the theme before first paint so the page never flashes the wrong one. */
+(function(){try{var m=localStorage.getItem("sdl-theme");
+if(m!=="dark"&&m!=="light"){m=window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";}
+document.documentElement.setAttribute("data-theme",m);}catch(e){}})();
+</script>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <nav class="nav" aria-label="Primary">
+    <a class="navlink" href="index.html">Home</a>
+    <a class="navlink" href="leads.html">Leads</a>
+    <a class="navlink" href="pool.html">Pool Finder</a>
+    <a class="navlink" href="outreach.html">Outreach</a>
+  </nav>
+  <a class="brandmark" href="index.html" aria-label="SDL Creations — home">
+    <img class="logo-light" src="assets/logo-light.svg" alt="" aria-hidden="true" width="319" height="382">
+    <img class="logo-dark" src="assets/logo-dark.svg" alt="" aria-hidden="true" width="319" height="382">
+    <span class="wordmark"><b>SDL</b><i>Creations</i></span>
+  </a>
+  <div class="nav-right">
+    <button type="button" class="toggle" id="theme-toggle" aria-pressed="false"
+            aria-label="Switch to dark mode"><span class="knob" aria-hidden="true">☀</span></button>
+  </div>
+</header>
+<div class="pagehead">
+  <p class="eyebrow">SDL Creations &middot; Business dashboard</p>
+  <div class="row">
+    <div>
+      <h1>Leads, pools and outreach in one place.</h1>
+      <p class="lede">Three working lists and the tools to pull addresses and contacts
+        straight out of them. Everything is static and runs offline in the browser.</p>
+    </div>
+    <button type="button" class="btn primary" id="jump-pool">Open Pool Finder</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="v" id="h-arch">750</div><div class="k">Architects</div></div>
+  <div class="stat"><div class="v" id="h-land">750</div><div class="k">Landscape designers</div></div>
+  <div class="stat"><div class="v">12,132</div><div class="k">Pool leads</div></div>
+  <div class="stat ink"><div class="v">1,532</div><div class="k">Mail-ready pools</div></div>
+  <div class="stat ink"><div class="v" id="h-email">&mdash;</div><div class="k">Contacts with email</div></div>
+</div>
+
+<div class="cards">
+  <a class="card" href="leads.html">
+    <span class="badge">1,500 contacts</span>
+    <h2>Leads</h2>
+    <p>NSW architects and landscape designers in one table. Switch list with the
+      dropdown, filter by region or contact detail, tick the ones you want and copy
+      the emails or the whole row set out as CSV.</p>
+    <span class="go">Open leads &rarr;</span>
+  </a>
+  <a class="card" href="pool.html">
+    <span class="badge">12,132 properties</span>
+    <h2>Pool Finder</h2>
+    <p>Sydney properties whose pool is confirmed 20+ years old from NSW government
+      aerial imagery, scored and filterable. Select rows or take the whole filtered
+      set and copy every address to the clipboard.</p>
+    <span class="go">Open pool finder &rarr;</span>
+  </a>
+  <a class="card" href="outreach.html">
+    <span class="badge">Coming next</span>
+    <h2>Outreach</h2>
+    <p>Reserved for the campaign side &mdash; sequences, templates and what has been
+      sent to whom. The page is scaffolded and empty for now.</p>
+    <span class="go">Open outreach &rarr;</span>
+  </a>
+</div>
+
+<hr class="hr">
+
+<p class="eyebrow">How this is put together</p>
+<div class="prose">
+  <p><b>Nothing leaves the browser.</b> Every page is a static file. Lead status, notes
+    and your light/dark choice live in this browser's <code>localStorage</code>, so they
+    are per-device and not shared between machines. The Pool Finder has
+    <b>Back&nbsp;up</b> / <b>Restore</b> buttons to move that tracking across.</p>
+  <p><b>Leads</b> come from two compiled lists: 750 NSW-registered architects taken from
+    NSW Architects Registration Board public profiles, and 750 NSW landscape and garden
+    design businesses from public listings. Only 28 of the landscape rows carry separate
+    public LDI / AILDM evidence &mdash; those are tagged, the rest are marked unverified
+    rather than claimed as members. Phone coverage on that list is near total; email
+    coverage is not, because most of those businesses publish a contact form instead.</p>
+  <p><b>Pool Finder</b> is the tool as built, carried across whole &mdash; same data, same
+    scoring, same filters &mdash; with the address-copying added and the styling wired
+    into this dashboard's theme.</p>
+</div>
+
+<script>
+(function(){
+  fetch("data/leads.json").then(function(r){return r.json();}).then(function(d){
+    document.getElementById("h-arch").textContent = d.architects.stats.total.toLocaleString();
+    document.getElementById("h-land").textContent = d.designers.stats.total.toLocaleString();
+    document.getElementById("h-email").textContent =
+      (d.architects.stats.withEmail + d.designers.stats.withEmail).toLocaleString();
+  }).catch(function(){ /* stat tiles keep their static fallbacks */ });
+  document.getElementById("jump-pool").addEventListener("click", function(){
+    location.href = "pool.html";
+  });
+})();
+</script>
+<footer class="site-foot">
+  SDL Creations &middot; internal dashboard. Everything runs in your browser &mdash; lead
+  tracking, notes and the theme you pick are stored on this device only, nothing is
+  uploaded.<br>
+  Lead data compiled from public professional listings. Pool data: OpenStreetMap
+  contributors (ODbL) &middot; NSW Spatial Services, Department of Customer Service (CC BY 4.0).
+</footer>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

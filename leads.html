@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leads · SDL Creations</title>
+<meta name="description" content="NSW architects and landscape designers — filter, select and copy contact details.">
+<link rel="icon" href="assets/logo-light.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap">
+<link rel="stylesheet" href="assets/theme.css">
+<script>
+/* Resolve the theme before first paint so the page never flashes the wrong one. */
+(function(){try{var m=localStorage.getItem("sdl-theme");
+if(m!=="dark"&&m!=="light"){m=window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";}
+document.documentElement.setAttribute("data-theme",m);}catch(e){}})();
+</script>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <nav class="nav" aria-label="Primary">
+    <a class="navlink" href="index.html">Home</a>
+    <a class="navlink" href="leads.html">Leads</a>
+    <a class="navlink" href="pool.html">Pool Finder</a>
+    <a class="navlink" href="outreach.html">Outreach</a>
+  </nav>
+  <a class="brandmark" href="index.html" aria-label="SDL Creations — home">
+    <img class="logo-light" src="assets/logo-light.svg" alt="" aria-hidden="true" width="319" height="382">
+    <img class="logo-dark" src="assets/logo-dark.svg" alt="" aria-hidden="true" width="319" height="382">
+    <span class="wordmark"><b>SDL</b><i>Creations</i></span>
+  </a>
+  <div class="nav-right">
+    <button type="button" class="toggle" id="theme-toggle" aria-pressed="false"
+            aria-label="Switch to dark mode"><span class="knob" aria-hidden="true">☀</span></button>
+  </div>
+</header>
+<div class="pagehead">
+  <p class="eyebrow">Leads</p>
+  <div class="row">
+    <div>
+      <h1>NSW professional contacts</h1>
+      <p class="lede" id="list-note">&nbsp;</p>
+    </div>
+    <div class="ctl-group">
+      <span class="ctl-label">List</span>
+      <select id="f-list" class="listpick" aria-label="Which lead list to show">
+        <option value="architects">Architects</option>
+        <option value="designers">Landscape Designers</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="v" id="k-total">&mdash;</div><div class="k">In this list</div></div>
+  <div class="stat"><div class="v" id="k-email">&mdash;</div><div class="k">With email</div></div>
+  <div class="stat"><div class="v" id="k-phone">&mdash;</div><div class="k">With phone</div></div>
+  <div class="stat ink"><div class="v" id="k-shown">&mdash;</div><div class="k">Matching filter</div></div>
+</div>
+
+<div class="controls">
+  <input type="search" id="q" placeholder="Search name, business, suburb or number&hellip;"
+         aria-label="Search leads" style="min-width:250px;flex:1 1 260px">
+  <span class="ctl-label">Region</span>
+  <select id="f-region" aria-label="Region"></select>
+  <span class="ctl-label">Has</span>
+  <select id="f-contact" aria-label="Contact detail available">
+    <option value="">Any contact detail</option>
+    <option value="email">Email</option>
+    <option value="phone">Phone</option>
+    <option value="both">Email and phone</option>
+    <option value="web">Website</option>
+  </select>
+  <span class="ctl-label">Status</span>
+  <select id="f-status" aria-label="Status"></select>
+  <button type="button" class="btn" id="reset">Clear</button>
+  <span class="tally" id="tally">&mdash;</span>
+</div>
+
+<div class="select-bar">
+  <span class="lbl">Selection <span id="sel-count">none selected</span></span>
+  <button type="button" class="btn primary" id="copy-email">Copy emails</button>
+  <button type="button" class="btn" id="copy-phone">Copy phones</button>
+  <button type="button" class="btn" id="copy-csv">Copy rows as CSV</button>
+  <button type="button" class="btn" id="clear-sel">Clear selection</button>
+  <span class="ctl-label" style="margin-left:auto">Tick rows to narrow it &mdash; with nothing ticked, copying takes every filtered row</span>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <span class="panel-title">Contact list &middot; public professional listings</span>
+    <span class="panel-note" id="note"></span>
+  </div>
+  <div class="scroller" style="height:min(64vh,760px)">
+    <table>
+      <colgroup>
+        <col style="width:44px"><col style="width:24%"><col style="width:19%">
+        <col style="width:13%"><col style="width:22%"><col style="width:7%">
+        <col style="width:13%">
+      </colgroup>
+      <thead><tr>
+        <th class="pick"><input type="checkbox" id="check-all" aria-label="Select every filtered row"></th>
+        <th class="sortable" data-sort="org">Business / Name<span class="ind">&#9650;</span></th>
+        <th class="sortable" data-sort="suburb">Location<span class="ind"></span></th>
+        <th class="sortable" data-sort="phone">Phone<span class="ind"></span></th>
+        <th class="sortable" data-sort="email">Email<span class="ind"></span></th>
+        <th>Web</th>
+        <th class="sortable" data-sort="status">Status<span class="ind"></span></th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>No contacts match these filters.</div>
+  </div>
+</div>
+
+<script src="assets/leads.js"></script>
+<footer class="site-foot">
+  SDL Creations &middot; internal dashboard. Everything runs in your browser &mdash; lead
+  tracking, notes and the theme you pick are stored on this device only, nothing is
+  uploaded.<br>
+  Lead data compiled from public professional listings. Pool data: OpenStreetMap
+  contributors (ODbL) &middot; NSW Spatial Services, Department of Customer Service (CC BY 4.0).
+</footer>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>
