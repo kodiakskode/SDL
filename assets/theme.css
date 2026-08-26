@@ -14,6 +14,12 @@
    ========================================================================== */
 
 :root{
+  /* Referenced by both html{zoom} and .sidebar's height calc below — CSS
+     zoom scales a box's rendered size *after* layout, so a height:100vh
+     sidebar would render 1.25x taller than the real viewport and push its
+     bottom (the theme toggle) below the fold. Dividing by --zoom cancels
+     that back out; keep the two in sync if this value ever changes. */
+  --zoom:1.25;
   --font-ui:"Helvetica Neue",Helvetica,Arial,sans-serif;
   --font-num:"Helvetica Neue",Helvetica,Arial,sans-serif;
   --font-mono:"Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -104,7 +110,7 @@
 
 /* Whole dashboard scaled up 125% — zoom scales layout, text and px sizes
    together, so nothing needs converting to rem to keep it uniform. */
-html{zoom:1.25;}
+html{zoom:var(--zoom);}
 
 body{
   margin:0;
@@ -136,13 +142,16 @@ body::after{
 
 .sidebar{
   flex:none;width:208px;position:sticky;top:0;align-self:flex-start;
-  height:100vh;display:flex;flex-direction:column;overflow:hidden;
+  height:calc(100vh / var(--zoom));display:flex;flex-direction:column;overflow:hidden;
   background:linear-gradient(180deg,var(--m-chassis-top) 0%,var(--m-chassis-mid) 26%,var(--m-chassis-bot) 100%);
   box-shadow:inset -1px 0 0 var(--m-ring),4px 0 18px var(--m-drop);
   transition:width .2s ease;
   z-index:300;
 }
-[data-sidebar="collapsed"] .sidebar{width:60px;}
+/* Collapsed: labels hide, icons and the theme toggle stay put — a slim
+   icon-only rail, not an empty one. 72px is wide enough for the 56px
+   toggle plus breathing room either side. */
+[data-sidebar="collapsed"] .sidebar{width:72px;}
 
 .sidebar-brand{
   flex:none;display:flex;align-items:center;justify-content:flex-start;
@@ -157,16 +166,13 @@ body::after{
 
 .sidebar-nav{
   flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--s1);
-  padding:var(--s3) var(--s2);opacity:1;transition:opacity .15s ease;
+  padding:var(--s3) var(--s2);
 }
 .sidebar-foot{
   flex:none;padding:var(--s2);display:flex;justify-content:center;
-  opacity:1;transition:opacity .15s ease;
 }
-[data-sidebar="collapsed"] .sidebar-nav,
-[data-sidebar="collapsed"] .sidebar-foot{
-  opacity:0;pointer-events:none;
-}
+[data-sidebar="collapsed"] .sidebar-nav .navlink{justify-content:center;padding:0;}
+[data-sidebar="collapsed"] .sidebar-nav .navlink .lbl{display:none;}
 
 .main-col{flex:1;min-width:0;}
 
@@ -204,6 +210,14 @@ body::after{
 .sidebar-nav .navlink .ico{flex:none;width:16px;height:16px;display:flex;}
 .sidebar-nav .navlink .ico svg{width:100%;height:100%;display:block;}
 .sidebar-nav .navlink .lbl{overflow:hidden;text-overflow:ellipsis;}
+/* Selected page reads as pressed in, not raised — sunk into the sidebar
+   the way an input field or a ticked box is, elsewhere in this theme. */
+.sidebar-nav .navlink[aria-current="page"]{
+  color:var(--accent-3);
+  background:var(--accent-wash);
+  box-shadow:var(--sh-field);
+}
+[data-theme="dark"] .sidebar-nav .navlink[aria-current="page"]{color:var(--accent-2);}
 
 /* sub-nav inside a page, carried over from the Pool Finder */
 .pagenav{display:flex;gap:var(--s1);}
@@ -453,8 +467,7 @@ code{font-family:var(--font-mono);font-size:.75rem;background:var(--accent-wash)
   :root{--gutter:14px;}
   /* Narrow screens: always a slim icon-only rail, whatever the stored
      open/closed preference — 208px would swallow most of the viewport. */
-  .sidebar,[data-sidebar="collapsed"] .sidebar{width:60px;}
-  .sidebar-nav,.sidebar-foot{opacity:1;pointer-events:auto;}
+  .sidebar,[data-sidebar="collapsed"] .sidebar{width:72px;}
   .sidebar-nav .navlink{justify-content:center;padding:0;}
   .sidebar-nav .navlink .lbl{display:none;}
   h1{font-size:1.25rem;}
