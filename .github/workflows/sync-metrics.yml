@@ -1,0 +1,49 @@
+name: Sync business metrics from Xero
+
+# JACK App has no public API; its documented outbound path is the two-way Xero
+# sync, so Xero is where these figures come from. Each run overwrites
+# data/metrics.json and commits it — the dashboard is a static site, so a
+# committed file is what "live data" means here, and git history doubles as the
+# backup of every snapshot.
+
+on:
+  schedule:
+    - cron: "0 19 * * *"    # 05:00 Sydney (AEST, UTC+10)
+  workflow_dispatch:         # and on demand from the Actions tab
+
+concurrency:
+  group: sync-metrics
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/dashboard-pool-finder-leads-1n6oyd
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch from Xero
+        env:
+          XERO_CLIENT_ID: ${{ secrets.XERO_CLIENT_ID }}
+          XERO_CLIENT_SECRET: ${{ secrets.XERO_CLIENT_SECRET }}
+          XERO_TENANT_ID: ${{ secrets.XERO_TENANT_ID }}
+        run: node scripts/sync_xero.js
+
+      - name: Commit if anything changed
+        run: |
+          git config user.name  "sdl-metrics-bot"
+          git config user.email "actions@github.com"
+          if git diff --quiet -- data/metrics.json; then
+            echo "No change in metrics — nothing to commit."
+            exit 0
+          fi
+          git add data/metrics.json
+          git commit -m "Metrics: refresh from Xero ($(date -u +%Y-%m-%d))"
+          git push

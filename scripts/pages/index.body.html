@@ -3,8 +3,54 @@
     <p class="eyebrow">Dashboard</p>
     <h1>SDL Creations</h1>
   </div>
+  <span class="sample-flag" id="data-flag" hidden>Sample data</span>
 </div>
 
+<div class="stats" id="biz-stats">
+  <div class="stat"><div class="v" id="b-rev">&mdash;</div><div class="k">Revenue MTD</div><div class="d" id="b-rev-d"></div></div>
+  <div class="stat"><div class="v" id="b-out">&mdash;</div><div class="k">Outstanding</div></div>
+  <div class="stat"><div class="v" id="b-over">&mdash;</div><div class="k">Overdue</div></div>
+  <div class="stat ink"><div class="v" id="b-bills">&mdash;</div><div class="k">Bills due</div></div>
+  <div class="stat ink"><div class="v" id="b-open">&mdash;</div><div class="k">Open invoices</div></div>
+</div>
+
+<div class="chart-grid">
+  <div class="chart-card">
+    <div class="chart-head">
+      <span class="chart-title">Invoiced vs paid</span>
+      <span class="chart-sub">Last 12 months</span>
+    </div>
+    <div class="chart-legend">
+      <span><i style="background:var(--c-cat-1)"></i>Invoiced</span>
+      <span><i style="background:var(--c-cat-2)"></i>Paid</span>
+    </div>
+    <div class="chart-body">
+      <div id="chart-cash"></div>
+      <details class="chart-table-wrap"><summary>Table</summary>
+        <table class="chart-table"><thead><tr>
+          <th>Month</th><th>Invoiced</th><th>Paid</th>
+        </tr></thead><tbody id="tbl-cash"></tbody></table>
+      </details>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head">
+      <span class="chart-title">Receivables ageing</span>
+      <span class="chart-sub" id="age-total"></span>
+    </div>
+    <div class="chart-body">
+      <div id="chart-age"></div>
+      <details class="chart-table-wrap"><summary>Table</summary>
+        <table class="chart-table"><thead><tr>
+          <th>Bucket</th><th>Amount</th>
+        </tr></thead><tbody id="tbl-age"></tbody></table>
+      </details>
+    </div>
+  </div>
+</div>
+
+<p class="eyebrow">Leads</p>
 <div class="stats">
   <div class="stat"><div class="v" id="h-arch">750</div><div class="k">Architects</div></div>
   <div class="stat"><div class="v" id="h-land">750</div><div class="k">Designers</div></div>
@@ -49,6 +95,7 @@
   </div>
 </details>
 
+<script src="assets/charts.js?v=4"></script>
 <script>
 fetch("data/leads.json").then(function(r){return r.json();}).then(function(d){
   document.getElementById("h-arch").textContent = d.architects.stats.total.toLocaleString();
@@ -56,4 +103,82 @@ fetch("data/leads.json").then(function(r){return r.json();}).then(function(d){
   document.getElementById("h-email").textContent =
     (d.architects.stats.withEmail + d.designers.stats.withEmail).toLocaleString();
 }).catch(function(){ /* tiles keep their static fallbacks */ });
+
+/* Business metrics — Xero, via the sync Action. See scripts/sync_xero.js. */
+(function(){
+  var C = window.SDLCharts, data = null;
+  var $ = function(id){ return document.getElementById(id); };
+
+  function render(){
+    if (!data) return;
+    C.lineChart($("chart-cash"), {
+      title: "Invoiced versus paid, last 12 months",
+      rows: data.months,
+      series: [{ name: "Invoiced", key: "invoiced", color: "--c-cat-1" },
+               { name: "Paid",     key: "paid",     color: "--c-cat-2" }]
+    });
+    C.barChart($("chart-age"), {
+      rows: data.ageing.map(function(a){ return { label: a.bucket, value: a.amount }; }),
+      ramp: ["--c-ord-1","--c-ord-2","--c-ord-3","--c-ord-4"],
+      seriesName: "Owed"
+    });
+  }
+
+  fetch("data/metrics.json").then(function(r){
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  }).then(function(d){
+    data = d;
+    var c = d.current;
+    $("b-rev").textContent   = C.money(c.revenueMTD);
+    $("b-out").textContent   = C.money(c.outstanding);
+    $("b-over").textContent  = C.money(c.overdue);
+    $("b-bills").textContent = C.money(c.billsDue);
+    $("b-open").textContent  = c.openInvoices.toLocaleString();
+
+    if (c.revenueMTDPrev) {
+      var pct = ((c.revenueMTD - c.revenueMTDPrev) / c.revenueMTDPrev) * 100;
+      var d2 = $("b-rev-d");
+      d2.textContent = (pct >= 0 ? "+" : "") + pct.toFixed(0) + "% vs last month";
+      d2.className = "d " + (pct >= 0 ? "up" : "down");
+    }
+
+    var total = d.ageing.reduce(function(a,x){ return a + x.amount; }, 0);
+    $("age-total").textContent = C.money(total) + " owed";
+
+    d.months.forEach(function(m){
+      var tr = document.createElement("tr");
+      [C.monthLabel(m.m), C.moneyFull(m.invoiced), C.moneyFull(m.paid)]
+        .forEach(function(v,i){
+          var cell = document.createElement(i ? "td" : "th");
+          if (!i) cell.setAttribute("scope","row");
+          cell.textContent = v;
+          tr.appendChild(cell);
+        });
+      $("tbl-cash").appendChild(tr);
+    });
+    d.ageing.forEach(function(a){
+      var tr = document.createElement("tr");
+      var th = document.createElement("th"); th.setAttribute("scope","row");
+      th.textContent = a.bucket;
+      var td = document.createElement("td"); td.textContent = C.moneyFull(a.amount);
+      tr.appendChild(th); tr.appendChild(td);
+      $("tbl-age").appendChild(tr);
+    });
+
+    $("data-flag").hidden = !d.sample;
+    render();
+  }).catch(function(){
+    $("data-flag").hidden = false;
+    $("data-flag").textContent = "No data feed yet";
+  });
+
+  /* Both themes render from one path, so re-render when the toggle flips. */
+  new MutationObserver(render).observe(document.documentElement,
+    { attributes: true, attributeFilter: ["data-theme"] });
+  window.addEventListener("resize", function(){
+    clearTimeout(window._chartT);
+    window._chartT = setTimeout(render, 150);
+  });
+})();
 </script>

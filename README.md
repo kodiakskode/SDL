@@ -114,6 +114,57 @@ python3 scripts/build_pool.py /tmp/pool
 The script asserts on every upstream anchor it edits, so if that page changes
 shape the build fails loudly instead of producing a broken page.
 
+## Business metrics (JACK App → Xero → dashboard)
+
+The home page's KPI row and two charts read `data/metrics.json`, refreshed daily
+by `.github/workflows/sync-metrics.yml`.
+
+**Why Xero and not JACK directly.** [JACK App](https://jackapp.io) has no public
+API. Its documented outbound path is the two-way Xero sync, so Xero is the system
+of record for anything financial and the supported way to get these figures out.
+Note that the "JACK API documentation" that tops a web search belongs to
+`itsjack.com` — *Jack App Financial*, an unrelated payments company. Different
+product; those docs do not apply.
+
+**Because the dashboard is a static site, a committed file is what "live" means.**
+The Action fetches, writes `data/metrics.json`, and commits it. That keeps the
+Xero credentials in GitHub Secrets rather than the browser, needs no CORS, and
+makes git history a free backup of every snapshot — which is also where the
+chart history comes from.
+
+### Setting it up
+
+1. In Xero: **Settings → Connected apps → Custom Connection**. Custom Connections
+   are machine-to-machine (client-credentials OAuth2) — one organisation, no
+   consent screen. Grant scopes `accounting.reports.read` and
+   `accounting.transactions.read`.
+2. Add three repository secrets (**Settings → Secrets and variables → Actions**):
+   `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`, `XERO_TENANT_ID`.
+3. Run the workflow once from the **Actions** tab to confirm, then let the daily
+   schedule take over.
+
+Until those secrets exist the page serves the placeholder `data/metrics.json` and
+shows a **Sample data** flag in the header, so the figures are never mistaken for
+SDL's real numbers.
+
+### Chart colours are validated, not chosen
+
+The brand green `#5d622a` is not usable as a data mark: it fails the chroma floor
+(0.079 — it reads gray) and collapses against rust under protanopia (ΔE 2.9). The
+chart palette re-steps it to a higher-chroma olive of the same family and pairs it
+with a blue that clears CVD separation in both modes.
+
+| Role | Light | Dark |
+| --- | --- | --- |
+| Series 1 (Invoiced) | `#6f7a1f` | `#8a9445` |
+| Series 2 (Paid) | `#2a78d6` | `#4a90d0` |
+| Ageing ramp (ordinal) | `#9aa663 → #414717` | `#646d2c → #c6cf90` |
+
+The ageing ramp is **ordinal**, not categorical — the buckets have an order, so
+they take one hue in monotone lightness steps, and the ramp flips anchor in dark
+mode so the oldest bucket stays the most prominent against its surface. Re-run
+the checks after any change with the dataviz validator rather than eyeballing them.
+
 ## Publishing
 
 GitHub Pages, project site, free and ad-free. In the repository:
