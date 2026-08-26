@@ -1,19 +1,31 @@
-<header class="topbar">
-  <div class="topbar-in">
-    <a class="brandmark" href="index.html" aria-label="SDL Creations — home">
-      <img class="logo-light" src="assets/logo-light.svg" alt="SDL Creations" width="319" height="382">
-      <img class="logo-dark" src="assets/logo-dark.svg" alt="SDL Creations" width="319" height="382">
+<div class="app-shell">
+<aside class="sidebar">
+  <button type="button" class="sidebar-brand" id="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="true">
+    <img class="logo-light" src="assets/logo-light.svg" alt="SDL Creations" width="319" height="382">
+    <img class="logo-dark" src="assets/logo-dark.svg" alt="SDL Creations" width="319" height="382">
+  </button>
+  <nav class="sidebar-nav" aria-label="Primary">
+    <a class="navlink" href="index.html">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></span>
+      <span class="lbl">Home</span>
     </a>
-    <nav class="nav" aria-label="Primary">
-      <a class="navlink" href="index.html">Home</a>
-      <a class="navlink" href="leads.html">Leads</a>
-      <a class="navlink" href="pool.html">Pool Finder</a>
-      <a class="navlink" href="outreach.html">Outreach</a>
-    </nav>
-    <div class="nav-right">
-      <button type="button" class="toggle" id="theme-toggle" aria-pressed="false"
-              aria-label="Switch to dark mode"><span class="knob" aria-hidden="true">☀</span></button>
-    </div>
+    <a class="navlink" href="leads.html">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
+      <span class="lbl">Leads</span>
+    </a>
+    <a class="navlink" href="pool.html">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12z"/></svg></span>
+      <span class="lbl">Pool Finder</span>
+    </a>
+    <a class="navlink" href="outreach.html">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+      <span class="lbl">Outreach</span>
+    </a>
+  </nav>
+  <div class="sidebar-foot">
+    <button type="button" class="toggle" id="theme-toggle" aria-pressed="false"
+            aria-label="Switch to dark mode"><span class="knob" aria-hidden="true">☀</span></button>
   </div>
-</header>
+</aside>
+<div class="main-col">
 <div class="shell">

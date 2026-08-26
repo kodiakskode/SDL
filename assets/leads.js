@@ -10,8 +10,10 @@
   var CUSTOM_KEY = "sdl-custom-leads"; // localStorage: { [listId]: {label, note, rows, stats} }
 
   var DB = null;                 // { architects:{...}, designers:{...}, [customId]:{...} }
-  var BUILTIN = { architects: 1, designers: 1 };
-  var listKey = "architects";
+  // "all" is a virtual list — every real list merged — not a real DB entry;
+  // reserved here too so an imported title can't collide with it.
+  var BUILTIN = { all: 1, architects: 1, designers: 1 };
+  var listKey = "all";
   var view = [];                 // row objects passing the current filters
   var sel = Object.create(null); // key -> true, kept across filter changes
   var sortKey = "org", sortDir = 1;
@@ -26,7 +28,18 @@
     deleteBtn: $("delete-list")
   };
 
-  function rows() { return DB[listKey].rows; }
+  function rows() {
+    if (listKey !== "all") return DB[listKey].rows;
+    var out = [];
+    Object.keys(DB).forEach(function (k) { out = out.concat(DB[k].rows); });
+    return out;
+  }
+  function statsForCurrent() {
+    if (listKey !== "all") return DB[listKey].stats;
+    var all = rows(), withEmail = 0, withPhone = 0;
+    all.forEach(function (r) { if (r.email) withEmail++; if (r.phone) withPhone++; });
+    return { total: all.length, withEmail: withEmail, withPhone: withPhone, withWeb: 0 };
+  }
   function keyOf(r) { return listKey + "|" + (r.ref || "") + "|" + r.name + "|" + r.org; }
 
   function selectedRows() {
@@ -131,7 +144,7 @@
   }
 
   function counts() {
-    var d = DB[listKey].stats;
+    var d = statsForCurrent();
     el.kTotal.textContent = d.total.toLocaleString();
     el.kEmail.textContent = d.withEmail.toLocaleString();
     el.kPhone.textContent = d.withPhone.toLocaleString();
@@ -357,7 +370,6 @@
       listKey = id;
       el.region.value = ""; el.status.value = "";
       fillRegions(); fillStatuses();
-      document.getElementById("list-note").textContent = entry.note;
       el.deleteBtn.hidden = false;
       rebuild();
 
@@ -386,7 +398,6 @@
     el.deleteBtn.hidden = true;
     el.region.value = ""; el.status.value = "";
     fillRegions(); fillStatuses();
-    document.getElementById("list-note").textContent = DB[listKey].note;
     rebuild();
   }
 
@@ -396,7 +407,6 @@
       el.deleteBtn.hidden = !!BUILTIN[listKey];
       el.region.value = ""; el.status.value = "";
       fillRegions(); fillStatuses();
-      document.getElementById("list-note").textContent = DB[listKey].note;
       rebuild();
     });
 
@@ -492,7 +502,6 @@
       DB = d;
       loadAllCustomIntoDB();
       fillRegions(); fillStatuses();
-      document.getElementById("list-note").textContent = DB[listKey].note;
       wire();
       rebuild();
     })

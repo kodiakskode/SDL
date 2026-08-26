@@ -9,12 +9,21 @@ below.
 | Page | File | What it does |
 | --- | --- | --- |
 | Home | `index.html` | Overview, live counts, links into the other pages |
-| Leads | `leads.html` | 66 Sydney landscape architects + 110 Sydney landscape designers behind one dropdown |
+| Leads | `leads.html` | 66 Sydney landscape architects + 110 Sydney landscape designers + anything you import, behind one dropdown (with an All Lists option) |
 | Pool Finder | `pool.html` | 12,132 Sydney properties with a pool confirmed 20+ years old |
 | Mail List | `mail-list.html` | The mail-ready set in two value bands, reached from Pool Finder |
 | Outreach | `outreach.html` | Email templates, SMTP settings, sending and history — a RawLeads outreach tab wired to the leads above |
 
 ## Look
+
+**Layout** — a left sidebar (`.app-shell` in `scripts/_nav.html`), not a top
+bar. The logo sits in its own row at the top of the sidebar and is itself
+the toggle: click it to open or close the nav panel below it
+(`data-sidebar="collapsed"` on `<html>`, remembered in
+`localStorage.sdl-sidebar` and resolved before first paint, same mechanism
+as the theme). Narrow screens ignore that preference and always show a
+slim icon-only rail — 208px of sidebar would swallow most of a phone
+screen.
 
 **Scale** — the whole dashboard renders at 125% (`html{zoom:1.25}` in
 `assets/theme.css`), same effect as the browser's own zoom, so it applies to

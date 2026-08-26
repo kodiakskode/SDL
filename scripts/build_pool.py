@@ -224,8 +224,11 @@ def vendor(src_name, out_name, title, desc, lede, page_title):
     nav = open(os.path.join(FRAG, "_nav.html"), encoding="utf-8").read()
 
     out = os.path.join(ROOT, out_name)
+    # nav (from _nav.html) opens .app-shell/.sidebar/.main-col/.shell; body
+    # closes .shell itself (see the note-block/</details> patch above), so
+    # this only needs to close .main-col and .app-shell before the footer.
     open(out, "w", encoding="utf-8").write(
-        head + nav + body + '\n<script src="assets/app.js?v=3"></script>\n</body>\n</html>\n')
+        head + nav + body + '\n</div>\n</div>\n<script src="assets/app.js?v=4"></script>\n</body>\n</html>\n')
     print("wrote %s (%.1f MB)" % (out_name, os.path.getsize(out) / 1e6))
 
 

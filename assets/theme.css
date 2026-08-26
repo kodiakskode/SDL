@@ -127,27 +127,48 @@ body::after{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ── header chassis ────────────────────────────────────────────── */
-/* Full-bleed bar; its contents share the page's centred column, so the mark
-   lines up with the content below it at every width. */
-.topbar{
-  position:sticky;top:0;z-index:300;
-  background:linear-gradient(180deg,var(--m-chassis-top) 0%,var(--m-chassis-mid) 26%,var(--m-chassis-bot) 100%);
-  box-shadow:var(--sh-chassis);
-}
-.topbar-in{
-  max-width:var(--max);margin:0 auto;padding:var(--s2) var(--gutter);
-  display:flex;align-items:center;gap:var(--s3);min-height:56px;
-}
-.brandmark{display:flex;align-items:center;flex:none;text-decoration:none;}
-.brandmark img{height:32px;width:auto;display:block;}
-/* One mark, one per mode: green on light, light taupe on dark. */
-.brandmark img.logo-dark{display:none;}
-[data-theme="dark"] .brandmark img.logo-light{display:none;}
-[data-theme="dark"] .brandmark img.logo-dark{display:block;}
+/* ── app shell: left sidebar + content column ─────────────────────
+   The logo sits in its own row at the top of the sidebar, always visible;
+   clicking it opens/closes the nav panel below it (data-sidebar="collapsed"
+   on <html>, set before first paint by the inline snippet in _head.html so
+   it never flashes open then shut). */
+.app-shell{display:flex;align-items:stretch;min-height:100vh;}
 
-.nav{display:flex;align-items:center;gap:var(--s1);flex-wrap:wrap;}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:var(--s2);}
+.sidebar{
+  flex:none;width:208px;position:sticky;top:0;align-self:flex-start;
+  height:100vh;display:flex;flex-direction:column;overflow:hidden;
+  background:linear-gradient(180deg,var(--m-chassis-top) 0%,var(--m-chassis-mid) 26%,var(--m-chassis-bot) 100%);
+  box-shadow:inset -1px 0 0 var(--m-ring),4px 0 18px var(--m-drop);
+  transition:width .2s ease;
+  z-index:300;
+}
+[data-sidebar="collapsed"] .sidebar{width:60px;}
+
+.sidebar-brand{
+  flex:none;display:flex;align-items:center;justify-content:flex-start;
+  height:60px;padding:0 var(--s3);border:none;background:transparent;cursor:pointer;
+  box-shadow:0 1px 0 var(--m-ring);
+}
+.sidebar-brand img{height:30px;width:auto;display:block;flex:none;}
+/* One mark, one per mode: green on light, light taupe on dark. */
+.sidebar-brand img.logo-dark{display:none;}
+[data-theme="dark"] .sidebar-brand img.logo-light{display:none;}
+[data-theme="dark"] .sidebar-brand img.logo-dark{display:block;}
+
+.sidebar-nav{
+  flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--s1);
+  padding:var(--s3) var(--s2);opacity:1;transition:opacity .15s ease;
+}
+.sidebar-foot{
+  flex:none;padding:var(--s2);display:flex;justify-content:center;
+  opacity:1;transition:opacity .15s ease;
+}
+[data-sidebar="collapsed"] .sidebar-nav,
+[data-sidebar="collapsed"] .sidebar-foot{
+  opacity:0;pointer-events:none;
+}
+
+.main-col{flex:1;min-width:0;}
 
 /* ── keys ──────────────────────────────────────────────────────── */
 .navlink,.btn{
@@ -174,6 +195,15 @@ body::after{
 .btn.danger{color:#b04040;}
 [data-theme="dark"] .btn.danger{color:#e08080;}
 .btn:disabled{opacity:.45;cursor:not-allowed;}
+.navlink[hidden],.btn[hidden]{display:none;}
+
+/* sidebar nav links: same key styling, stacked full-width instead of pills */
+.sidebar-nav .navlink{
+  width:100%;height:36px;justify-content:flex-start;padding:0 12px;gap:10px;
+}
+.sidebar-nav .navlink .ico{flex:none;width:16px;height:16px;display:flex;}
+.sidebar-nav .navlink .ico svg{width:100%;height:100%;display:block;}
+.sidebar-nav .navlink .lbl{overflow:hidden;text-overflow:ellipsis;}
 
 /* sub-nav inside a page, carried over from the Pool Finder */
 .pagenav{display:flex;gap:var(--s1);}
@@ -421,9 +451,12 @@ code{font-family:var(--font-mono);font-size:.75rem;background:var(--accent-wash)
 
 @media (max-width:820px){
   :root{--gutter:14px;}
-  .topbar-in{flex-wrap:wrap;gap:var(--s2);}
-  .nav{order:3;width:100%;}
-  .nav-right{margin-left:auto;}
+  /* Narrow screens: always a slim icon-only rail, whatever the stored
+     open/closed preference — 208px would swallow most of the viewport. */
+  .sidebar,[data-sidebar="collapsed"] .sidebar{width:60px;}
+  .sidebar-nav,.sidebar-foot{opacity:1;pointer-events:auto;}
+  .sidebar-nav .navlink{justify-content:center;padding:0;}
+  .sidebar-nav .navlink .lbl{display:none;}
   h1{font-size:1.25rem;}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
