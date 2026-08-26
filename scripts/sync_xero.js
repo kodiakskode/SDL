@@ -8,12 +8,22 @@
    company whose payments API tops the search results.)
 
    Auth is a Xero Custom Connection (machine-to-machine OAuth2, client
-   credentials). It is tied to one organisation, needs no user consent screen,
-   and the token lasts 30 minutes — short enough that we just fetch a new one
-   per run. Required env:
+   credentials), created at developer.xero.com/app/manage — NOT in the Xero
+   accounting app's Connected apps page, which only lists what is already
+   connected to the org.
+
+   Required env:
      XERO_CLIENT_ID, XERO_CLIENT_SECRET   from the Custom Connection app
-     XERO_TENANT_ID                       the connected org's tenantId
-   Scopes to grant the app: accounting.reports.read accounting.transactions.read
+     XERO_TENANT_ID                       optional; see below
+
+   A Custom Connection is bound to exactly one organisation, so the token by
+   itself identifies the org and the Xero-Tenant-Id header is not required —
+   which is why XERO_TENANT_ID is optional here. It is still sent when set, so
+   the same script works unchanged against a standard OAuth2 app, where the
+   header IS required because one token can span several orgs.
+
+   Scopes to grant: accounting.transactions.read (add accounting.reports.read
+   only if you later pull Xero's own reports).
 */
 "use strict";
 
@@ -40,7 +50,7 @@ async function token() {
     },
     body: new URLSearchParams({
       grant_type: "client_credentials",
-      scope: "accounting.reports.read accounting.transactions.read"
+      scope: process.env.XERO_SCOPES || "accounting.transactions.read"
     })
   });
   if (!res.ok) throw new Error(`Xero token ${res.status}: ${await res.text()}`);
@@ -53,14 +63,12 @@ async function get(pathname, tok, params = {}) {
   const url = new URL(API + pathname);
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
 
+  const headers = { Authorization: `Bearer ${tok}`, Accept: "application/json" };
+  // Only meaningful for a multi-org OAuth2 app; a Custom Connection ignores it.
+  if (process.env.XERO_TENANT_ID) headers["Xero-Tenant-Id"] = process.env.XERO_TENANT_ID;
+
   for (let attempt = 0; attempt < 4; attempt++) {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${tok}`,
-        "Xero-Tenant-Id": need("XERO_TENANT_ID"),
-        Accept: "application/json"
-      }
-    });
+    const res = await fetch(url, { headers });
     if (res.status === 429) {
       const wait = (Number(res.headers.get("Retry-After")) || 5) * 1000;
       console.warn(`rate limited, waiting ${wait}ms`);
