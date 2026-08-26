@@ -305,9 +305,46 @@ separate **Xero Developer portal**, and there are two ways to authorise one:
    connection gets revoked or the refresh token expires from the schedule
    not running for 60+ days.
 
-Until those secrets exist the page serves the placeholder `data/metrics.json`
-and shows a **Sample data** flag in the header, so the figures are never
-mistaken for SDL's real numbers.
+Before those secrets exist the page serves a placeholder `data/metrics.json`
+and shows a **Sample data** flag in the header, so figures are never mistaken
+for real ones. That flag clears itself once the feed carries `sample: false`.
+
+### Revenue by job
+
+`accounting.settings.read` exposes Xero **Tracking Categories**, which is where
+SDL records the job an invoice belongs to (category `Jobs`, options like
+`5 Bellevue St, Chatswood`). Tracking lives on invoice **line items**, not on
+the invoice, so these calls can't use `summaryOnly` — that flag omits line
+items entirely.
+
+One invoice can span several jobs, so revenue is attributed per line.
+`AmountDue` is only known at invoice level, so it's split across that invoice's
+jobs in proportion to their line amounts.
+
+**Not every invoice is job-tagged.** At the time of writing, 69 of 132 invoices
+in the 12-month window carry no job tag — a little over half the revenue. Those
+are counted in `jobs.untaggedInvoices` / `jobs.untaggedAmount` and stated on the
+page under the chart, so the breakdown reads as the slice it is rather than as
+the whole business.
+
+### What this publishes
+
+This repository is **public**, and the dashboard is a static site that fetches
+`data/metrics.json` from the browser — so that file has to be publicly readable
+for the page to work at all. Making the repo private would not change that.
+
+Committing real Xero output therefore publishes, permanently and in git history:
+
+- SDL's revenue, outstanding, overdue and bills-due figures, refreshed daily;
+- job names, which are **client street addresses**, alongside what each was
+  invoiced and still owes.
+
+That was a deliberate choice, not an oversight. If it should ever be walked
+back, note that deleting the file is not enough — the history holds every past
+snapshot, so it would need a history rewrite, and anything already fetched or
+forked is beyond recall. The alternatives, if wanted later: serve metrics from
+the `server/` backend behind auth instead of a committed file, or keep the
+sync local and never commit real output.
 
 ### Chart colours are validated, not chosen
 

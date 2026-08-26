@@ -108,6 +108,14 @@
 
 *,*::before,*::after{box-sizing:border-box;}
 
+/* Any rule setting an explicit `display` outclasses the UA stylesheet's
+   `[hidden]{display:none}`, so an element toggled via the hidden attribute
+   stays on screen — this has already bitten the nav keys, the "Delete this
+   list" button and the Sample data flag. One global rule ends the whole
+   category; `!important` is the accepted fix here (it's what normalize.css
+   and HTML5 Boilerplate do) because `hidden` should always win. */
+[hidden]{display:none!important;}
+
 /* Whole dashboard scaled up 125% — zoom scales layout, text and px sizes
    together, so nothing needs converting to rem to keep it uniform. */
 html{zoom:var(--zoom);}
@@ -201,7 +209,7 @@ body::after{
 .btn.danger{color:#b04040;}
 [data-theme="dark"] .btn.danger{color:#e08080;}
 .btn:disabled{opacity:.45;cursor:not-allowed;}
-.navlink[hidden],.btn[hidden]{display:none;}
+/* (the global [hidden] rule near the top covers these now) */
 
 /* sidebar nav links: same key styling, stacked full-width instead of pills */
 .sidebar-nav .navlink{
@@ -570,6 +578,17 @@ code{font-family:var(--font-mono);font-size:.75rem;background:var(--accent-wash)
 .bar-row{
   display:grid;grid-template-columns:64px 1fr 58px;align-items:center;
   gap:var(--s2);padding:5px 0;cursor:default;
+}
+/* Job names are full street addresses, not "1–30" — they need a real label
+   column, and still have to truncate rather than wrap a row out of line. */
+.chart-card.wide{grid-column:1/-1;}
+.chart-card.wide .bar-row{grid-template-columns:minmax(120px,230px) 1fr 66px;}
+.chart-card.wide .bar-label{
+  font-size:.66rem;color:var(--ink-2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+@media (max-width:640px){
+  .chart-card.wide .bar-row{grid-template-columns:minmax(90px,140px) 1fr 58px;}
 }
 .bar-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
 .bar-label{font-family:var(--font-mono);font-size:.6rem;color:var(--ink-3);}

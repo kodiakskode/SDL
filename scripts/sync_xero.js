@@ -61,6 +61,7 @@ const path = require("path");
 const OUT = path.join(__dirname, "..", "data", "metrics.json");
 const API = "https://api.xero.com/api.xro/2.0";
 const MONTHS_BACK = 12;
+const TOP_JOBS = 12;   // how many jobs the home page charts; `all` keeps the rest
 
 function need(name) {
   const v = process.env[name];
@@ -101,7 +102,16 @@ async function rotateSecret() {
   const pat = process.env.GH_SECRETS_PAT;
   const repo = process.env.GITHUB_REPOSITORY;
   if (!pat || !repo || !newRefreshToken) {
-    console.log("Skipping XERO_REFRESH_TOKEN rotation (GH_SECRETS_PAT or GITHUB_REPOSITORY not set).");
+    /* Xero has ALREADY invalidated the token we came in with — it rotates on
+       every use. Printing the replacement is not optional: discard it and the
+       connection is simply dead, needing the whole browser login again. Xero
+       honours the previous token for a short grace period, which is the only
+       reason a missed rotation is ever recoverable. */
+    console.log("Could not save the rotated refresh token (GH_SECRETS_PAT / GITHUB_REPOSITORY not set).");
+    if (newRefreshToken) {
+      console.log("The OLD token is now spent. Store this replacement as XERO_REFRESH_TOKEN:");
+      console.log("  " + newRefreshToken);
+    }
     return;
   }
 
@@ -161,6 +171,75 @@ async function get(pathname, tok, params = {}) {
 
 const ym = d => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 
+/* Xero returns at most 100 invoices per page and gives no total count, so the
+   only way to know you have them all is to keep asking until a short page
+   comes back. Skipping this silently truncates every figure at 100 invoices —
+   which is exactly what an earlier version of this script did. */
+async function getAllInvoices(tok, params) {
+  const all = [];
+  for (let page = 1; page <= 100; page++) {
+    const res = await get("/Invoices", tok, { ...params, page });
+    const batch = res.Invoices || [];
+    all.push(...batch);
+    if (batch.length < 100) return all;
+  }
+  throw new Error("Invoice pagination exceeded 100 pages — refusing to loop further");
+}
+
+/* Per-job figures come from Xero Tracking Categories, which live on invoice
+   LINE ITEMS, not on the invoice — so these calls can't use summaryOnly,
+   which omits line items entirely.
+
+   A single invoice can span several jobs, so revenue is attributed per line.
+   AmountDue is only known at invoice level, so it's split across that
+   invoice's jobs in proportion to their line amounts; an invoice with no job
+   tag at all is counted in `untagged` rather than silently dropped. */
+function jobBreakdown(invoices, categoryName) {
+  const jobs = new Map();
+  let taggedInvoices = 0, untaggedInvoices = 0, untaggedAmount = 0;
+
+  const pick = li => (li.Tracking || []).find(t => t.Name === categoryName);
+
+  for (const inv of invoices) {
+    const lines = inv.LineItems || [];
+    const lineTotal = lines.reduce((a, l) => a + Math.abs(l.LineAmount || 0), 0);
+    let invoiceHasTag = false;
+
+    for (const li of lines) {
+      const tag = pick(li);
+      if (!tag || !tag.Option) continue;
+      invoiceHasTag = true;
+
+      const j = jobs.get(tag.Option) || { name: tag.Option, invoiced: 0, outstanding: 0, invoices: new Set() };
+      j.invoiced += li.LineAmount || 0;
+      // Proportional share of what's still owed on the parent invoice.
+      if (lineTotal > 0) {
+        j.outstanding += (inv.AmountDue || 0) * (Math.abs(li.LineAmount || 0) / lineTotal);
+      }
+      j.invoices.add(inv.InvoiceID);
+      jobs.set(tag.Option, j);
+    }
+
+    if (invoiceHasTag) taggedInvoices++;
+    else { untaggedInvoices++; untaggedAmount += inv.Total || 0; }
+  }
+
+  const round = n => Math.round(n);
+  const list = [...jobs.values()]
+    .map(j => ({ name: j.name, invoiced: round(j.invoiced), outstanding: round(j.outstanding), invoices: j.invoices.size }))
+    .sort((a, b) => b.invoiced - a.invoiced);
+
+  return {
+    category: categoryName,
+    totalJobs: list.length,
+    taggedInvoices,
+    untaggedInvoices,
+    untaggedAmount: round(untaggedAmount),
+    top: list.slice(0, TOP_JOBS),
+    all: list
+  };
+}
+
 async function main() {
   const tok = await token();
   const now = new Date();
@@ -169,20 +248,24 @@ async function main() {
   const from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (MONTHS_BACK - 1), 1));
 
   // ACCREC = invoices we issued. Drafts and deleted are excluded so the
-  // numbers match what Xero itself reports.
-  const invRes = await get("/Invoices", tok, {
+  // numbers match what Xero itself reports. Full detail (no summaryOnly) so
+  // line-item Tracking comes through for the per-job breakdown.
+  const invoices = await getAllInvoices(tok, {
     where: `Type=="ACCREC" AND Date>=DateTime(${from.getUTCFullYear()},${from.getUTCMonth() + 1},1) `
          + `AND Status!="DELETED" AND Status!="VOIDED" AND Status!="DRAFT"`,
-    order: "Date ASC", page: 1, summaryOnly: "true"
+    order: "Date ASC"
   });
-  const invoices = invRes.Invoices || [];
 
-  // ACCPAY = bills we owe.
-  const billRes = await get("/Invoices", tok, {
+  // ACCPAY = bills we owe. Only the totals matter here, so summary is enough.
+  const bills = await getAllInvoices(tok, {
     where: `Type=="ACCPAY" AND Status=="AUTHORISED"`,
     summaryOnly: "true"
   });
-  const bills = billRes.Invoices || [];
+
+  // Which tracking category holds job names — usually literally "Jobs".
+  const tcRes = await get("/TrackingCategories", tok);
+  const activeCat = (tcRes.TrackingCategories || []).find(c => c.Status === "ACTIVE");
+  const jobs = activeCat ? jobBreakdown(invoices, activeCat.Name) : null;
 
   const months = [];
   for (let i = MONTHS_BACK - 1; i >= 0; i--) {
@@ -238,12 +321,18 @@ async function main() {
       openInvoices
     },
     months: months.map(m => ({ m: m.m, invoiced: round(m.invoiced), paid: round(m.paid) })),
-    ageing: Object.entries(ageing).map(([bucket, amount]) => ({ bucket, amount: round(amount) }))
+    ageing: Object.entries(ageing).map(([bucket, amount]) => ({ bucket, amount: round(amount) })),
+    jobs
   };
 
   fs.writeFileSync(OUT, JSON.stringify(out, null, 2) + "\n");
   console.log(`wrote ${OUT} — ${invoices.length} invoices, ${months.length} months, `
             + `$${round(outstanding).toLocaleString()} outstanding`);
+  if (jobs) {
+    console.log(`jobs: ${jobs.totalJobs} tracked via "${jobs.category}"; `
+              + `${jobs.taggedInvoices} invoices tagged, ${jobs.untaggedInvoices} untagged `
+              + `($${jobs.untaggedAmount.toLocaleString()})`);
+  }
 
   // Xero already rotated the refresh token the moment token() used the old
   // one — write the new one back now, or the next scheduled run fails.

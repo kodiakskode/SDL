@@ -6,7 +6,7 @@
 <title>Dashboard · SDL Creations</title>
 <meta name="description" content="SDL Creations dashboard — leads, pool finder and outreach.">
 <link rel="icon" href="assets/logo-light.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/theme.css?v=5">
+<link rel="stylesheet" href="assets/theme.css?v=6">
 <script>
 /* Resolve the theme and sidebar open/closed state before first paint so the
    page never flashes the wrong one. */
@@ -112,6 +112,22 @@ if(localStorage.getItem("sdl-sidebar")==="collapsed"){document.documentElement.s
       </details>
     </div>
   </div>
+
+  <div class="chart-card wide" id="jobs-card" hidden>
+    <div class="chart-head">
+      <span class="chart-title">Revenue by job</span>
+      <span class="chart-sub" id="jobs-sub"></span>
+    </div>
+    <div class="chart-body">
+      <div id="chart-jobs"></div>
+      <p class="eyebrow" id="jobs-untagged" style="margin-top:var(--s2)"></p>
+      <details class="chart-table-wrap"><summary>Table &mdash; every job</summary>
+        <table class="chart-table"><thead><tr>
+          <th>Job</th><th>Invoiced</th><th>Outstanding</th><th>Invoices</th>
+        </tr></thead><tbody id="tbl-jobs"></tbody></table>
+      </details>
+    </div>
+  </div>
 </div>
 
 <p class="eyebrow">Leads</p>
@@ -197,6 +213,15 @@ fetch("data/leads.json").then(function(r){return r.json();}).then(function(d){
       ramp: ["--c-ord-1","--c-ord-2","--c-ord-3","--c-ord-4"],
       seriesName: "Owed"
     });
+    /* Jobs are ranked, not categorical — bar length already encodes the value,
+       so a single hue reads cleaner than colouring each job differently. */
+    if (data.jobs && data.jobs.top.length) {
+      C.barChart($("chart-jobs"), {
+        rows: data.jobs.top.map(function(j){ return { label: j.name, value: j.invoiced }; }),
+        ramp: ["--c-cat-1"],
+        seriesName: "Invoiced"
+      });
+    }
   }
 
   fetch("data/metrics.json").then(function(r){
@@ -240,6 +265,29 @@ fetch("data/leads.json").then(function(r){return r.json();}).then(function(d){
       tr.appendChild(th); tr.appendChild(td);
       $("tbl-age").appendChild(tr);
     });
+
+    if (d.jobs && d.jobs.top.length) {
+      $("jobs-card").hidden = false;
+      $("jobs-sub").textContent = d.jobs.totalJobs.toLocaleString() + " jobs · top "
+        + d.jobs.top.length + " shown";
+      /* Most revenue here isn't job-tagged in Xero, so say so on the page —
+         otherwise the chart reads as the whole business rather than a slice. */
+      if (d.jobs.untaggedInvoices) {
+        $("jobs-untagged").textContent = d.jobs.untaggedInvoices.toLocaleString()
+          + " invoices (" + C.money(d.jobs.untaggedAmount) + ") carry no job tag and are not shown above";
+      }
+      d.jobs.all.forEach(function(j){
+        var tr = document.createElement("tr");
+        var th = document.createElement("th"); th.setAttribute("scope","row");
+        th.textContent = j.name;
+        tr.appendChild(th);
+        [C.moneyFull(j.invoiced), C.moneyFull(j.outstanding), String(j.invoices)]
+          .forEach(function(v){
+            var td = document.createElement("td"); td.textContent = v; tr.appendChild(td);
+          });
+        $("tbl-jobs").appendChild(tr);
+      });
+    }
 
     $("data-flag").hidden = !d.sample;
     render();
