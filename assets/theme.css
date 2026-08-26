@@ -102,6 +102,10 @@
 
 *,*::before,*::after{box-sizing:border-box;}
 
+/* Whole dashboard scaled up 125% — zoom scales layout, text and px sizes
+   together, so nothing needs converting to rem to keep it uniform. */
+html{zoom:1.25;}
+
 body{
   margin:0;
   min-height:100vh;
@@ -167,6 +171,8 @@ body::after{
 [data-theme="dark"] .navlink[aria-current="page"],
 [data-theme="dark"] .btn.on{color:var(--accent-2);}
 .btn.primary{color:var(--accent);}
+.btn.danger{color:#b04040;}
+[data-theme="dark"] .btn.danger{color:#e08080;}
 .btn:disabled{opacity:.45;cursor:not-allowed;}
 
 /* sub-nav inside a page, carried over from the Pool Finder */

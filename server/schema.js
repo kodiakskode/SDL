@@ -69,4 +69,17 @@ module.exports = function applySchema(db) {
     );
     CREATE INDEX IF NOT EXISTS idx_leads_user ON leads(user_id);
   `);
+
+  // NOT part of the RawLeads extraction. `leads.source` doubles as a "which
+  // list is this lead in" tag (seed-leads.js sets 'architects'/'designers';
+  // server/leads.js's import route sets a slug per uploaded CSV/Excel file).
+  // This table just holds the human-readable label for each of those ids so
+  // the dashboard and the Outreach tab's list filter can display real names
+  // instead of slugs.
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS lead_lists (
+      id TEXT PRIMARY KEY, user_id INTEGER REFERENCES users(id),
+      label TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now'))
+    );
+  `);
 };

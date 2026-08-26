@@ -43,20 +43,6 @@ async function api(path, opts = {}) {
 // BEGIN verbatim OutreachTab.jsx (kodiakskode/rawleads src/OutreachTab.jsx)
 // ─────────────────────────────────────────────────────────────────────────
 
-// The lead picker inside OutreachSend (below) renders a small source-icon
-// badge per row. In the original app.html these three are defined next to
-// LeadsTab (app.html:2669-2682), outside the 3056-4756 range this file was
-// extracted from — without them OutreachSend throws a ReferenceError the
-// moment it renders a lead row. Pulled in verbatim from that location.
-const SRC_ICON = {
-  all:           (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>),
-  google_maps:   (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>),
-  instagram:     (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>),
-  google_search: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>),
-};
-const SRC_LABEL = { all:'All Leads', google_maps:'Google Maps', instagram:'Instagram', google_search:'Google Search' };
-const srcCellClass = src => src === 'instagram' ? 'ig' : src === 'google_search' ? 'web' : 'maps';
-
 // ── Outreach Tab ──────────────────────────────────────────────────────────────
 function OutreachTab() {
   const [view, setView]             = useState('send');
@@ -952,6 +938,10 @@ function OutreachSend({ smtp, templates, setTemplates }) {
   const [search, setSearch]         = useState('');
   const [source, setSource]         = useState('all');
   const [selectedIds, setSelectedIds] = useState(new Set());
+  // Which lists exist (architects/designers plus anything imported on the
+  // Leads page) — not part of the rawleads extraction, which hard-coded
+  // google_maps/instagram/google_search instead of real, user-named lists.
+  const [lists, setLists]           = useState([]);
   const timer = useRef(null);
 
   function fetchLeads(s, src) {
@@ -960,7 +950,11 @@ function OutreachSend({ smtp, templates, setTemplates }) {
       .then(d => { setLeads(d.leads || []); setTotal(d.total || 0); })
       .catch(() => {}).finally(() => setLoadingLeads(false));
   }
-  useEffect(() => { fetchLeads('', 'all'); }, []);
+  useEffect(() => {
+    fetchLeads('', 'all');
+    api('/leads/lists').then(d => setLists(d.lists || [])).catch(() => {});
+  }, []);
+  const listLabel = id => (lists.find(l => l.id === id) || {}).label || id;
 
   function onSearch(v) {
     setSearch(v); clearTimeout(timer.current);
@@ -1357,11 +1351,12 @@ function OutreachSend({ smtp, templates, setTemplates }) {
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', color: 'var(--muted)' }}>RECIPIENTS</div>
           <input className="inp" style={{ marginBottom: 0, maxWidth: 200, fontSize: 13 }}
             placeholder="Search…" value={search} onChange={e => onSearch(e.target.value)} />
-          <select className="inp" style={{ marginBottom: 0, maxWidth: 150, fontSize: 13 }}
+          <select className="inp" style={{ marginBottom: 0, maxWidth: 180, fontSize: 13 }}
             value={source} onChange={e => { setSource(e.target.value); setSelectedIds(new Set()); fetchLeads(search, e.target.value); }}>
-            <option value="all">All sources</option>
-            <option value="google_maps">Google Maps</option>
-            <option value="instagram">Instagram</option>
+            <option value="all">All lists</option>
+            {lists.map(l => (
+              <option key={l.id} value={l.id}>{l.label} ({l.count})</option>
+            ))}
           </select>
           <span style={{ fontSize: 12, color: 'var(--muted)' }}>{total.toLocaleString()} with email</span>
           {selectedIds.size > 0 && (
@@ -1373,7 +1368,7 @@ function OutreachSend({ smtp, templates, setTemplates }) {
             <thead>
               <tr>
                 <th style={{ width: 34 }}><input type="checkbox" checked={leads.length > 0 && selectedIds.size === leads.length} onChange={toggleAll} style={{ accentColor: 'var(--teal)' }} /></th>
-                <th>Name / Account</th><th>Email</th><th>Src</th><th>Location</th>
+                <th>Name / Account</th><th>Email</th><th>List</th><th>Location</th>
               </tr>
             </thead>
             <tbody>
@@ -1391,7 +1386,7 @@ function OutreachSend({ smtp, templates, setTemplates }) {
                             {isIg && l.ig_handle && <div style={{ fontSize: 11, color: 'var(--teal)' }}>@{l.ig_handle}</div>}
                           </td>
                           <td style={{ fontSize: 12, color: 'var(--teal)' }}>{l.email}</td>
-                          <td><span className={'src-cell sm ' + srcCellClass(l.source || 'google_maps')} title={SRC_LABEL[l.source] || 'Google Maps'}>{SRC_ICON[l.source] || SRC_ICON.google_maps}</span></td>
+                          <td><span className="tag tag-teal">{listLabel(l.source)}</span></td>
                           <td style={{ fontSize: 12, color: 'var(--muted)' }}>{l.location || '—'}</td>
                         </tr>
                       );

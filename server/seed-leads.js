@@ -5,8 +5,11 @@
  * dashboard's leads live in a static JSON file (no accounts, no database);
  * this is the bridge that gives the Outreach tab something to send to.
  *
- * Safe to call on every boot: it only inserts rows whose id isn't already
- * present, so re-running after editing data/leads.json just adds new leads.
+ * Safe to call on every boot: leads are upserted by id, so re-running after
+ * editing data/leads.json updates existing rows and adds new ones. Each of
+ * the two built-in lists also gets a row in `lead_lists` (id 'architects' /
+ * 'designers') so the Outreach tab's list filter has a real label to show,
+ * the same way an uploaded CSV/Excel list does (see server/leads.js).
  */
 const fs   = require('fs');
 const path = require('path');
@@ -43,21 +46,32 @@ module.exports = function seedLeads(db, dataPath) {
 
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   const rows = [
-    ...rowsFrom(data.architects?.rows || [], 'arch', 'google_search'),
-    ...rowsFrom(data.designers?.rows || [], 'land', 'google_maps'),
+    ...rowsFrom(data.architects?.rows || [], 'arch', 'architects'),
+    ...rowsFrom(data.designers?.rows || [], 'land', 'designers'),
   ];
 
-  const insert = db.prepare(`
-    INSERT OR IGNORE INTO leads
+  const upsertList = db.prepare(`
+    INSERT INTO lead_lists (id, user_id, label) VALUES (@id, @user_id, @label)
+    ON CONFLICT(id) DO UPDATE SET label = excluded.label
+  `);
+  upsertList.run({ id: 'architects', user_id: ADMIN_USER_ID, label: data.architects?.label || 'Landscape Architects' });
+  upsertList.run({ id: 'designers',  user_id: ADMIN_USER_ID, label: data.designers?.label  || 'Landscape Designers' });
+
+  const upsert = db.prepare(`
+    INSERT INTO leads
       (id, user_id, business_name, phone, email, address, industry, location, website, source)
     VALUES (@id, @user_id, @business_name, @phone, @email, @address, @industry, @location, @website, @source)
+    ON CONFLICT(id) DO UPDATE SET
+      business_name = excluded.business_name, phone = excluded.phone, email = excluded.email,
+      address = excluded.address, industry = excluded.industry, location = excluded.location,
+      website = excluded.website, source = excluded.source
   `);
-  const insertAll = db.transaction(rs => {
+  const upsertAll = db.transaction(rs => {
     let n = 0;
-    for (const r of rs) { const info = insert.run({ ...r, user_id: ADMIN_USER_ID }); n += info.changes; }
+    for (const r of rs) { const info = upsert.run({ ...r, user_id: ADMIN_USER_ID }); n += info.changes; }
     return n;
   });
 
-  const inserted = insertAll(rows);
-  return { inserted, total: rows.length };
+  const upserted = upsertAll(rows);
+  return { inserted: upserted, total: rows.length };
 };

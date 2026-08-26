@@ -16,6 +16,11 @@ below.
 
 ## Look
 
+**Scale** — the whole dashboard renders at 125% (`html{zoom:1.25}` in
+`assets/theme.css`), same effect as the browser's own zoom, so it applies to
+every page — including the vendored Pool Finder/Mail List and the Outreach
+tab — without converting anything to rem.
+
 **Type** — Helvetica throughout (`--font-ui`, `--font-num` and `--font-mono` all
 resolve to `"Helvetica Neue", Helvetica, Arial, sans-serif`). No web font, so
 nothing to load — every page, including the vendored Pool Finder and Mail List
@@ -61,9 +66,30 @@ first, either order works.
 - **Leads** — *Copy emails* (comma-separated, de-duplicated, ready for a To:
   field), *Copy phones*, or *Copy rows as CSV*.
 
-Nothing is uploaded. Lead status, notes and the theme live in this browser's
-`localStorage`, so they are per-device. The Pool Finder's **Back up** /
-**Restore** buttons move that tracking to another machine.
+Lead status, notes and the theme live in this browser's `localStorage`, so
+they are per-device. The Pool Finder's **Back up** / **Restore** buttons move
+that tracking to another machine.
+
+### Importing your own list
+
+**Import CSV / Excel…**, next to the List dropdown on the Leads page, adds a
+new list from a `.csv`, `.xlsx` or `.xls` file — pick a title for it and it
+behaves exactly like Landscape Architects/Designers: filter, tick, copy. It's
+matched against common header names (Business/Company/Org, Name, Email,
+Phone/Mobile, Suburb/City, Postcode, Region/State, Website, Type, Status —
+case-insensitive, any subset); a single-column file with no header is read as
+a bare list of emails or names. Parsing is entirely client-side (CSV by hand,
+Excel via [SheetJS](https://sheetjs.com), vendored at
+`assets/js/xlsx.full.min.js`) and the result is saved to this browser's
+`localStorage`, same as everything else on this page — **Delete this list**
+removes it again, only from this device.
+
+If the Outreach backend (see below) is reachable, the import is also posted
+to it — `POST /leads/import` — so the new list shows up as a filterable
+option on the Outreach tab's recipient picker alongside the built-in lists,
+next to everyone else's email. If the backend isn't reachable at import time,
+the list still works fine on the Leads page; it just isn't sendable from
+Outreach until you import it again with a live connection.
 
 ## Layout
 
@@ -142,7 +168,7 @@ accounts needed a bit more glue than "drop it into your Express app":
 
 | File | Why |
 | --- | --- |
-| `server/leads.js` | Lists leads for the send picker — the route existed in RawLeads' full server.js but wasn't part of the outreach extraction. |
+| `server/leads.js` | Lists leads for the send picker (the route existed in RawLeads' full server.js but wasn't part of the outreach extraction), plus list management: `GET /leads/lists`, `POST /leads/import` and `DELETE /leads/lists/:id` back the Leads page's CSV/Excel importer and the Outreach tab's list filter. |
 | `server/seed-leads.js` | Idempotently imports `data/leads.json` into the SQL `leads` table `server/outreach.js` sends from — the dashboard's leads are a static JSON file, not a database. |
 
 **No login.** There are no user accounts anywhere on this dashboard, and the

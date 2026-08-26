@@ -1,9 +1,16 @@
-/* Leads table: two lists behind one dropdown, filtered and sorted client-side.
-   750 rows per list renders fast enough without virtualisation. */
+/* Leads table: any number of lists behind one dropdown, filtered and sorted
+   client-side. architects/designers come from data/leads.json; anything
+   imported via "Import CSV / Excel…" is parsed in the browser, kept in this
+   device's localStorage (matching how the rest of the dashboard stores
+   things), and — best effort, if the Outreach backend is reachable — synced
+   there too so it shows up as a filterable list on the Outreach tab. */
 (function () {
   "use strict";
 
-  var DB = null;                 // { architects:{...}, designers:{...} }
+  var CUSTOM_KEY = "sdl-custom-leads"; // localStorage: { [listId]: {label, note, rows, stats} }
+
+  var DB = null;                 // { architects:{...}, designers:{...}, [customId]:{...} }
+  var BUILTIN = { architects: 1, designers: 1 };
   var listKey = "architects";
   var view = [];                 // row objects passing the current filters
   var sel = Object.create(null); // key -> true, kept across filter changes
@@ -14,7 +21,9 @@
     list: $("f-list"), q: $("q"), region: $("f-region"), contact: $("f-contact"),
     status: $("f-status"), tbody: $("tb"), empty: $("empty"), tally: $("tally"),
     note: $("note"), selCount: $("sel-count"), all: $("check-all"),
-    kTotal: $("k-total"), kEmail: $("k-email"), kPhone: $("k-phone"), kShown: $("k-shown")
+    kTotal: $("k-total"), kEmail: $("k-email"), kPhone: $("k-phone"), kShown: $("k-shown"),
+    importBtn: $("import-list"), importFile: $("import-file"), importNote: $("import-note"),
+    deleteBtn: $("delete-list")
   };
 
   function rows() { return DB[listKey].rows; }
@@ -149,14 +158,255 @@
     });
   }
 
+  /* ── custom (imported) lists ──────────────────────────────────── */
+  function loadCustom() {
+    try { return JSON.parse(localStorage.getItem(CUSTOM_KEY) || "{}"); }
+    catch (e) { return {}; }
+  }
+  function saveCustom(custom) {
+    try { localStorage.setItem(CUSTOM_KEY, JSON.stringify(custom)); } catch (e) {}
+  }
+
+  function slugify(title) {
+    var s = String(title).trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return (s || "list").slice(0, 60);
+  }
+
+  function statsFor(rowsArr) {
+    var withEmail = 0, withPhone = 0;
+    rowsArr.forEach(function (r) { if (r.email) withEmail++; if (r.phone) withPhone++; });
+    return { total: rowsArr.length, withEmail: withEmail, withPhone: withPhone, withWeb: 0 };
+  }
+
+  function addCustomListOption(id, label) {
+    var opt = document.createElement("option");
+    opt.value = id; opt.textContent = label;
+    el.list.appendChild(opt);
+  }
+
+  function loadAllCustomIntoDB() {
+    var custom = loadCustom();
+    Object.keys(custom).forEach(function (id) {
+      DB[id] = custom[id];
+      addCustomListOption(id, custom[id].label);
+    });
+  }
+
+  /* ── file parsing ─────────────────────────────────────────────── */
+  function parseCSV(text) {
+    // Hand-rolled RFC4180-ish parser: quoted fields, escaped "" quotes,
+    // commas/newlines inside quotes, \r\n or \n line endings.
+    var rows = [], row = [], field = "", inQuotes = false, i = 0, n = text.length;
+    while (i < n) {
+      var c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+          inQuotes = false; i++; continue;
+        }
+        field += c; i++; continue;
+      }
+      if (c === '"') { inQuotes = true; i++; continue; }
+      if (c === ",") { row.push(field); field = ""; i++; continue; }
+      if (c === "\r") { i++; continue; }
+      if (c === "\n") { row.push(field); rows.push(row); row = []; field = ""; i++; continue; }
+      field += c; i++;
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(function (r) { return r.length > 1 || r[0] !== ""; });
+  }
+
+  var HEADER_ALIASES = {
+    org:      ["business", "business name", "company", "organisation", "organization", "org", "employer"],
+    name:     ["name", "full name", "contact", "contact name", "person"],
+    email:    ["email", "e-mail", "email address", "contact email"],
+    phone:    ["phone", "telephone", "mobile", "contact number", "phone number", "tel"],
+    suburb:   ["suburb", "city", "town", "address", "location"],
+    postcode: ["postcode", "post code", "zip", "zip code"],
+    region:   ["region", "state", "area"],
+    website:  ["website", "url", "web", "site", "web site"],
+    type:     ["type", "category", "industry", "role"],
+    status:   ["status"]
+  };
+
+  function mapHeaders(headers) {
+    var norm = headers.map(function (h) { return String(h || "").trim().toLowerCase(); });
+    var map = {}; // field -> column index
+    Object.keys(HEADER_ALIASES).forEach(function (field) {
+      var aliases = HEADER_ALIASES[field];
+      for (var i = 0; i < norm.length; i++) {
+        if (aliases.indexOf(norm[i]) !== -1 && map[field] === undefined) { map[field] = i; break; }
+      }
+    });
+    return map;
+  }
+
+  function rowsFromTable(table) {
+    // table: array of arrays, first row = headers
+    if (!table.length) return [];
+    var headers = table[0], map = mapHeaders(headers);
+    var hasAnyMap = Object.keys(map).length > 0;
+    var body = table.slice(1);
+
+    // No recognisable headers and exactly one column: treat every non-empty
+    // cell (including the first row) as a bare email/name list.
+    if (!hasAnyMap && headers.length === 1) {
+      return table.filter(function (r) { return r[0] && r[0].trim(); }).map(function (r) {
+        var v = r[0].trim();
+        return /@/.test(v) ? { email: v } : { org: v };
+      });
+    }
+
+    return body.map(function (r) {
+      var out = {};
+      Object.keys(map).forEach(function (field) {
+        var v = r[map[field]];
+        if (v != null && String(v).trim()) out[field] = String(v).trim();
+      });
+      return out;
+    }).filter(function (o) { return Object.keys(o).length > 0; });
+  }
+
+  function rowsFromXlsx(workbook) {
+    var sheet = workbook.Sheets[workbook.SheetNames[0]];
+    var table = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false, defval: "" });
+    return rowsFromTable(table);
+  }
+
+  function toLeadRow(raw, i) {
+    return {
+      name: raw.name || "", org: raw.org || (raw.name ? "" : ""), suburb: raw.suburb || "",
+      postcode: raw.postcode || "", region: raw.region || "Imported",
+      email: raw.email || "", phone: raw.phone || "", website: raw.website || "",
+      ref: "", type: raw.type || "Imported contact",
+      status: raw.status || "Unverified", statusNote: "From an imported CSV/Excel file",
+      source: ""
+    };
+  }
+
+  function apiBase() {
+    return window.SDL_OUTREACH_API_BASE || "http://localhost:3021/rawleads/api";
+  }
+
+  function syncImportToBackend(title, rawRows) {
+    // Best effort — the outreach backend may not be deployed/reachable yet.
+    // Local storage above is the source of truth for this page either way.
+    fetch(apiBase() + "/leads/import", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: title,
+        rows: rawRows.map(function (r) {
+          return {
+            business_name: r.org || r.name || "", email: r.email || "", phone: r.phone || "",
+            address: [r.suburb, r.postcode].filter(Boolean).join(" "),
+            industry: r.type || "", location: r.region || "", website: r.website || ""
+          };
+        })
+      })
+    }).then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function () {
+        SDL.flash(el.importNote, "Imported — also synced to the Outreach tab");
+      })
+      .catch(function () {
+        SDL.flash(el.importNote, "Imported — saved on this device (Outreach server not reachable to sync)");
+      });
+  }
+
+  function handleImport(file) {
+    var title = window.prompt("Title for this list (e.g. “Referral partners 2026”):", file.name.replace(/\.[^.]+$/, ""));
+    if (!title || !title.trim()) return;
+    title = title.trim();
+
+    var isExcel = /\.(xlsx|xls)$/i.test(file.name);
+    var reader = new FileReader();
+    reader.onerror = function () { SDL.flash(el.importNote, "Could not read that file"); };
+    reader.onload = function () {
+      var raw;
+      try {
+        if (isExcel) {
+          var wb = XLSX.read(new Uint8Array(reader.result), { type: "array" });
+          raw = rowsFromXlsx(wb);
+        } else {
+          raw = rowsFromTable(parseCSV(String(reader.result)));
+        }
+      } catch (e) {
+        SDL.flash(el.importNote, "Could not parse that file — is it a valid CSV/Excel file?");
+        return;
+      }
+      if (!raw.length) { SDL.flash(el.importNote, "No rows found in that file"); return; }
+
+      var rowsArr = raw.map(toLeadRow);
+      var custom = loadCustom();
+      var id = "custom-" + slugify(title);
+      if (custom[id] || BUILTIN[id]) {
+        var n = 2;
+        while (custom["custom-" + slugify(title) + "-" + n] || BUILTIN["custom-" + slugify(title) + "-" + n]) n++;
+        id = "custom-" + slugify(title) + "-" + n;
+      }
+
+      var entry = {
+        label: title, note: rowsArr.length + " contacts imported from " + file.name + ".",
+        rows: rowsArr, stats: statsFor(rowsArr)
+      };
+      custom[id] = entry;
+      saveCustom(custom);
+
+      DB[id] = entry;
+      addCustomListOption(id, title);
+      el.list.value = id;
+      listKey = id;
+      el.region.value = ""; el.status.value = "";
+      fillRegions(); fillStatuses();
+      document.getElementById("list-note").textContent = entry.note;
+      el.deleteBtn.hidden = false;
+      rebuild();
+
+      SDL.flash(el.importNote, rowsArr.length + " contacts imported as “" + title + "”");
+      syncImportToBackend(title, raw);
+    };
+    if (isExcel) reader.readAsArrayBuffer(file); else reader.readAsText(file);
+  }
+
+  function deleteCurrentList() {
+    if (BUILTIN[listKey]) return;
+    if (!window.confirm('Delete the list "' + DB[listKey].label + '"? This only removes it from this device.')) return;
+    var id = listKey;
+    var custom = loadCustom();
+    delete custom[id];
+    saveCustom(custom);
+    delete DB[id];
+    var opt = el.list.querySelector('option[value="' + id.replace(/"/g, '\\"') + '"]');
+    if (opt) opt.remove();
+
+    // best effort backend cleanup too
+    fetch(apiBase() + "/leads/lists/" + encodeURIComponent(id), { method: "DELETE" }).catch(function () {});
+
+    listKey = "architects";
+    el.list.value = listKey;
+    el.deleteBtn.hidden = true;
+    el.region.value = ""; el.status.value = "";
+    fillRegions(); fillStatuses();
+    document.getElementById("list-note").textContent = DB[listKey].note;
+    rebuild();
+  }
+
   function wire() {
     el.list.addEventListener("change", function () {
       listKey = el.list.value;
+      el.deleteBtn.hidden = !!BUILTIN[listKey];
       el.region.value = ""; el.status.value = "";
       fillRegions(); fillStatuses();
       document.getElementById("list-note").textContent = DB[listKey].note;
       rebuild();
     });
+
+    el.importBtn.addEventListener("click", function () { el.importFile.click(); });
+    el.importFile.addEventListener("change", function () {
+      var f = el.importFile.files && el.importFile.files[0];
+      el.importFile.value = ""; // allow re-selecting the same file later
+      if (f) handleImport(f);
+    });
+    el.deleteBtn.addEventListener("click", deleteCurrentList);
 
     [el.q, el.region, el.contact, el.status].forEach(function (c) {
       c.addEventListener("input", rebuild);
@@ -240,6 +490,7 @@
     })
     .then(function (d) {
       DB = d;
+      loadAllCustomIntoDB();
       fillRegions(); fillStatuses();
       document.getElementById("list-note").textContent = DB[listKey].note;
       wire();
