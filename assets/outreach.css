@@ -118,9 +118,10 @@
 /* ── Data-source selector (text keycap buttons) ──────────────── */
 /* ── Source selector — seg-style: flat tray, transparent inactive, lit active ── */
 .rl-outreach .src-tray {display:inline-flex;gap:4px;padding:5px;border-radius:11px;background:linear-gradient(180deg,var(--tray-top),var(--tray-bot));box-shadow:inset 0 4px 10px var(--tray-recess),inset 0 -2px 1px var(--tray-lip),0 1px 0 var(--edge-light);transition:background 280ms ease}
-.rl-outreach .src-btn {border:none;cursor:pointer;color:var(--cream-300);background:transparent;display:inline-flex;align-items:center;justify-content:center;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif,-apple-system,sans-serif;padding:8px 14px;border-radius:8px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.64rem;white-space:nowrap;transition:all 90ms}
-.rl-outreach .src-btn:hover:not(.active) {color:var(--cream-100)}
-.rl-outreach .src-btn.active {color:#d6e7b8;background:radial-gradient(ellipse 80% 90% at 50% 60%,rgba(184,206,109,.8),rgba(107,109,43,.5) 50%,transparent 82%),linear-gradient(180deg,#222212,#160a05);box-shadow:inset 0 1px 0 rgba(202,221,154,.22),inset 0 2px 7px rgba(8,3,0,.7),0 0 14px -2px rgba(154,164,64,.5);text-shadow:0 0 7px rgba(198,212,125,.55);animation:filament-flicker 3.9s linear infinite 0.65s}
+.rl-outreach .src-btn {border:none;cursor:pointer;color:var(--ink-2);background:transparent;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-ui);padding:8px 14px;border-radius:var(--r-sm);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.64rem;white-space:nowrap;transition:color 90ms}
+.rl-outreach .src-btn:hover:not(.active) {color:var(--ink)}
+.rl-outreach .src-btn.active {color:var(--accent-3);background:var(--accent-wash);box-shadow:var(--sh-field)}
+[data-theme="dark"] .rl-outreach .src-btn.active{color:var(--accent-2)}
 /* ── Large icon keycap (page-level primary actions) ────────── */
 .rl-outreach .key {
   position:relative;border:none;cursor:pointer;
@@ -394,61 +395,55 @@
 .rl-outreach select option {background:var(--panel-700)}
 .rl-outreach input::placeholder {color:var(--faint)}
 /* ── Content Buttons ─────────────────────────────────────────────── */
-.rl-outreach button {cursor:pointer;border:none;border-radius:5px;font-size:13px;font-weight:600;transition:all .1s;font-family:inherit;letter-spacing:.02em}
+/* Every button in this panel now shares the dashboard's metal-key look
+   (theme.css's --face-top/--face-bot/--sh-key recipe) instead of its own
+   dark "hardware console" palette, so it reads as one system with the
+   sidebar and the rest of the site. */
+.rl-outreach button {cursor:pointer;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:700;transition:box-shadow .12s ease,color .12s ease,transform .08s ease;font-family:inherit;letter-spacing:.02em}
 .rl-outreach .btn {
-  background:linear-gradient(180deg,#242018,#181511);
-  color:var(--dim);padding:10px 18px;
-  border:1px solid rgba(0,0,0,.55);
-  box-shadow:0 2px 5px rgba(0,0,0,.5),inset 0 1px 0 rgba(184,216,139,.06),inset 0 -1px 0 rgba(0,0,0,.35);
-}
-.rl-outreach .btn:hover:not(:disabled) {background:linear-gradient(180deg,#302A1E,#241E16);color:var(--text);border-color:rgba(0,0,0,.6)}
-.rl-outreach .btn:active:not(:disabled) {background:linear-gradient(180deg,#0A0906,#111009);box-shadow:inset 0 2px 6px rgba(0,0,0,.8),inset 0 -1px 0 rgba(184,216,139,.02)}
-/* btn-teal — smoked plastic primary action, internal amber LED */
-.rl-outreach .btn-teal {
-  color:#d6e7b8;
-  padding:15px 22px;border-radius:7px;line-height:1;
-  background:
-    radial-gradient(ellipse 75% 80% at 50% 70%,rgba(165,188,85,.88) 0%,rgba(149,155,61,.72) 20%,rgba(98,99,37,.50) 44%,rgba(37,37,13,.26) 68%,transparent 84%),
-    radial-gradient(ellipse 50% 35% at 50% 22%,rgba(186,198,85,.16) 0%,transparent 70%),
-    linear-gradient(180deg,rgba(40,37,33,.97),rgba(24,22,18,.99));
+  background:linear-gradient(180deg,var(--face-top),var(--face-bot));
+  color:var(--ink-2);padding:10px 18px;
   border:none;
-  box-shadow:
-    inset 0 1px 0 rgba(198,220,150,.24),
-    inset 0 3px 8px rgba(12,4,1,.62),
-    inset 0 -2px 6px rgba(144,151,59,.17),
-    inset 0 -1px 0 rgba(0,0,0,.88),
-    0 4px 0 rgba(10,4,1,.88),
-    0 8px 18px -4px rgba(0,0,0,.6),
-    0 0 22px -2px rgba(144,155,61,.62),
-    0 0 10px -1px rgba(189,201,92,.48);
-  filter:drop-shadow(0 0 4px rgba(142,151,60,.38));
-  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
-  animation:filament-flicker 6.3s linear infinite 2.2s;
+  box-shadow:var(--sh-key);
 }
-.rl-outreach .btn-teal:hover:not(:disabled) {
-  filter:drop-shadow(0 0 7px rgba(142,151,60,.58));color:#dcecc8;
+.rl-outreach .btn:hover:not(:disabled) {color:var(--ink)}
+.rl-outreach .btn:active:not(:disabled) {transform:translateY(1px);box-shadow:var(--sh-key-press)}
+/* btn-teal — the panel's primary action, styled like the sidebar's active
+   (debossed) state rather than its own glowing plastic key */
+.rl-outreach .btn-teal {
+  color:var(--accent-3);
+  padding:11px 20px;border-radius:var(--r-sm);line-height:1;
+  background:var(--accent-wash);
+  border:none;
+  box-shadow:var(--sh-field);
+  font-family:var(--font-ui);font-weight:700;letter-spacing:.07em;text-transform:uppercase;font-size:.66rem;
 }
-.rl-outreach .btn-teal:active:not(:disabled) {
-  transform:translateY(2px);
-  box-shadow:
-    inset 0 1px 0 rgba(198,220,150,.15),
-    inset 0 4px 10px rgba(12,4,1,.72),
-    inset 0 -1px 4px rgba(144,151,59,.14),
-    inset 0 -1px 0 rgba(0,0,0,.92),
-    0 1px 0 rgba(10,4,1,.88),
-    0 0 15px -2px rgba(144,155,61,.52);
-  filter:none;
+[data-theme="dark"] .rl-outreach .btn-teal{color:var(--accent-2)}
+.rl-outreach .btn-teal:hover:not(:disabled) {color:var(--accent-3)}
+[data-theme="dark"] .rl-outreach .btn-teal:hover:not(:disabled){color:var(--accent-2)}
+.rl-outreach .btn-teal:active:not(:disabled) {transform:translateY(1px)}
+.rl-outreach .btn-purple {
+  background:linear-gradient(180deg,var(--face-top),var(--face-bot));
+  color:#8b5cb8;padding:9px 18px;font-weight:700;border:none;box-shadow:var(--sh-key);
 }
-.rl-outreach .btn-purple {background:linear-gradient(180deg,#AA7AD4,#8B5CB8);color:#fff;padding:9px 18px;font-weight:700;border:1px solid rgba(0,0,0,.3);box-shadow:0 2px 6px rgba(155,110,196,.3)}
-.rl-outreach .btn-purple:hover:not(:disabled) {background:linear-gradient(180deg,#B888E0,#9B6EC4)}
+.rl-outreach .btn-purple:hover:not(:disabled) {color:#9b6ec4}
+.rl-outreach .btn-purple:active:not(:disabled) {transform:translateY(1px);box-shadow:var(--sh-key-press)}
 .rl-outreach .btn-sm {padding:5px 10px;font-size:11px}
-.rl-outreach .btn-ghost {background:transparent;color:var(--muted);padding:7px 12px;border:1px solid var(--border)}
-.rl-outreach .btn-ghost:hover {color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.03)}
-.rl-outreach .btn-danger {background:transparent;color:var(--red);border:1px solid rgba(190,173,116,.2);padding:6px 10px;font-size:11px}
-.rl-outreach .btn-danger:hover {background:rgba(190,173,116,.08);border-color:rgba(190,173,116,.35)}
-.rl-outreach .btn-stop {background:transparent;color:var(--signal-glow);border:1px solid rgba(152,160,81,.25);padding:5px 9px;font-size:11px;border-radius:6px;cursor:pointer;line-height:1;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.04em;transition:background .15s,border-color .15s}
-.rl-outreach .btn-stop:hover {background:rgba(152,160,81,.12);border-color:rgba(152,160,81,.45)}
-.rl-outreach button:disabled {opacity:.35;cursor:not-allowed}
+.rl-outreach .btn-ghost {background:transparent;color:var(--ink-3);padding:10px 18px;border:none;box-shadow:inset 0 0 0 1px var(--m-ring)}
+.rl-outreach .btn-ghost:hover {color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent-line)}
+.rl-outreach .btn-danger {
+  background:linear-gradient(180deg,var(--face-top),var(--face-bot));
+  color:#b04040;border:none;padding:6px 10px;font-size:11px;box-shadow:var(--sh-key);
+}
+[data-theme="dark"] .rl-outreach .btn-danger{color:#e08080}
+.rl-outreach .btn-danger:hover {filter:brightness(1.03)}
+.rl-outreach .btn-stop {
+  background:transparent;color:var(--ink-3);border:none;box-shadow:inset 0 0 0 1px var(--m-ring);
+  padding:5px 9px;font-size:11px;border-radius:var(--r-sm);cursor:pointer;line-height:1;
+  font-family:var(--font-ui);letter-spacing:.04em;transition:color .15s,box-shadow .15s;
+}
+.rl-outreach .btn-stop:hover {color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent-line)}
+.rl-outreach button:disabled {opacity:.45;cursor:not-allowed}
 /* ── Orange realism — no flat orange: every fill embossed + glowing ──── */
 .rl-outreach .o-fill {
   background:linear-gradient(180deg,#bac676 0%,#a0a956 46%,#828842 100%)!important;
@@ -511,41 +506,24 @@
 .rl-outreach .src-tabs {display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap}
 .rl-outreach .src-tab {
   position:relative;border:none;cursor:pointer;
-  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:.05em;
-  display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:11px;
-  color:var(--cream-300);
-  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot));
-  transition:transform 70ms ease,box-shadow 70ms ease,color 120ms ease,background 280ms ease;
-  box-shadow:
-    inset 0 1.5px 0 var(--k-top),
-    inset 0 3px 5px var(--k-sheen),
-    inset 0 -3px 8px var(--k-under),
-    inset 0 -1.5px 0 var(--k-botline),
-    0 4px 0 var(--key-wall),
-    0 7px 14px -3px rgba(0,0,0,.55),
-    0 13px 20px -6px rgba(0,0,0,.4);
+  font-family:var(--font-ui);font-weight:700;font-size:.66rem;letter-spacing:.11em;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:var(--r-sm);
+  color:var(--ink-2);
+  background:linear-gradient(180deg,var(--face-top),var(--face-bot));
+  box-shadow:var(--sh-key);
+  transition:box-shadow .12s ease,color .12s ease,transform .08s ease;
 }
 .rl-outreach .src-tab svg {display:block;width:15px;height:15px;pointer-events:none;opacity:.8}
-.rl-outreach .src-tab:hover:not(.active) {color:var(--cream-100)}
-.rl-outreach .src-tab:active:not(.active) {transform:translateY(3px);box-shadow:inset 0 1px 0 var(--k-top),inset 0 -2px 5px var(--k-under),inset 0 -1px 0 var(--k-botline),0 1px 0 var(--key-wall),0 2px 4px -2px rgba(0,0,0,.6)}
+.rl-outreach .src-tab:hover:not(.active) {color:var(--ink)}
+.rl-outreach .src-tab:active:not(.active) {transform:translateY(1px);box-shadow:var(--sh-key-press)}
+/* Active tab reads pressed in, matching the sidebar's active-page state */
 .rl-outreach .src-tab.active {
-  color:#d6e7b8;
-  background:
-    radial-gradient(ellipse 72% 78% at 50% 68%,rgba(180,202,95,.92) 0%,rgba(154,162,64,.78) 20%,rgba(105,107,39,.54) 44%,rgba(45,45,16,.28) 66%,transparent 84%),
-    radial-gradient(ellipse 50% 35% at 50% 22%,rgba(185,199,86,.22) 0%,transparent 70%),
-    linear-gradient(180deg,rgba(40,37,33,.97) 0%,rgba(25,23,20,.99) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(200,221,154,.28),
-    inset 0 3px 10px rgba(12,4,1,.72),
-    inset 0 -2px 7px rgba(144,153,60,.22),
-    inset 0 -1px 0 rgba(0,0,0,.88),
-    0 4px 0 #0d0906,
-    0 8px 16px -4px rgba(0,0,0,.7),
-    0 0 20px -1px rgba(146,157,63,.7),
-    0 0 9px -1px rgba(189,201,94,.55);
-  filter:drop-shadow(0 0 5px rgba(144,153,62,.45));
+  color:var(--accent-3);
+  background:var(--accent-wash);
+  box-shadow:var(--sh-field);
 }
-.rl-outreach .src-tab.active svg {filter:drop-shadow(0 0 4px rgba(190,208,112,.85));stroke:rgba(201,224,161,.95);opacity:1}
+[data-theme="dark"] .rl-outreach .src-tab.active{color:var(--accent-2)}
+.rl-outreach .src-tab.active svg {opacity:1}
 /* ── Source icon cell (All Leads) — recessed instrument well ─────────── */
 .rl-outreach .src-cell {
   display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;
@@ -891,29 +869,9 @@
 }
 [data-theme="light"] .rl-outreach input::placeholder {color:var(--cream-500) !important}
 [data-theme="light"] .rl-outreach select option {background:var(--panel-600)}
-/* Light mode buttons */
-[data-theme="light"] .rl-outreach .btn {
-  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot)) !important;
-  color:var(--cream-300) !important;
-}
-[data-theme="light"] .rl-outreach .btn:hover:not(:disabled) {color:var(--cream-100) !important}
-/* Light mode pills/toggles */
-[data-theme="light"] .rl-outreach .pill {
-  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot)) !important;
-  color:var(--cream-300) !important;
-}
-[data-theme="light"] .rl-outreach .filter-pill {
-  background:linear-gradient(180deg,var(--panel-600),var(--panel-700)) !important;
-  color:var(--cream-500) !important;
-  box-shadow:inset 0 1px 2px rgba(120,108,90,.2),inset 0 -1px 0 rgba(255,255,252,.7) !important;
-}
-[data-theme="light"] .rl-outreach .filter-pill:hover {background:linear-gradient(180deg,var(--panel-600),var(--panel-700)) !important;color:var(--cream-500) !important}
-[data-theme="light"] .rl-outreach .pill.active, [data-theme="light"] .rl-outreach .pill:active {
-  color:var(--signal) !important;
-}
-[data-theme="light"] .rl-outreach .toggle {
-  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot)) !important;
-}
+/* Buttons (.btn, .src-tab, .src-btn) now use theme.css's --face-top/
+   --face-bot/--sh-key tokens directly, which are already theme-aware, so
+   they no longer need a light-mode override here. */
 /* Light mode chips */
 [data-theme="light"] .rl-outreach .chip {
   background:rgba(152,160,81,.1) !important;
