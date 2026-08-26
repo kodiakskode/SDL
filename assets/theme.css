@@ -260,9 +260,13 @@ body::after{
 .shell{max-width:var(--max);margin:0 auto;padding:var(--s4) var(--gutter) var(--s5);
   position:relative;z-index:1;}
 
-.pagehead{
-  display:flex;align-items:baseline;justify-content:space-between;
-  gap:var(--s3);flex-wrap:wrap;margin-bottom:var(--s3);
+.pagehead{margin-bottom:var(--s3);}
+/* Compact page label — replaces the old eyebrow+H1+lede block. The page's
+   sub-nav (Pool Finder / Mail List), when there is one, sits right under
+   it in the same spot the description used to occupy. */
+.page-title{
+  margin:0 0 var(--s2);font-family:var(--font-ui);font-size:1.05rem;font-weight:800;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ink);
 }
 h1{margin:0;font-size:1.5rem;font-weight:700;letter-spacing:-.01em;color:var(--ink);}
 h2{margin:0 0 var(--s1);font-size:.95rem;font-weight:700;color:var(--ink);}

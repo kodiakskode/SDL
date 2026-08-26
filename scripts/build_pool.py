@@ -26,20 +26,18 @@ COLGROUP = """<colgroup>
         <col style="width:5%">
       </colgroup>"""
 
-def pagehead(title, lede, here):
-    """Page title plus the Pool Finder / Mail List sub-nav, on our filenames."""
+def pagehead(short_title, here):
+    """Compact bold-caps page title, with the Pool Finder / Mail List
+    sub-nav sitting right under it — in the spot the old H1 + lede used
+    to occupy, on our filenames."""
     link = lambda href, label: \
         '<a href="%s"%s>%s</a>' % (href, ' class="on"' if here == href else "", label)
     return (
         '<div class="pagehead">\n'
-        '  <div>\n'
-        '    <p class="eyebrow">Pool Finder</p>\n'
-        '    <h1>%s</h1>\n'
-        '    <p class="lede">%s</p>\n'
-        '  </div>\n'
+        '  <p class="page-title">%s</p>\n'
         '  <nav class="pagenav" aria-label="Pool Finder pages">%s%s</nav>\n'
         '</div>\n\n'
-    ) % (title, lede,
+    ) % (short_title,
          link("pool.html", "Pool Finder"), link("mail-list.html", "Mail List"))
 
 WELL_HEAD_OLD = """  <div class="well-head">
@@ -186,7 +184,7 @@ def once(haystack, needle, label):
         raise SystemExit("expected 1 occurrence of %s upstream, found %d" % (label, n))
 
 
-def vendor(src_name, out_name, title, desc, lede, page_title):
+def vendor(src_name, out_name, short_title, desc, page_title):
     """Shared for both upstream pages: strip their chassis, keep everything else."""
     src = open(os.path.join(UP, src_name), encoding="utf-8").read()
     upstream_style = src[src.index("<style>"):src.index("</style>") + len("</style>")]
@@ -200,7 +198,16 @@ def vendor(src_name, out_name, title, desc, lede, page_title):
     chassis = re.search(r'<div class="chassis">.*?</div>\n', body, re.S)
     if not chassis:
         raise SystemExit("%s: could not find the upstream .chassis block" % src_name)
-    body = body[:chassis.start()] + pagehead(title, lede, out_name) + body[chassis.end():]
+    body = body[:chassis.start()] + pagehead(short_title, out_name) + body[chassis.end():]
+
+    # 1b. Pool Finder only: the era/condition legend rows under the stats
+    #     strip are dropped — informational clutter, not a control.
+    if src_name == "index.html":
+        legend = re.findall(r'<div class="legend">.*?</div>\n', body)
+        if len(legend) != 2:
+            raise SystemExit("expected 2 <div class=\"legend\"> rows upstream, found %d" % len(legend))
+        for block in legend:
+            body = body.replace(block, "", 1)
 
     # 2. the long explainer folds into a collapsible block
     foot = re.search(r"<footer>.*?</footer>", body, re.S)
@@ -267,13 +274,11 @@ def add_selection(body):
     return body.replace(tail, "\n" + SELECT_JS + tail, 1)
 
 
-vendor("index.html", "pool.html", "Sydney pools, 20+ years old",
+vendor("index.html", "pool.html", "POOL FINDER",
        "Sydney properties with a pool confirmed 20+ years old from NSW government "
        "aerial imagery — filter, select and copy addresses.",
-       "Pools confirmed pre-2006 from NSW government aerial imagery.",
        "Pool Finder")
 
-vendor("mail-list.html", "mail-list.html", "Mail list",
+vendor("mail-list.html", "mail-list.html", "MAIL LIST",
        "Mail-ready Sydney pool leads sorted into value bands for a physical-mail run.",
-       "The mail-ready set, re-sorted into value bands for the mail run.",
        "Mail List")
