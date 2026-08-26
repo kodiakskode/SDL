@@ -17,10 +17,10 @@ import re
 import sys
 
 COLGROUP = """<colgroup>
-        <col style="width:42px"><col style="width:20%"><col style="width:9%">
-        <col style="width:10%"><col style="width:8%"><col style="width:5%">
-        <col style="width:5%"><col style="width:5%"><col style="width:5%">
-        <col style="width:5%"><col style="width:10%"><col style="width:13%">
+        <col style="width:42px"><col style="width:19%"><col style="width:11%">
+        <col style="width:9%"><col style="width:8%"><col style="width:6%">
+        <col style="width:6%"><col style="width:5%"><col style="width:5%">
+        <col style="width:5%"><col style="width:10%"><col style="width:11%">
         <col style="width:5%">
       </colgroup>"""
 

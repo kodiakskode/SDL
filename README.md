@@ -14,13 +14,26 @@ third-party services. Published free on GitHub Pages, no ads.
 
 Light taupe/cream ground, very dark brown ink, highlights in the logo's green
 (`#5d622a`). The button in the top right inverts it to dark; the choice is
-remembered per browser. Depth is neumorphic throughout — a single light source
-from the top left, raised faces for anything you press, inset wells for anything
-that holds content, embossed text on raised surfaces.
+remembered per browser.
 
-The logo sits small in the centre of the header: `assets/logo-light.svg` (green)
-on light, `assets/logo-dark.svg` (light taupe) on dark. Replace either file
-in place and the header picks it up — no markup change needed.
+Depth is **debossed only** — nothing is raised. Every surface is carved into the
+ground with one light source from the top left: a dark edge inside the top-left
+of a shape, a light edge inside the bottom-right. Four depths do all the work,
+defined once in `assets/theme.css`:
+
+| Token | Used for |
+| --- | --- |
+| `--carve-soft` | tick boxes, small groups |
+| `--carve` | buttons, nav links, cards, control bars |
+| `--carve-deep` | fields, stat tiles, panels, hover |
+| `--carve-press` | the pressed and current states |
+
+Text carries no shadow at all except a single hairline highlight under display
+type (`--deboss-text`), so nothing is set on a halo. There is no emboss token.
+
+The logo sits small in the **left corner** of the header — the mark alone, no
+wordmark: `assets/logo-light.svg` (green) on light, `assets/logo-dark.svg`
+(light taupe) on dark. Replace either file in place and the header picks it up.
 
 ## Copying data out
 
