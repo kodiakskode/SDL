@@ -8,32 +8,45 @@ third-party services. Published free on GitHub Pages, no ads.
 | Home | `index.html` | Overview, live counts, links into the other pages |
 | Leads | `leads.html` | 750 NSW architects + 750 NSW landscape designers behind one dropdown |
 | Pool Finder | `pool.html` | 12,132 Sydney properties with a pool confirmed 20+ years old |
+| Mail List | `mail-list.html` | The mail-ready set in two value bands, reached from Pool Finder |
 | Outreach | `outreach.html` | Placeholder, styled and wired into the nav |
 
 ## Look
 
-Light taupe/cream ground, very dark brown ink, highlights in the logo's green
-(`#5d622a`). The button in the top right inverts it to dark; the choice is
-remembered per browser.
+**Type** — FT Overpass, self-hosted at `assets/fonts/ft-overpass.woff2`. The ten
+digit outlines in the supplied OTF are all the same wrong glyph, so `0`-`9` are
+subset out of the web font and fall through per-glyph to **Overpass**, the family
+FT Overpass is drawn from. Overpass also covers the handful of characters FT
+Overpass lacks (`'` `"` `<` `>` `~` `.`). Anything mostly numeric is set in
+Overpass outright, via `--font-num`, so a single string never mixes the two.
+`--font-mono` is Overpass Mono, for labels and tabular figures.
 
-Depth is **debossed only** — nothing is raised. Every surface is carved into the
-ground with one light source from the top left: a dark edge inside the top-left
-of a shape, a light edge inside the bottom-right. Four depths do all the work,
-defined once in `assets/theme.css`:
+**Colour** — light taupe/cream ground, very dark brown ink, highlights in the
+logo's green (`#5d622a`). The button top right inverts it; the choice is
+remembered per browser. The logo is the mark alone, in the left corner:
+`assets/logo-light.svg` (green) on light, `assets/logo-dark.svg` (light taupe)
+on dark. Replace either file in place and the header picks it up.
+
+**Depth** — the Pool Finder's metal panelling, in this palette. One light source
+straight overhead, so every edge is horizontal: a hairline highlight along the
+top inside of a raised face, a dark lip along its bottom, a soft drop beneath —
+and the inverse, sunk from the top, for anything that holds content. Six recipes
+in `assets/theme.css` do all of it:
 
 | Token | Used for |
 | --- | --- |
-| `--carve-soft` | tick boxes, small groups |
-| `--carve` | buttons, nav links, cards, control bars |
-| `--carve-deep` | fields, stat tiles, panels, hover |
-| `--carve-press` | the pressed and current states |
+| `--sh-chassis` | the header bar |
+| `--sh-key` | buttons, nav links, cards, status keys |
+| `--sh-key-press` | those same faces, pressed |
+| `--sh-panel` | filter bars, stat strip, note blocks |
+| `--sh-well` | table panels — anything that holds content |
+| `--sh-field` | inputs, selects, tick boxes |
 
-Text carries no shadow at all except a single hairline highlight under display
-type (`--deboss-text`), so nothing is set on a halo. There is no emboss token.
+Panels carry the relief; text stays flat so it reads clean. The metal tokens are
+namespaced `--m-*` because the vendored Pool Finder stylesheet defines its own
+`--ground`, `--edge-light`, `--edge-dark` and `--pad`, and it loads after this
+one.
 
-The logo sits small in the **left corner** of the header — the mark alone, no
-wordmark: `assets/logo-light.svg` (green) on light, `assets/logo-dark.svg`
-(light taupe) on dark. Replace either file in place and the header picks it up.
 
 ## Copying data out
 
@@ -55,16 +68,20 @@ Nothing is uploaded. Lead status, notes and the theme live in this browser's
 ## Layout
 
 ```
-index.html leads.html outreach.html   hand-edited pages
-pool.html                             generated — see below
-assets/  theme.css  pool-skin.css  app.js  leads.js  logo-light.svg  logo-dark.svg
+index.html leads.html outreach.html   built from scripts/pages/*.body.html
+pool.html  mail-list.html             vendored - see below
+assets/  theme.css  pool-skin.css  app.js  leads.js
+         logo-light.svg  logo-dark.svg  fonts/ft-overpass.woff2
 data/    leads.json                  cleaned lead lists
-scripts/ build_leads.py build_pool.py _head.html _nav.html
+scripts/ build_leads.py build_pool.py
+         _head.html _nav.html _foot.html  pages/*.body.html
 mail_merge.csv  leads_full.csv        Pool Finder downloads
 ```
 
-The nav block is repeated in each hand-edited page — change it in all four
-(`scripts/_nav.html` is the copy `build_pool.py` uses).
+Every page shares `scripts/_head.html`, `_nav.html` and `_foot.html`, so the
+header is defined once. `scripts/build_pages.py` reassembles the three
+hand-edited pages after you edit a fragment or a body file; `build_pool.py`
+does the two vendored ones.
 
 ## Regenerating
 
@@ -81,16 +98,17 @@ from free-text addresses, maps postcodes onto NSW regions, and marks LDI/AILDM
 membership only where the source carried separate evidence (28 of 750 —
 the rest are labelled unverified rather than claimed as members).
 
-**Pool Finder** — `pool.html` is vendored from
-[ddeonmadeit/pool](https://github.com/ddeonmadeit/pool). The markup, embedded
-data and the entire filter/sort/track script are carried across untouched;
-the build only wraps it in this dashboard's head and nav, layers
-`assets/pool-skin.css` over its own stylesheet, and adds the tick column and
-address copying.
+**Pool Finder and Mail List** — `pool.html` and `mail-list.html` are vendored
+from [ddeonmadeit/pool](https://github.com/ddeonmadeit/pool). The markup,
+embedded data and the entire filter/sort/track script are carried across
+untouched; the build only wraps each in this dashboard's head and nav, layers
+`assets/pool-skin.css` over the upstream stylesheet, rebuilds the two-page
+sub-nav on our filenames, folds the long explainer into a collapsible block,
+and (on Pool Finder) adds the tick column and address copying.
 
 ```bash
 git clone --depth 1 https://github.com/ddeonmadeit/pool /tmp/pool
-python3 scripts/build_pool.py /tmp/pool/index.html
+python3 scripts/build_pool.py /tmp/pool
 ```
 
 The script asserts on every upstream anchor it edits, so if that page changes

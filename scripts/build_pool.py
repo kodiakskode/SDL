@@ -1,16 +1,18 @@
-"""Vendor the Pool Finder into the dashboard.
+"""Vendor the Pool Finder pages into the dashboard.
 
-Source: https://github.com/ddeonmadeit/pool (index.html — the page published at
-https://ddeonmadeit.github.io/pool/). The markup, the embedded lead data and the
+Source: https://github.com/ddeonmadeit/pool — index.html (Pool Finder) and
+mail-list.html (Mail List), the pages published at
+https://ddeonmadeit.github.io/pool/. The markup, the embedded lead data and the
 whole filter/sort/track script are carried across untouched. This script only:
 
-  1. wraps it in the dashboard's head + nav so it shares the theme toggle,
+  1. wraps each in the dashboard's head + nav so they share the theme toggle,
   2. layers assets/pool-skin.css over its own stylesheet,
   3. adds a checkbox column and a selection bar so the addresses in the table —
      the ones ticked, or every row passing the current filters — can be copied
      out as plain lines or as CSV.
 
-Re-run after pulling a newer upstream index.html.
+Usage: python3 scripts/build_pool.py [path/to/upstream/checkout]
+Re-run after pulling a newer upstream.
 """
 import os
 import re
@@ -24,31 +26,35 @@ COLGROUP = """<colgroup>
         <col style="width:5%">
       </colgroup>"""
 
-PAGEHEAD = """<div class="pagehead">
-  <p class="eyebrow">Pool Finder</p>
-  <div class="row">
-    <div>
-      <h1>Sydney pools, 20+ years old</h1>
-      <p class="lede">Properties whose pool is confirmed pre-2006 from NSW government
-        aerial imagery, scored and filterable. Tick rows, or filter down to the set you
-        want and copy every address in it.</p>
-    </div>
-  </div>
-</div>
+def pagehead(title, lede, here):
+    """Page title plus the Pool Finder / Mail List sub-nav, on our filenames."""
+    link = lambda href, label: \
+        '<a href="%s"%s>%s</a>' % (href, ' class="on"' if here == href else "", label)
+    return (
+        '<div class="pagehead">\n'
+        '  <div>\n'
+        '    <p class="eyebrow">Pool Finder</p>\n'
+        '    <h1>%s</h1>\n'
+        '    <p class="lede">%s</p>\n'
+        '  </div>\n'
+        '  <nav class="pagenav" aria-label="Pool Finder pages">%s%s</nav>\n'
+        '</div>\n\n'
+    ) % (title, lede,
+         link("pool.html", "Pool Finder"), link("mail-list.html", "Mail List"))
 
-"""
+WELL_HEAD_OLD = """  <div class="well-head">
+    <span class="well-title">Outreach ledger &middot; NSW historical imagery 1978&ndash;2005</span>
+    <span class="well-count" id="saved"></span>
+  </div>"""
 
-SELECT_BAR = """<div class="select-bar">
-  <span class="lbl">Selection <span id="sel-count">none ticked</span></span>
-  <button type="button" class="key primary" id="copy-addr">Copy addresses</button>
-  <button type="button" class="key" id="copy-addr-csv">Copy addresses as CSV</button>
-  <button type="button" class="key" id="clear-sel">Clear selection</button>
-  <span id="copy-note"></span>
-  <span class="ctl-label" style="margin-left:auto">Tick rows to narrow it &mdash; with
-    nothing ticked, copying takes every address matching the filters</span>
-</div>
-
-"""
+WELL_HEAD_NEW = """  <div class="well-head">
+    <span class="well-title" id="sel-count">None ticked</span>
+    <button type="button" class="key primary" id="copy-addr">Copy addresses</button>
+    <button type="button" class="key" id="copy-addr-csv">Copy CSV</button>
+    <button type="button" class="key" id="clear-sel">Untick</button>
+    <span class="well-count" id="copy-note"></span>
+    <span class="well-count" id="saved"></span>
+  </div>"""
 
 SELECT_JS = r"""  // ── address selection and copying ──────────────────────────────
   // Ticks are held by DATA index, so they survive filtering, sorting and the
@@ -70,7 +76,7 @@ SELECT_JS = r"""  // ── address selection and copying ───────�
 
   function syncSel() {
     var n = pickedInView().length;
-    selCount.textContent = n ? n.toLocaleString() + " ticked" : "none ticked";
+    selCount.textContent = n ? n.toLocaleString() + " ticked" : "None ticked";
     checkAll.checked = view.length > 0 && n === view.length;
     checkAll.indeterminate = n > 0 && n < view.length;
   }
@@ -95,7 +101,7 @@ SELECT_JS = r"""  // ── address selection and copying ───────�
     picked = Object.create(null);
     render();
     syncSel();
-    noteFlash("Selection cleared");
+    noteFlash("Unticked");
   });
 
   // The filter controls carry their own listeners registered before this block,
@@ -169,11 +175,9 @@ SELECT_JS = r"""  // ── address selection and copying ───────�
   syncSel();
 """
 
-SRC = sys.argv[1] if len(sys.argv) > 1 else "/home/user/ddeonmadeit/pool/index.html"
-OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pool.html")
-FRAG = os.path.dirname(os.path.abspath(__file__))
-
-src = open(SRC, encoding="utf-8").read()
+UP = sys.argv[1] if len(sys.argv) > 1 else "/home/user/ddeonmadeit/pool"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FRAG = os.path.join(ROOT, "scripts")
 
 
 def once(haystack, needle, label):
@@ -182,65 +186,91 @@ def once(haystack, needle, label):
         raise SystemExit("expected 1 occurrence of %s upstream, found %d" % (label, n))
 
 
-# ── split the upstream file ───────────────────────────────────────
-style_start = src.index("<style>")
-style_end = src.index("</style>") + len("</style>")
-upstream_style = src[style_start:style_end]
-body = src[src.index('<div class="shell">'):]
-# The head fragment already opens .shell; drop the vendored opener.
-body = body[len('<div class="shell">'):].lstrip("\n")
+def vendor(src_name, out_name, title, desc, lede, page_title):
+    """Shared for both upstream pages: strip their chassis, keep everything else."""
+    src = open(os.path.join(UP, src_name), encoding="utf-8").read()
+    upstream_style = src[src.index("<style>"):src.index("</style>") + len("</style>")]
 
-# ── 1. drop the upstream chassis; the dashboard nav replaces it ───
-chassis = re.search(r'<div class="chassis">.*?</div>\n', body, re.S)
-if not chassis:
-    raise SystemExit("could not find the upstream .chassis block")
-body = body[:chassis.start()] + PAGEHEAD + body[chassis.end():]
+    body = src[src.index('<div class="shell">'):]
+    # The nav fragment opens .shell; drop the vendored opener.
+    body = body[len('<div class="shell">'):].lstrip("\n")
 
-# ── 2. checkbox column ────────────────────────────────────────────
-old_cols = re.search(r"<colgroup>.*?</colgroup>", body, re.S)
-if not old_cols:
-    raise SystemExit("could not find the upstream <colgroup>")
-body = body[:old_cols.start()] + COLGROUP + body[old_cols.end():]
+    # 1. the upstream chassis goes; the dashboard header replaces it, and the
+    #    sub-nav it carried is rebuilt on our filenames.
+    chassis = re.search(r'<div class="chassis">.*?</div>\n', body, re.S)
+    if not chassis:
+        raise SystemExit("%s: could not find the upstream .chassis block" % src_name)
+    body = body[:chassis.start()] + pagehead(title, lede, out_name) + body[chassis.end():]
 
-once(body, '<th class="sortable" data-sort="suburb">', "address <th>")
-body = body.replace(
-    '<th class="sortable" data-sort="suburb">',
-    '<th class="pick"><input type="checkbox" id="check-all" '
-    'aria-label="Select every row matching the filters"></th>\n'
-    '        <th class="sortable" data-sort="suburb">', 1)
+    # 2. the long explainer folds into a collapsible block
+    foot = re.search(r"<footer>.*?</footer>", body, re.S)
+    if not foot:
+        raise SystemExit("%s: could not find the upstream <footer>" % src_name)
+    inner = foot.group(0)[len("<footer>"):-len("</footer>")]
+    body = (body[:foot.start()] +
+            '<details class="note-block">\n'
+            '  <summary>How this works</summary>\n'
+            '  <div class="note-body">' + inner + '</div>\n'
+            '</details>\n' +
+            body[foot.end():])
 
-# The upstream pad rows understate the column count; fix it while we are here.
-body = body.replace('<td colspan="11"></td>', '<td colspan="13"></td>')
+    if src_name == "index.html":
+        body = add_selection(body)
 
-# ── 3. selection bar above the well ───────────────────────────────
-once(body, '<div class="well">', "well")
-body = body.replace('<div class="well">', SELECT_BAR + '<div class="well">', 1)
+    head = (open(os.path.join(FRAG, "_head.html"), encoding="utf-8").read()
+            .replace("__TITLE__", page_title).replace("__DESC__", desc))
+    head = head.replace("</head>", upstream_style +
+                        '\n<link rel="stylesheet" href="assets/pool-skin.css?v=3">\n</head>')
+    nav = open(os.path.join(FRAG, "_nav.html"), encoding="utf-8").read()
 
-# ── 4. row markup: prepend the checkbox cell ──────────────────────
-old_row = ("html += '<tr class=\"lead\" data-i=\"' + i + '\" data-s=\"' + stt + '\">' +\n"
-           "        '<td><span class=\"addr\">'")
-if body.count(old_row) != 1:
-    raise SystemExit("upstream row template changed; update build_pool.py")
-body = body.replace(old_row,
-    ("html += '<tr class=\"lead\" data-i=\"' + i + '\" data-s=\"' + stt + '\">' +\n"
-     "        '<td class=\"pick\"><input type=\"checkbox\" class=\"rowpick\"' +\n"
-     "        (picked[i] ? ' checked' : '') + ' aria-label=\"Select ' + esc(d[A]) + '\"></td>' +\n"
-     "        '<td><span class=\"addr\">'"), 1)
+    out = os.path.join(ROOT, out_name)
+    open(out, "w", encoding="utf-8").write(
+        head + nav + body + '\n<script src="assets/app.js?v=3"></script>\n</body>\n</html>\n')
+    print("wrote %s (%.1f MB)" % (out_name, os.path.getsize(out) / 1e6))
 
-# ── 5. selection + copy behaviour, injected before the closing IIFE ──
-tail = "\n  rebuild();\n})();\n</script>"
-once(body, tail, "script tail")
-body = body.replace(tail, "\n" + SELECT_JS + tail, 1)
 
-# ── assemble ──────────────────────────────────────────────────────
-head = (open(os.path.join(FRAG, "_head.html"), encoding="utf-8").read()
-        .replace("__TITLE__", "Pool Finder")
-        .replace("__DESC__", "Sydney properties with a pool confirmed 20+ years old from "
-                             "NSW government aerial imagery — filter, select and copy addresses."))
-head = head.replace("</head>", upstream_style +
-                    '\n<link rel="stylesheet" href="assets/pool-skin.css">\n</head>')
-nav = open(os.path.join(FRAG, "_nav.html"), encoding="utf-8").read()
+def add_selection(body):
+    """Pool Finder only: a tick column, and copying the addresses out."""
+    old_cols = re.search(r"<colgroup>.*?</colgroup>", body, re.S)
+    if not old_cols:
+        raise SystemExit("could not find the upstream <colgroup>")
+    body = body[:old_cols.start()] + COLGROUP + body[old_cols.end():]
 
-open(OUT, "w", encoding="utf-8").write(
-    head + nav + body + '\n<script src="assets/app.js"></script>\n</body>\n</html>\n')
-print("wrote %s (%.1f MB)" % (OUT, os.path.getsize(OUT) / 1e6))
+    once(body, '<th class="sortable" data-sort="suburb">', "address <th>")
+    body = body.replace(
+        '<th class="sortable" data-sort="suburb">',
+        '<th class="pick"><input type="checkbox" id="check-all" '
+        'aria-label="Select every row matching the filters"></th>\n'
+        '        <th class="sortable" data-sort="suburb">', 1)
+
+    # The upstream pad rows understate the column count; fix it while we are here.
+    body = body.replace('<td colspan="11"></td>', '<td colspan="13"></td>')
+
+    once(body, WELL_HEAD_OLD, "well head")
+    body = body.replace(WELL_HEAD_OLD, WELL_HEAD_NEW, 1)
+
+    old_row = ("html += '<tr class=\"lead\" data-i=\"' + i + '\" data-s=\"' + stt + '\">' +\n"
+               "        '<td><span class=\"addr\">'")
+    if body.count(old_row) != 1:
+        raise SystemExit("upstream row template changed; update build_pool.py")
+    body = body.replace(old_row,
+        ("html += '<tr class=\"lead\" data-i=\"' + i + '\" data-s=\"' + stt + '\">' +\n"
+         "        '<td class=\"pick\"><input type=\"checkbox\" class=\"rowpick\"' +\n"
+         "        (picked[i] ? ' checked' : '') + ' aria-label=\"Select ' + esc(d[A]) + '\"></td>' +\n"
+         "        '<td><span class=\"addr\">'"), 1)
+
+    tail = "\n  rebuild();\n})();\n</script>"
+    once(body, tail, "script tail")
+    return body.replace(tail, "\n" + SELECT_JS + tail, 1)
+
+
+vendor("index.html", "pool.html", "Sydney pools, 20+ years old",
+       "Sydney properties with a pool confirmed 20+ years old from NSW government "
+       "aerial imagery — filter, select and copy addresses.",
+       "Pools confirmed pre-2006 from NSW government aerial imagery.",
+       "Pool Finder")
+
+vendor("mail-list.html", "mail-list.html", "Mail list",
+       "Mail-ready Sydney pool leads sorted into value bands for a physical-mail run.",
+       "The mail-ready set, re-sorted into value bands for the mail run.",
+       "Mail List")

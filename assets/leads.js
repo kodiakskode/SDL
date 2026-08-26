@@ -130,7 +130,7 @@
     el.tally.textContent = view.length.toLocaleString() + " of " +
       d.total.toLocaleString() + " shown";
     var n = view.filter(function (r) { return sel[keyOf(r)]; }).length;
-    el.selCount.textContent = n ? n.toLocaleString() + " selected" : "none selected";
+    el.selCount.textContent = n ? n.toLocaleString() + " ticked" : "None ticked";
   }
 
   function syncAll() {
@@ -187,7 +187,7 @@
     document.getElementById("clear-sel").addEventListener("click", function () {
       sel = Object.create(null);
       render(); counts();
-      SDL.flash(el.note, "Selection cleared");
+      SDL.flash(el.note, "Unticked");
     });
 
     document.querySelectorAll("th.sortable").forEach(function (th) {
