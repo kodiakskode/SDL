@@ -6,8 +6,15 @@
 </div>
 
 <div class="panel">
-  <div class="panel-head"><span class="panel-title">Nothing here yet</span></div>
-  <div class="empty" style="padding:80px 32px">
-    Left empty for now.<br>Say what belongs here and it gets built.
+  <div class="panel-head"><span class="panel-title">Outreach</span></div>
+  <div id="outreach-root" class="rl-outreach" style="padding:24px">
+    <div style="text-align:center;padding:80px 32px;color:var(--ink-3)">Loading Outreach&hellip;</div>
   </div>
 </div>
+
+<link rel="stylesheet" href="assets/outreach.css?v=1">
+<script>window.SDL_OUTREACH_API_BASE = localStorage.getItem('sdl-outreach-api') || 'http://localhost:3021/rawleads/api';</script>
+<script src="assets/js/react.min.js"></script>
+<script src="assets/js/react-dom.min.js"></script>
+<script src="assets/js/babel.min.js"></script>
+<script type="text/babel" src="assets/outreach-app.jsx"></script>

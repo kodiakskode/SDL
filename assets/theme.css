@@ -1,11 +1,8 @@
 /* ==========================================================================
    SDL Creations — shared theme
 
-   Type    FT Overpass, self-hosted. Its ten digit outlines are broken in the
-           source file, so they are subset out and fall through to Overpass —
-           the family FT Overpass is drawn from — which also covers the few
-           glyphs it lacks (' " < > ~ ·). Anything mostly numeric is set in
-           Overpass outright so a string never mixes the two.
+   Type    Helvetica throughout — Helvetica Neue where the system has it,
+           system Helvetica/Arial elsewhere. No web font, nothing to load.
    Colour  Light taupe/cream ground, very dark brown ink, logo green for
            highlights. The header toggle inverts it; the choice is remembered.
    Depth   The Pool Finder's metal panelling, in this palette. One light
@@ -16,17 +13,10 @@
            Panels carry the relief; text stays flat so it reads clean.
    ========================================================================== */
 
-@font-face{
-  font-family:"FT Overpass";
-  src:url("fonts/ft-overpass.woff2") format("woff2");
-  font-weight:400 700;
-  font-display:swap;
-}
-
 :root{
-  --font-ui:"FT Overpass","Overpass",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --font-num:"Overpass","FT Overpass",system-ui,-apple-system,sans-serif;
-  --font-mono:"Overpass Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --font-ui:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --font-num:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --font-mono:"Helvetica Neue",Helvetica,Arial,sans-serif;
 
   /* ground and the four metal faces */
   --m-ground:#e3dbcb;

@@ -1,7 +1,10 @@
 # SDL Creations — dashboard
 
-A static, no-build dashboard: four pages, one shared theme, no server and no
-third-party services. Published free on GitHub Pages, no ads.
+A static, no-build dashboard: four pages, one shared theme, no third-party
+services. Published free on GitHub Pages, no ads. Outreach is the one page
+that isn't fully static — it talks to a small backend (`server/`) for SMTP
+sending, templates and history; see [Outreach backend](#outreach-backend)
+below.
 
 | Page | File | What it does |
 | --- | --- | --- |
@@ -9,17 +12,14 @@ third-party services. Published free on GitHub Pages, no ads.
 | Leads | `leads.html` | 750 NSW architects + 750 NSW landscape designers behind one dropdown |
 | Pool Finder | `pool.html` | 12,132 Sydney properties with a pool confirmed 20+ years old |
 | Mail List | `mail-list.html` | The mail-ready set in two value bands, reached from Pool Finder |
-| Outreach | `outreach.html` | Placeholder, styled and wired into the nav |
+| Outreach | `outreach.html` | Email templates, SMTP settings, sending and history — a RawLeads outreach tab wired to the leads above |
 
 ## Look
 
-**Type** — FT Overpass, self-hosted at `assets/fonts/ft-overpass.woff2`. The ten
-digit outlines in the supplied OTF are all the same wrong glyph, so `0`-`9` are
-subset out of the web font and fall through per-glyph to **Overpass**, the family
-FT Overpass is drawn from. Overpass also covers the handful of characters FT
-Overpass lacks (`'` `"` `<` `>` `~` `.`). Anything mostly numeric is set in
-Overpass outright, via `--font-num`, so a single string never mixes the two.
-`--font-mono` is Overpass Mono, for labels and tabular figures.
+**Type** — Helvetica throughout (`--font-ui`, `--font-num` and `--font-mono` all
+resolve to `"Helvetica Neue", Helvetica, Arial, sans-serif`). No web font, so
+nothing to load — every page, including the vendored Pool Finder and Mail List
+and the Outreach tab, sets the same stack.
 
 **Colour** — light taupe/cream ground, very dark brown ink, highlights in the
 logo's green (`#5d622a`). The button top right inverts it; the choice is
@@ -71,10 +71,15 @@ Nothing is uploaded. Lead status, notes and the theme live in this browser's
 index.html leads.html outreach.html   built from scripts/pages/*.body.html
 pool.html  mail-list.html             vendored - see below
 assets/  theme.css  pool-skin.css  app.js  leads.js
-         logo-light.svg  logo-dark.svg  fonts/ft-overpass.woff2
+         logo-light.svg  logo-dark.svg
+         outreach.css  outreach-app.jsx    Outreach tab, styled for this theme
+         js/  react.min.js  react-dom.min.js  babel.min.js   vendored, in-browser JSX
 data/    leads.json                  cleaned lead lists
 scripts/ build_leads.py build_pool.py
          _head.html _nav.html _foot.html  pages/*.body.html
+server/  outreach.js schema.js auth.js helpers.js   verbatim from rawleads
+         leads.js seed-leads.js bootstrap-auth.js   new — see Outreach backend
+         index.js  package.json  .env.example
 mail_merge.csv  leads_full.csv        Pool Finder downloads
 ```
 
@@ -113,6 +118,51 @@ python3 scripts/build_pool.py /tmp/pool
 
 The script asserts on every upstream anchor it edits, so if that page changes
 shape the build fails loudly instead of producing a broken page.
+
+## Outreach backend
+
+The Outreach page is [kodiakskode/rawleads](https://github.com/kodiakskode/rawleads)'s
+outreach tab, dropped in per its own README: `server/outreach.js`, `schema.js`,
+`auth.js` and `helpers.js` are carried over verbatim, and `assets/outreach-app.jsx`
+is `src/OutreachTab.jsx` verbatim (only its literal "signal orange" colors were
+hue-rotated to this dashboard's green, so the two never fight — logic and
+structure are untouched). `assets/outreach.css` is `src/outreach.css` scoped
+under `.rl-outreach`, with rawleads' own page chrome (its topbar/nav/theme
+toggle) dropped in favour of this dashboard's, and its design tokens remapped
+to the palette above.
+
+Three files are new, not from rawleads, because a static dashboard with no
+accounts needed a bit more glue than "drop it into your Express app":
+
+| File | Why |
+| --- | --- |
+| `server/leads.js` | Lists leads for the send picker — the route existed in RawLeads' full server.js but wasn't part of the outreach extraction. |
+| `server/seed-leads.js` | Idempotently imports `data/leads.json` into the SQL `leads` table `server/outreach.js` sends from — the dashboard's leads are a static JSON file, not a database. |
+| `server/bootstrap-auth.js` | Trades one shared secret (`OUTREACH_ACCESS_KEY`) for the JWT every other route expects. There are no user accounts anywhere on this dashboard. |
+
+GitHub Pages can't run Node, so this backend runs elsewhere — any small VPS
+reachable over HTTPS works. `outreach.html` calls whatever `SDL_OUTREACH_API_BASE`
+resolves to (a `localStorage.sdl-outreach-api` override, falling back to
+`http://localhost:3021/rawleads/api` for local development); the server's CORS
+allowlist (`OUTREACH_ALLOWED_ORIGIN`) must include the dashboard's real origin.
+
+```bash
+cd server
+npm install
+cp .env.example .env      # fill in JWT_SECRET, OUTREACH_SECRET, OUTREACH_ACCESS_KEY
+npm start
+```
+
+Then, on the dashboard itself, set the API base once per browser:
+
+```js
+localStorage.setItem('sdl-outreach-api', 'https://your-server.example.com/rawleads/api');
+```
+
+Open the Outreach tab and enter `OUTREACH_ACCESS_KEY` when prompted — it's
+remembered on that device from then on (`localStorage.rl_token`, a 30-day JWT).
+See `server/.env.example` for every variable, and the comment at the top of
+each `server/*.js` file for whether it's verbatim from rawleads or new.
 
 ## Publishing
 
