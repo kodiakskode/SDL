@@ -154,7 +154,7 @@ body::after{
 [data-sidebar="collapsed"] .sidebar{width:72px;}
 
 .sidebar-brand{
-  flex:none;display:flex;align-items:center;justify-content:flex-start;
+  flex:none;display:flex;align-items:center;justify-content:center;
   height:60px;padding:0 var(--s3);border:none;background:transparent;cursor:pointer;
   box-shadow:0 1px 0 var(--m-ring);
 }
@@ -211,11 +211,15 @@ body::after{
 .sidebar-nav .navlink .ico svg{width:100%;height:100%;display:block;}
 .sidebar-nav .navlink .lbl{overflow:hidden;text-overflow:ellipsis;}
 /* Selected page reads as pressed in, not raised — sunk into the sidebar
-   the way an input field or a ticked box is, elsewhere in this theme. */
+   the way an input field or a ticked box is, elsewhere in this theme.
+   aria-current is set by app.js right after the page paints, so without
+   killing the transition here the link would render raised for a beat
+   and then animate down — it should just snap straight to debossed. */
 .sidebar-nav .navlink[aria-current="page"]{
   color:var(--accent-3);
   background:var(--accent-wash);
   box-shadow:var(--sh-field);
+  transition:none;
 }
 [data-theme="dark"] .sidebar-nav .navlink[aria-current="page"]{color:var(--accent-2);}
 

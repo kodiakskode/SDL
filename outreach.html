@@ -26,19 +26,29 @@ if(localStorage.getItem("sdl-sidebar")==="collapsed"){document.documentElement.s
   </button>
   <nav class="sidebar-nav" aria-label="Primary">
     <a class="navlink" href="index.html">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></span>
+      <span class="ico"><svg viewBox="0 0 24 24"><path fill="currentColor" fill-opacity=".8" d="M12 3.4c.34 0 .67.12.93.34l7.3 6.2c.46.4.77.96.77 1.6V19a2 2 0 0 1-2 2h-3.5a1 1 0 0 1-1-1v-5a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v5a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2v-7.46c0-.64.31-1.2.77-1.6l7.3-6.2c.26-.22.59-.34.93-.34z"/></svg></span>
       <span class="lbl">Home</span>
     </a>
     <a class="navlink" href="leads.html">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.6 2.5-6 5.5-6s5.5 2.4 5.5 6"/><circle cx="17.5" cy="8.5" r="2.4"/><path d="M15.3 20c.3-2.6 2-4.6 4.2-5"/></svg></span>
+      <span class="ico"><svg viewBox="0 0 24 24">
+        <circle fill="currentColor" fill-opacity=".8" cx="14.5" cy="8" r="3.6"/>
+        <path fill="currentColor" fill-opacity=".8" d="M14.5 13c-3.4 0-6.2 2.4-6.2 6.3V21h12.4v-1.7c0-3.9-2.8-6.3-6.2-6.3z"/>
+        <circle fill="currentColor" fill-opacity=".8" cx="7.8" cy="10.6" r="2.7"/>
+        <path fill="currentColor" fill-opacity=".8" d="M7.8 14.6c-2.6 0-4.7 1.9-4.7 4.9V21h6.4v-1.4c0-1.2.28-2.3.78-3.2-.68-.5-1.53-.8-2.48-.8z"/>
+      </svg></span>
       <span class="lbl">Leads</span>
     </a>
     <a class="navlink" href="pool.html">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="6"/><path d="M5.5 12c1.5-1.4 3-1.4 4.5 0s3 1.4 4.5 0 3-1.4 4.5 0"/></svg></span>
+      <span class="ico"><svg viewBox="0 0 24 24">
+        <mask id="nav-pool-wave"><rect width="24" height="24" fill="#fff"/>
+          <path d="M4 12.6c1.6-1.5 3.2-1.5 4.8 0s3.2 1.5 4.8 0 3.2-1.5 4.8 0 3.2 1.5 4.8 0" stroke="#000" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+        </mask>
+        <ellipse fill="currentColor" fill-opacity=".8" cx="12" cy="12" rx="8.6" ry="6.4" mask="url(#nav-pool-wave)"/>
+      </svg></span>
       <span class="lbl">Pool Finder</span>
     </a>
     <a class="navlink" href="outreach.html">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+      <span class="ico"><svg viewBox="0 0 24 24"><path fill="currentColor" fill-opacity=".8" d="M3.4 11.6 20.6 3.4c.9-.43 1.85.47 1.44 1.4l-6.4 16.1c-.4.94-1.72.9-2.05-.07l-2.1-6.6-6.6-2.1c-1.02-.32-1.02-1.63.11-2.13z"/></svg></span>
       <span class="lbl">Outreach</span>
     </a>
   </nav>
