@@ -1,25 +1,39 @@
 # SDL Creations — dashboard
 
-A static, no-build dashboard: four pages, one shared theme, no server and no
-third-party services. Published free on GitHub Pages, no ads.
+A static, no-build dashboard: four pages, one shared theme, no third-party
+services. Published free on GitHub Pages, no ads. Outreach is the one page
+that isn't fully static — it talks to a small backend (`server/`) for SMTP
+sending, templates and history; see [Outreach backend](#outreach-backend)
+below.
 
 | Page | File | What it does |
 | --- | --- | --- |
 | Home | `index.html` | Overview, live counts, links into the other pages |
-| Leads | `leads.html` | 750 NSW architects + 750 NSW landscape designers behind one dropdown |
+| Leads | `leads.html` | 66 Sydney landscape architects + 110 Sydney landscape designers + anything you import, behind one dropdown (with an All Lists option) |
 | Pool Finder | `pool.html` | 12,132 Sydney properties with a pool confirmed 20+ years old |
 | Mail List | `mail-list.html` | The mail-ready set in two value bands, reached from Pool Finder |
-| Outreach | `outreach.html` | Placeholder, styled and wired into the nav |
+| Outreach | `outreach.html` | Email templates, SMTP settings, sending and history — a RawLeads outreach tab wired to the leads above |
 
 ## Look
 
-**Type** — FT Overpass, self-hosted at `assets/fonts/ft-overpass.woff2`. The ten
-digit outlines in the supplied OTF are all the same wrong glyph, so `0`-`9` are
-subset out of the web font and fall through per-glyph to **Overpass**, the family
-FT Overpass is drawn from. Overpass also covers the handful of characters FT
-Overpass lacks (`'` `"` `<` `>` `~` `.`). Anything mostly numeric is set in
-Overpass outright, via `--font-num`, so a single string never mixes the two.
-`--font-mono` is Overpass Mono, for labels and tabular figures.
+**Layout** — a left sidebar (`.app-shell` in `scripts/_nav.html`), not a top
+bar. The logo sits in its own row at the top of the sidebar and is itself
+the toggle: click it to open or close the nav panel below it
+(`data-sidebar="collapsed"` on `<html>`, remembered in
+`localStorage.sdl-sidebar` and resolved before first paint, same mechanism
+as the theme). Narrow screens ignore that preference and always show a
+slim icon-only rail — 208px of sidebar would swallow most of a phone
+screen.
+
+**Scale** — the whole dashboard renders at 125% (`html{zoom:1.25}` in
+`assets/theme.css`), same effect as the browser's own zoom, so it applies to
+every page — including the vendored Pool Finder/Mail List and the Outreach
+tab — without converting anything to rem.
+
+**Type** — Helvetica throughout (`--font-ui`, `--font-num` and `--font-mono` all
+resolve to `"Helvetica Neue", Helvetica, Arial, sans-serif`). No web font, so
+nothing to load — every page, including the vendored Pool Finder and Mail List
+and the Outreach tab, sets the same stack.
 
 **Colour** — light taupe/cream ground, very dark brown ink, highlights in the
 logo's green (`#5d622a`). The button top right inverts it; the choice is
@@ -61,9 +75,30 @@ first, either order works.
 - **Leads** — *Copy emails* (comma-separated, de-duplicated, ready for a To:
   field), *Copy phones*, or *Copy rows as CSV*.
 
-Nothing is uploaded. Lead status, notes and the theme live in this browser's
-`localStorage`, so they are per-device. The Pool Finder's **Back up** /
-**Restore** buttons move that tracking to another machine.
+Lead status, notes and the theme live in this browser's `localStorage`, so
+they are per-device. The Pool Finder's **Back up** / **Restore** buttons move
+that tracking to another machine.
+
+### Importing your own list
+
+**Import CSV / Excel…**, next to the List dropdown on the Leads page, adds a
+new list from a `.csv`, `.xlsx` or `.xls` file — pick a title for it and it
+behaves exactly like Landscape Architects/Designers: filter, tick, copy. It's
+matched against common header names (Business/Company/Org, Name, Email,
+Phone/Mobile, Suburb/City, Postcode, Region/State, Website, Type, Status —
+case-insensitive, any subset); a single-column file with no header is read as
+a bare list of emails or names. Parsing is entirely client-side (CSV by hand,
+Excel via [SheetJS](https://sheetjs.com), vendored at
+`assets/js/xlsx.full.min.js`) and the result is saved to this browser's
+`localStorage`, same as everything else on this page — **Delete this list**
+removes it again, only from this device.
+
+If the Outreach backend (see below) is reachable, the import is also posted
+to it — `POST /leads/import` — so the new list shows up as a filterable
+option on the Outreach tab's recipient picker alongside the built-in lists,
+next to everyone else's email. If the backend isn't reachable at import time,
+the list still works fine on the Leads page; it just isn't sendable from
+Outreach until you import it again with a live connection.
 
 ## Layout
 
@@ -71,10 +106,15 @@ Nothing is uploaded. Lead status, notes and the theme live in this browser's
 index.html leads.html outreach.html   built from scripts/pages/*.body.html
 pool.html  mail-list.html             vendored - see below
 assets/  theme.css  pool-skin.css  app.js  leads.js
-         logo-light.svg  logo-dark.svg  fonts/ft-overpass.woff2
+         logo-light.svg  logo-dark.svg
+         outreach.css  outreach-app.jsx    Outreach tab, styled for this theme
+         js/  react.min.js  react-dom.min.js  babel.min.js   vendored, in-browser JSX
 data/    leads.json                  cleaned lead lists
 scripts/ build_leads.py build_pool.py
          _head.html _nav.html _foot.html  pages/*.body.html
+server/  outreach.js schema.js auth.js helpers.js   verbatim from rawleads
+         leads.js seed-leads.js no-auth.js           new — see Outreach backend
+         index.js  package.json  .env.example
 mail_merge.csv  leads_full.csv        Pool Finder downloads
 ```
 
@@ -85,18 +125,24 @@ does the two vendored ones.
 
 ## Regenerating
 
-**Leads** — `data/leads.json` is built from the two source spreadsheets:
+**Leads** — `data/leads.json` no longer matches `scripts/build_leads.py`.
+That script builds the *original* two 750-row spreadsheets (NSW-registered
+architects, and a loosely-categorised "landscape" list that turned out to be
+full of unrelated trades — excavation, mowing, fencing). Both lists have
+since been replaced by hand:
 
-```bash
-pip install openpyxl
-python3 scripts/build_leads.py     # edit the SRC path at the top first
-```
+- **`designers`** — the original 750 filtered down to 110 confirmed landscape
+  *design* businesses in Sydney (excavation/mowing/paving/fencing/concreting
+  and other non-design trades removed, regional-NSW rows dropped).
+- **`architects`** — the original 750 general architects replaced entirely.
+  The NSW Architects Registration Board doesn't register landscape
+  architects at all (0 of the original 750 were landscape specialists), so
+  this is a from-scratch list of 66 landscape architecture/design practices
+  in Sydney, compiled from public directories and each firm's own site.
 
-It normalises phone numbers to Australian formats, validates emails, drops
-placeholder values, title-cases shouted names, derives a suburb and postcode
-from free-text addresses, maps postcodes onto NSW regions, and marks LDI/AILDM
-membership only where the source carried separate evidence (28 of 750 —
-the rest are labelled unverified rather than claimed as members).
+Don't run `build_leads.py` against `data/leads.json` — it would overwrite
+both curated lists with the original, uncurated ones. Each list's `note`
+field (shown on the Leads page) documents exactly how it was built.
 
 **Pool Finder and Mail List** — `pool.html` and `mail-list.html` are vendored
 from [ddeonmadeit/pool](https://github.com/ddeonmadeit/pool). The markup,
@@ -113,6 +159,63 @@ python3 scripts/build_pool.py /tmp/pool
 
 The script asserts on every upstream anchor it edits, so if that page changes
 shape the build fails loudly instead of producing a broken page.
+
+## Outreach backend
+
+The Outreach page is [kodiakskode/rawleads](https://github.com/kodiakskode/rawleads)'s
+outreach tab, dropped in per its own README: `server/outreach.js`, `schema.js`,
+`auth.js` and `helpers.js` are carried over verbatim, and `assets/outreach-app.jsx`
+is `src/OutreachTab.jsx` verbatim (only its literal "signal orange" colors were
+hue-rotated to this dashboard's green, so the two never fight — logic and
+structure are untouched). `assets/outreach.css` is `src/outreach.css` scoped
+under `.rl-outreach`, with rawleads' own page chrome (its topbar/nav/theme
+toggle) dropped in favour of this dashboard's, and its design tokens remapped
+to the palette above.
+
+Two files are new, not from rawleads, because a static dashboard with no
+accounts needed a bit more glue than "drop it into your Express app":
+
+| File | Why |
+| --- | --- |
+| `server/leads.js` | Lists leads for the send picker (the route existed in RawLeads' full server.js but wasn't part of the outreach extraction), plus list management: `GET /leads/lists`, `POST /leads/import` and `DELETE /leads/lists/:id` back the Leads page's CSV/Excel importer and the Outreach tab's list filter. |
+| `server/seed-leads.js` | Idempotently imports `data/leads.json` into the SQL `leads` table `server/outreach.js` sends from — the dashboard's leads are a static JSON file, not a database. |
+
+**No login.** There are no user accounts anywhere on this dashboard, and the
+owner chose to run Outreach the same way: `server/no-auth.js` treats every
+request as the same single admin user instead of `server/auth.js`'s JWT
+check. That means anyone who can reach the API can send mail through the
+configured SMTP account and read the send history — acceptable for a
+low-traffic personal tool, but keep `OUTREACH_ALLOWED_ORIGIN` narrow and
+don't publish the server's URL if that trade-off ever needs to change (or
+put it behind auth at the network level, and swap `no-auth` back for
+`auth` in `server/index.js`).
+
+GitHub Pages can't run Node, so this backend runs elsewhere —
+**https://sdl.helixsolution.au**, in production. `outreach.html` and
+`leads.html` both call whatever `SDL_OUTREACH_API_BASE` resolves to: a
+`localStorage.sdl-outreach-api` override if you've set one on that browser,
+falling back to that domain otherwise. The server's CORS allowlist
+(`OUTREACH_ALLOWED_ORIGIN`) must be the dashboard's real GitHub Pages
+origin — `https://kodiakskode.github.io`, no path — or the browser blocks
+every request.
+
+```bash
+cd server
+npm install
+cp .env.example .env      # fill in OUTREACH_SECRET at minimum
+npm start
+```
+
+See `server/.env.example` for every variable (the deploy runbook covers
+running it persistently behind nginx on that domain), and the comment at
+the top of each `server/*.js` file for whether it's verbatim from rawleads
+or new. Open the Outreach tab — it talks to the server directly, no
+sign-in step. To point a browser at a different backend (e.g. while
+developing locally), run:
+
+```js
+localStorage.setItem('sdl-outreach-api', 'http://localhost:3021/rawleads/api');
+```
 
 ## Business metrics (JACK App → Xero → dashboard)
 
@@ -174,11 +277,13 @@ GitHub Pages, project site, free and ad-free. In the repository:
 
 ## Data
 
-Lead lists are compiled from public professional listings — NSW Architects
-Registration Board profiles, and public NSW landscape/garden design business
-listings. Email coverage on the landscape list is thin (18 of 750); phone
-coverage is near total, because most of those businesses publish a contact
-form rather than an address.
+Lead lists are compiled from public business directories (Yellow Pages, True
+Local, Houzz and similar) and each firm's own website — 66 landscape
+architecture practices and 110 landscape design businesses, both scoped to
+the Sydney metro area. Every row with an email has that email confirmed as
+published text on the firm's own site (never guessed or pattern-generated);
+rows without one are phone/website-only. See each list's `note` field
+(shown on the Leads page) for exactly how it was filtered.
 
 Pool data: OpenStreetMap contributors (ODbL) · NSW Spatial Services,
 Department of Customer Service (CC BY 4.0).

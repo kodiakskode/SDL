@@ -6,36 +6,64 @@
 <title>Dashboard · SDL Creations</title>
 <meta name="description" content="SDL Creations dashboard — leads, pool finder and outreach.">
 <link rel="icon" href="assets/logo-light.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700&family=Overpass+Mono:wght@400;600&display=swap">
-<link rel="stylesheet" href="assets/theme.css?v=4">
+<link rel="stylesheet" href="assets/theme.css?v=5">
 <script>
-/* Resolve the theme before first paint so the page never flashes the wrong one. */
+/* Resolve the theme and sidebar open/closed state before first paint so the
+   page never flashes the wrong one. */
 (function(){try{var m=localStorage.getItem("sdl-theme");
 if(m!=="dark"&&m!=="light"){m=window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";}
-document.documentElement.setAttribute("data-theme",m);}catch(e){}})();
+document.documentElement.setAttribute("data-theme",m);
+if(localStorage.getItem("sdl-sidebar")==="collapsed"){document.documentElement.setAttribute("data-sidebar","collapsed");}
+}catch(e){}})();
 </script>
 </head>
 <body>
-<header class="topbar">
-  <div class="topbar-in">
-    <a class="brandmark" href="index.html" aria-label="SDL Creations — home">
-      <img class="logo-light" src="assets/logo-light.svg" alt="SDL Creations" width="319" height="382">
-      <img class="logo-dark" src="assets/logo-dark.svg" alt="SDL Creations" width="319" height="382">
+<div class="app-shell">
+<aside class="sidebar">
+  <button type="button" class="sidebar-brand" id="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="true">
+    <img class="logo-light" src="assets/logo-light.svg" alt="SDL Creations" width="319" height="382">
+    <img class="logo-dark" src="assets/logo-dark.svg" alt="SDL Creations" width="319" height="382">
+  </button>
+  <nav class="sidebar-nav" aria-label="Primary">
+    <a class="navlink" href="index.html">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 11.5 12 4l8 7.5"/>
+        <path d="M6 10.2V20a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9.8"/>
+        <path d="M10 21v-6h4v6"/>
+      </svg></span>
+      <span class="lbl">Home</span>
     </a>
-    <nav class="nav" aria-label="Primary">
-      <a class="navlink" href="index.html">Home</a>
-      <a class="navlink" href="leads.html">Leads</a>
-      <a class="navlink" href="pool.html">Pool Finder</a>
-      <a class="navlink" href="outreach.html">Outreach</a>
-    </nav>
-    <div class="nav-right">
-      <button type="button" class="toggle" id="theme-toggle" aria-pressed="false"
-              aria-label="Switch to dark mode"><span class="knob" aria-hidden="true">☀</span></button>
-    </div>
+    <a class="navlink" href="leads.html">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="15" cy="7.4" r="2.9"/>
+        <path d="M9.6 20.2c0-3.1 2.4-5.3 5.4-5.3s5.4 2.2 5.4 5.3"/>
+        <circle cx="7.9" cy="10.7" r="2.1"/>
+        <path d="M2.6 20.2c0-2.7 2.2-4.6 4.9-4.6.9 0 1.7.2 2.4.6"/>
+      </svg></span>
+      <span class="lbl">Leads</span>
+    </a>
+    <a class="navlink" href="pool.html">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.2 6.7c1.6-1.4 3.2-1.4 4.8 0s3.2 1.4 4.8 0 3.2-1.4 4.8 0 3.2 1.4 4.8 0"/>
+        <path d="M3.2 12.4c1.6-1.4 3.2-1.4 4.8 0s3.2 1.4 4.8 0 3.2-1.4 4.8 0 3.2 1.4 4.8 0"/>
+        <path d="M3.2 18.1c1.6-1.4 3.2-1.4 4.8 0s3.2 1.4 4.8 0 3.2-1.4 4.8 0 3.2 1.4 4.8 0"/>
+      </svg></span>
+      <span class="lbl">Pool Finder</span>
+    </a>
+    <a class="navlink" href="outreach.html">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.5 3 3.4 10.9c-.7.3-.6 1.3.1 1.5l6.3 1.9 1.9 6.3c.2.7 1.2.8 1.5.1L21.5 3z"/>
+        <path d="M10.3 13.2 21.5 3"/>
+      </svg></span>
+      <span class="lbl">Outreach</span>
+    </a>
+  </nav>
+  <div class="sidebar-foot">
+    <button type="button" class="toggle" id="theme-toggle" aria-pressed="false"
+            aria-label="Switch to dark mode"><span class="knob" aria-hidden="true">☀</span></button>
   </div>
-</header>
+</aside>
+<div class="main-col">
 <div class="shell">
 <div class="pagehead">
   <div>
@@ -91,8 +119,8 @@ document.documentElement.setAttribute("data-theme",m);}catch(e){}})();
 
 <p class="eyebrow">Leads</p>
 <div class="stats">
-  <div class="stat"><div class="v" id="h-arch">750</div><div class="k">Architects</div></div>
-  <div class="stat"><div class="v" id="h-land">750</div><div class="k">Designers</div></div>
+  <div class="stat"><div class="v" id="h-arch">66</div><div class="k">Landscape architects</div></div>
+  <div class="stat"><div class="v" id="h-land">110</div><div class="k">Designers</div></div>
   <div class="stat"><div class="v" id="h-email">&mdash;</div><div class="k">With email</div></div>
   <div class="stat ink"><div class="v">12,132</div><div class="k">Pool leads</div></div>
   <div class="stat ink"><div class="v">1,532</div><div class="k">Mail-ready</div></div>
@@ -101,8 +129,8 @@ document.documentElement.setAttribute("data-theme",m);}catch(e){}})();
 <div class="cards">
   <a class="card" href="leads.html">
     <h2>Leads</h2>
-    <p>NSW architects and landscape designers. Switch list, filter, tick rows,
-      copy emails or CSV.</p>
+    <p>Sydney landscape architects and landscape designers. Switch list, filter,
+      tick rows, copy emails or CSV.</p>
     <span class="go">Open &rarr;</span>
   </a>
   <a class="card" href="pool.html">
@@ -113,7 +141,8 @@ document.documentElement.setAttribute("data-theme",m);}catch(e){}})();
   </a>
   <a class="card" href="outreach.html">
     <h2>Outreach</h2>
-    <p>Campaign side. Empty for now.</p>
+    <p>Email templates, SMTP settings, sending and history — talks to the
+      leads above directly.</p>
     <span class="go">Open &rarr;</span>
   </a>
 </div>
@@ -121,11 +150,13 @@ document.documentElement.setAttribute("data-theme",m);}catch(e){}})();
 <details class="note-block">
   <summary>About the data</summary>
   <div class="note-body">
-    <p><b>Leads</b> — 750 NSW-registered architects from NSW Architects Registration
-      Board profiles, and 750 NSW landscape and garden design businesses from public
-      listings. Only 28 of the landscape rows carry separate LDI / AILDM evidence;
-      the rest are marked unverified. Phone coverage there is near total, email
-      coverage is not.</p>
+    <p><b>Leads</b> — 66 Sydney landscape architecture practices and 110 Sydney
+      landscape design businesses, both compiled from public directories and each
+      firm's own site. The original architects list (750 general NSW-registered
+      architects) and the original designers list (750 businesses, most of them
+      unrelated trades like mowing and excavation swept up by a broad category)
+      have both been replaced with these narrower, verified sets — see each
+      list's note in the Leads page for how it was built.</p>
     <p><b>Pool Finder</b> — the tool as built, carried across whole. Same data, same
       scoring, same filters, with address copying added.</p>
     <p><b>Storage</b> — lead status, notes and your light/dark choice live in this
@@ -227,6 +258,8 @@ fetch("data/leads.json").then(function(r){return r.json();}).then(function(d){
   Leads from public professional listings &middot; pool data OpenStreetMap (ODbL) and
   NSW Spatial Services (CC BY 4.0).
 </footer>
+</div>
+</div>
 </div>
 <script src="assets/app.js?v=4"></script>
 </body>

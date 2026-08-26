@@ -1,0 +1,6 @@
+# Outreach backend — local runtime state, never committed
+server/node_modules/
+server/.env
+server/*.db
+server/*.db-shm
+server/*.db-wal

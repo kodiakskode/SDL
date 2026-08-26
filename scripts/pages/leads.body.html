@@ -1,17 +1,17 @@
 <div class="pagehead">
-  <div>
-    <p class="eyebrow">Leads</p>
-    <h1>NSW professional contacts</h1>
-    <p class="lede" id="list-note">&nbsp;</p>
-  </div>
   <div class="ctl-group">
     <span class="ctl-label">List</span>
     <select id="f-list" aria-label="Which lead list to show">
-      <option value="architects">Architects</option>
+      <option value="all">All Lists</option>
+      <option value="architects">Landscape Architects</option>
       <option value="designers">Landscape Designers</option>
     </select>
+    <button type="button" class="btn" id="import-list">Import CSV / Excel&hellip;</button>
+    <button type="button" class="btn danger" id="delete-list" hidden>Delete this list</button>
+    <input type="file" id="import-file" accept=".csv,.xlsx,.xls" hidden>
   </div>
 </div>
+<p class="eyebrow" id="import-note" style="min-height:1em"></p>
 
 <div class="stats">
   <div class="stat"><div class="v" id="k-total">&mdash;</div><div class="k">In list</div></div>
@@ -69,4 +69,6 @@
 
 <p class="eyebrow" style="margin-top:var(--s2)">Tick rows to narrow it &mdash; with nothing ticked, copying takes every filtered row</p>
 
-<script src="assets/leads.js?v=3"></script>
+<script>window.SDL_OUTREACH_API_BASE = localStorage.getItem('sdl-outreach-api') || 'https://sdl.helixsolution.au/rawleads/api';</script>
+<script src="assets/js/xlsx.full.min.js"></script>
+<script src="assets/leads.js?v=4"></script>

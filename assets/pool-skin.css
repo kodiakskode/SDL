@@ -77,6 +77,24 @@ input[type=search],input[type=number],select{
 }
 input[type=search]{min-width:200px;flex:1 1 220px;}
 input[type=number]{width:62px;}
+/* appearance:none sidesteps a Chromium bug where the page-wide CSS zoom
+   clips the top of native <select> text; the chevron replaces the arrow
+   it removes. Redeclared here (not just in theme.css) because this rule
+   loads after theme.css's and would otherwise win the cascade and wipe
+   the chevron back out via its own background shorthand. */
+select{
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  padding-right:30px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a7c66' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"),
+                    linear-gradient(180deg,var(--well-top),var(--well-bot));
+  background-repeat:no-repeat,no-repeat;
+  background-position:right 10px center,0 0;
+  background-size:11px 11px,auto;
+}
+[data-theme="dark"] select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23877f70' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"),
+                    linear-gradient(180deg,var(--well-top),var(--well-bot));
+}
 option{background:var(--panel-top);color:var(--ink);}
 .ctl-label{font-size:.55rem;letter-spacing:.15em;color:var(--ink-3);}
 .ctl-group{

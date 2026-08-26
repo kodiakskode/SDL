@@ -48,13 +48,18 @@
   function ticks(max, count) {
     var raw = max / count;
     var mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
-    var step = mag;
-    [1, 2, 2.5, 5, 10].some(function (m) {
+    var step = mag * 10;
+    [1, 2, 2.5, 4, 5, 10].some(function (m) {
       if (mag * m >= raw) { step = mag * m; return true; }
       return false;
     });
+    // Run past max, never up to it — stopping early puts the top gridline
+    // below the highest point and the line overshoots the plot.
     var out = [];
-    for (var v = 0; v <= max + step * 0.001; v += step) out.push(v);
+    for (var v = 0; ; v += step) {
+      out.push(v);
+      if (v >= max) break;
+    }
     return out;
   }
 

@@ -4,6 +4,7 @@
   "use strict";
 
   var KEY = "sdl-theme";
+  var SIDEBAR_KEY = "sdl-sidebar";
 
   /* Theme is resolved before first paint by the inline snippet in each page;
      this only wires the control and keeps the two in sync. */
@@ -24,11 +25,27 @@
     }
   }
 
+  /* Sidebar open/closed is likewise resolved before first paint; this wires
+     the logo button that toggles it and keeps the two in sync. */
+  function sidebarState() {
+    return document.documentElement.getAttribute("data-sidebar") === "collapsed"
+      ? "collapsed" : "open";
+  }
+
+  function applySidebar(state) {
+    if (state === "collapsed") {
+      document.documentElement.setAttribute("data-sidebar", "collapsed");
+    } else {
+      document.documentElement.removeAttribute("data-sidebar");
+    }
+    try { localStorage.setItem(SIDEBAR_KEY, state); } catch (e) { /* private mode */ }
+    var btn = document.getElementById("sidebar-toggle");
+    if (btn) btn.setAttribute("aria-expanded", state === "open" ? "true" : "false");
+  }
+
   function buildChrome() {
-    var bar = document.querySelector(".topbar");
-    if (!bar) return;
     var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
-    bar.querySelectorAll(".navlink").forEach(function (a) {
+    document.querySelectorAll(".sidebar-nav .navlink").forEach(function (a) {
       var target = (a.getAttribute("href") || "").split("/").pop().toLowerCase();
       if (target === here || (here === "" && target === "index.html")) {
         a.setAttribute("aria-current", "page");
@@ -41,6 +58,14 @@
       });
     }
     apply(current());
+
+    var sidebarBtn = document.getElementById("sidebar-toggle");
+    if (sidebarBtn) {
+      sidebarBtn.addEventListener("click", function () {
+        applySidebar(sidebarState() === "collapsed" ? "open" : "collapsed");
+      });
+    }
+    applySidebar(sidebarState());
   }
 
   /* Clipboard with a fallback for browsers that block the async API on

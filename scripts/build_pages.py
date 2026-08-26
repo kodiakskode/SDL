@@ -14,9 +14,9 @@ PAGES = [
     ("index.html", "Dashboard",
      "SDL Creations dashboard — leads, pool finder and outreach."),
     ("leads.html", "Leads",
-     "NSW architects and landscape designers — filter, tick and copy contact details."),
+     "Sydney landscape architects and landscape designers — filter, tick and copy contact details."),
     ("outreach.html", "Outreach",
-     "SDL Creations outreach — placeholder."),
+     "SDL Creations outreach — email templates, SMTP settings, sending and history."),
 ]
 
 read = lambda *p: open(os.path.join(*p), encoding="utf-8").read()

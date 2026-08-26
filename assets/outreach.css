@@ -1,0 +1,953 @@
+/* Adapted from kodiakskode/rawleads src/outreach.css for the SDL Creations
+   dashboard: scoped under .rl-outreach, page chrome dropped (SDL supplies its
+   own header/nav/theme toggle), design tokens remapped to SDL's taupe/cream +
+   olive palette, and every literal accent color hue-rotated from rawleads'
+   orange to SDL's green so the two never fight. Font is Helvetica throughout,
+   matching the rest of the dashboard. Generated — see scripts/build_outreach.py. */
+
+/* ── Design Tokens ────────────────────────────────────────────────── */
+.rl-outreach *{box-sizing:border-box;margin:0;padding:0}
+.rl-outreach{
+  --panel-900:#1a1815; --panel-800:#242220; --panel-700:#2c2a27;
+  --panel-600:#353330; --panel-500:#423f3b;
+  --cream-100:#efe8db; --cream-300:#b8ae9c; --cream-500:#877f70;
+  --signal:#a8b063; --signal-dim:#6f7639; --signal-glow:#c2ca82; --done:#a8b063;
+  --edge-light:rgba(255,248,235,0.10); --edge-dark:rgba(0,0,0,0.45);
+  --cast-soft:rgba(0,0,0,0.6); --cast-mid:rgba(0,0,0,0.55);
+  --bg-1:#2b2926; --bg-2:#181714;
+  --metal-top:#36332f; --metal-mid:#2d2b28; --metal-bot:#262320; --metal-edge:rgba(255,248,235,0.10);
+  --chassis-top:#322f2a; --chassis-mid:#2b2823; --chassis-bot:#262320;
+  --k-face-top:#3c3a35; --k-face-bot:#252320;
+  --k-top:rgba(255,248,235,0.16); --k-sheen:rgba(255,248,235,0.05);
+  --k-under:rgba(0,0,0,0.50); --k-botline:rgba(0,0,0,0.65);
+  --key-wall:#141008;
+  --tray-top:#0e0d0b; --tray-bot:#161412;
+  --tray-recess:rgba(0,0,0,0.90); --tray-lip:rgba(255,248,235,0.08);
+  --bg:#181714; --surf:#2c2a27; --surf2:#353330; --surf3:#3d3b37;
+  --border:rgba(0,0,0,0.45); --border2:rgba(0,0,0,0.65);
+  --accent:#a8b063; --accent2:#c2ca82; --accent-dim:#6f7639;
+  --accent-glow:rgba(168,176,99,0.14); --accent-glow2:rgba(168,176,99,0.24);
+  --text:#efe8db; --dim:#b8ae9c; --muted:#877f70; --faint:#5d574d;
+  --red:#b1a26f; --green:#7f8f6a; --yellow:#8aaa68;
+  --blue:#5B8EC4; --purple:#9B6EC4;
+  --teal:#a8b063; --teal2:#6f7639;
+  --teal-glow:rgba(168,176,99,0.14); --border-teal:rgba(168,176,99,0.3);
+  --glass:rgba(236,230,218,0.045);
+  --sh-raised:0 1px 0 var(--edge-light) inset,0 6px 14px -4px rgba(0,0,0,0.5);
+  --sh-raised-sm:0 1px 0 var(--edge-light) inset,0 3px 8px -2px rgba(0,0,0,0.5);
+  --sh-debossed:0 2px 5px var(--edge-dark) inset,0 -1px 0 var(--edge-light) inset;
+  --sh-accent:0 6px 18px -4px rgba(0,0,0,0.6),0 0 24px -2px rgba(168,176,99,0.45);
+  background:transparent;color:var(--cream-100);
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;letter-spacing:.01em;
+}
+/* Dark body color fills behind Safari chrome (notch, home indicator) — no white flash */
+/* Light theme — match surround color behind browser chrome */
+/* Prevent body scroll — only .content-area should scroll */
+/* ── Keyframe Animations ────────────────────────────────────────── */
+@keyframes led-pulse{
+  0%,100%{box-shadow:0 0 6px rgba(163,175,86,.9),0 0 2px rgba(192,211,124,1)}
+  50%{box-shadow:0 0 12px rgba(163,175,86,1),0 0 5px rgba(182,211,124,1),0 0 18px rgba(163,175,86,.5)}
+}
+@keyframes tab-fadein{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes scanline-drift{
+  0%{background-position:0 0}
+  100%{background-position:0 100px}
+}
+@keyframes amber-flicker{
+  0%,100%{opacity:1}
+  92%{opacity:1}
+  93%{opacity:.85}
+  94%{opacity:1}
+  96%{opacity:.9}
+  97%{opacity:1}
+}
+@keyframes warm-breathe{
+  0%,100%{box-shadow:0 0 0 rgba(163,175,86,0)}
+  50%{box-shadow:0 0 30px rgba(163,175,86,.06)}
+}
+@keyframes sweep{0%{left:-32%}100%{left:100%}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes level{0%,100%{width:60%}50%{width:66%}}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* Incandescent filament flicker — mostly steady with brief irregular dips */
+@keyframes filament-flicker{
+  0%,100%{opacity:1}
+  6%{opacity:1}7%{opacity:.80}8%{opacity:1}
+  22%{opacity:1}23%{opacity:.90}24%{opacity:1}
+  41%{opacity:1}42%{opacity:.68}43%{opacity:1}44%{opacity:.88}45%{opacity:1}
+  67%{opacity:1}68%{opacity:.78}69%{opacity:1}
+  85%{opacity:1}86%{opacity:.92}87%{opacity:1}
+}
+/* Lamp bloom — the warm pool a lit element casts onto the panel gently breathes */
+@keyframes lamp-bloom{
+  0%,100%{opacity:.85}
+  43%{opacity:.62}
+  68%{opacity:.95}
+}
+/* Grain — matte molded plastic texture over entire surface */
+.rl-outreach body::after {
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Vignette — the room falls into shadow at the edges, contrast for the lit instrument */
+.rl-outreach body::before {
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9997;
+  background:radial-gradient(ellipse 96% 84% at 50% 40%,transparent 56%,rgba(0,0,0,.30) 82%,rgba(0,0,0,.6) 100%);
+}
+/* Cursor shadow — pointer floats above the machine */
+/* ── Layout ──────────────────────────────────────────────────────── */
+/* The whole app sits in a dark room with a gap at the top, so the instrument reads as a single physical object resting on a surface. */
+/* ── Chassis — the rounded-top brushed-metal body of the instrument ── */
+/* Top sheen — one overhead light catching the curved top lip */
+/* ── Top Bar — Instrument Panel ─────────────────────────────── */
+/* Hard shadow line cast by the raised rail onto the interior below */
+/* Absolutely center the keytray in the topbar */
+/* ── Brand plate ─────────────────────────────────────────── */
+/* ── Keytray (recessed tray that holds the keys) ─────────── */
+/* ── Navkey + nav-btn (same keycap style) ─────────────────── */
+/* Lit/active navkey — smoked plastic + internal amber LED glow */
+/* ── Top-nav text keys (word labels on desktop, icons on mobile) ─── */
+/* Settings key — always a gear icon, never a word */
+/* Mobile — nav drops to its own centered row, every key collapses to its icon */
+@media(max-width:820px){}
+/* LED dot (hidden — navkeys use ambient glow instead) */
+/* ── Data-source selector (text keycap buttons) ──────────────── */
+/* ── Source selector — seg-style: flat tray, transparent inactive, lit active ── */
+.rl-outreach .src-tray {display:inline-flex;gap:4px;padding:5px;border-radius:11px;background:linear-gradient(180deg,var(--tray-top),var(--tray-bot));box-shadow:inset 0 4px 10px var(--tray-recess),inset 0 -2px 1px var(--tray-lip),0 1px 0 var(--edge-light);transition:background 280ms ease}
+.rl-outreach .src-btn {border:none;cursor:pointer;color:var(--cream-300);background:transparent;display:inline-flex;align-items:center;justify-content:center;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif,-apple-system,sans-serif;padding:8px 14px;border-radius:8px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.64rem;white-space:nowrap;transition:all 90ms}
+.rl-outreach .src-btn:hover:not(.active) {color:var(--cream-100)}
+.rl-outreach .src-btn.active {color:#d6e7b8;background:radial-gradient(ellipse 80% 90% at 50% 60%,rgba(184,206,109,.8),rgba(107,109,43,.5) 50%,transparent 82%),linear-gradient(180deg,#222212,#160a05);box-shadow:inset 0 1px 0 rgba(202,221,154,.22),inset 0 2px 7px rgba(8,3,0,.7),0 0 14px -2px rgba(154,164,64,.5);text-shadow:0 0 7px rgba(198,212,125,.55);animation:filament-flicker 3.9s linear infinite 0.65s}
+/* ── Large icon keycap (page-level primary actions) ────────── */
+.rl-outreach .key {
+  position:relative;border:none;cursor:pointer;
+  color:var(--cream-300);
+  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot));
+  display:inline-grid;place-items:center;
+  width:62px;height:56px;border-radius:14px;
+  transition:transform 70ms ease,box-shadow 70ms ease,color 120ms ease;
+  box-shadow:
+    inset 0 2.5px 0 var(--k-top),
+    inset 0 5px 10px var(--k-sheen),
+    inset 0 -12px 15px var(--k-under),
+    inset 0 -2px 0 var(--k-botline),
+    0 8px 0 var(--key-wall),
+    0 12px 18px -4px var(--cast-mid),
+    0 22px 34px -8px var(--cast-soft);
+}
+.rl-outreach .key:hover {color:var(--cream-100)}
+.rl-outreach .key .glyph {position:relative;z-index:1;display:grid;place-items:center}
+.rl-outreach .key .glyph svg {width:22px;height:22px;display:block}
+.rl-outreach .key:active {
+  transform:translateY(7px);
+  box-shadow:
+    inset 0 2px 0 var(--k-top),
+    inset 0 -7px 10px var(--k-under),
+    inset 0 -2px 0 var(--k-botline),
+    0 1px 0 var(--key-wall),
+    0 3px 6px -2px var(--cast-mid);
+}
+/* Signal key — the one lit primary action */
+.rl-outreach .key--sig {
+  color:#e4edca;
+  background:
+    radial-gradient(circle at 50% 42%,rgba(219,231,184,.98) 0%,rgba(198,212,125,.92) 11%,transparent 30%),
+    radial-gradient(circle at 50% 47%,rgba(176,189,95,.95) 0%,rgba(154,160,76,.72) 32%,rgba(96,96,46,.45) 56%,transparent 74%),
+    radial-gradient(circle at 50% 118%,rgba(0,0,0,.65) 0%,transparent 58%),
+    linear-gradient(180deg,#33341c 0%,#17170c 100%);
+  text-shadow:0 0 11px rgba(198,212,125,.9),0 0 4px rgba(215,226,169,.85);
+  box-shadow:
+    inset 0 1.5px 0 rgba(227,236,197,.45),
+    inset 0 0 18px 4px rgba(36,35,16,.6),
+    inset 0 -9px 13px rgba(0,0,0,.62),
+    inset 0 -1.5px 0 rgba(0,0,0,.65),
+    0 6px 0 #120604,
+    0 9px 13px -3px rgba(0,0,0,.55),
+    0 0 34px -2px rgba(176,189,95,.6),
+    0 0 15px -1px rgba(198,212,125,.5);
+}
+.rl-outreach .key--sig::before {
+  content:"";position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+  width:34px;height:34px;border-radius:50%;z-index:0;
+  box-shadow:0 0 0 1.5px rgba(198,214,133,.7),0 0 18px 3px rgba(176,189,95,.55),inset 0 0 9px rgba(201,217,142,.4);
+}
+.rl-outreach .key--sig .glyph svg {stroke:#ffe0c2;stroke-width:2.6;filter:drop-shadow(0 0 8px rgba(198,212,125,.95))}
+.rl-outreach .key--sig:active {
+  transform:translateY(5px);
+  box-shadow:
+    inset 0 1.5px 0 rgba(227,236,197,.45),
+    inset 0 0 16px 4px rgba(36,35,16,.6),
+    inset 0 -6px 10px rgba(0,0,0,.6),
+    inset 0 -1.5px 0 rgba(0,0,0,.6),
+    0 1px 0 #120604,
+    0 0 22px -3px rgba(176,189,95,.55);
+}
+/* ── Small action button (table row actions) ───────────────── */
+.rl-outreach .kbtn {
+  position:relative;border:none;cursor:pointer;
+  color:var(--cream-300);
+  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot));
+  display:inline-grid;place-items:center;
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  height:30px;min-width:32px;padding:0 10px;border-radius:8px;
+  transition:transform 70ms ease,box-shadow 70ms ease,color 120ms ease;
+  box-shadow:
+    inset 0 1.5px 0 var(--k-top),
+    inset 0 3px 5px var(--k-sheen),
+    inset 0 -7px 9px var(--k-under),
+    inset 0 -1.5px 0 var(--k-botline),
+    0 4px 0 var(--key-wall),
+    0 6px 12px -3px var(--cast-mid);
+}
+.rl-outreach .kbtn svg {width:13px;height:13px;display:block}
+.rl-outreach .kbtn:hover {color:var(--cream-100)}
+.rl-outreach .kbtn:active {
+  transform:translateY(4px);
+  box-shadow:inset 0 1.5px 0 var(--k-top),inset 0 -4px 5px var(--k-under),inset 0 -1.5px 0 var(--k-botline),0 1px 0 var(--key-wall);
+}
+/* ── LED status indicator (jobs) ───────────────────────────── */
+.rl-outreach .led {
+  width:11px;height:11px;border-radius:50%;position:relative;flex-shrink:0;
+  background:linear-gradient(180deg,var(--tray-top),var(--tray-bot));
+  box-shadow:inset 0 1px 3px var(--tray-recess),0 1px 0 var(--edge-light);
+}
+.rl-outreach .led::after {content:"";position:absolute;inset:2.5px;border-radius:50%;background:var(--panel-700)}
+.rl-outreach .led.done::after {background:radial-gradient(circle at 42% 36%,#cfe0b4,var(--done) 60%);box-shadow:0 0 7px 1px rgba(127,143,106,.85),0 0 2px rgba(207,224,180,.9),inset 0 1px 1px rgba(255,255,255,.25)}
+.rl-outreach .led.run::after {background:radial-gradient(circle at 42% 36%,#e0ebc2,var(--signal-glow) 58%);box-shadow:0 0 9px 1px rgba(189,201,92,.8),0 0 3px rgba(210,226,169,.8),inset 0 1px 1px rgba(255,235,210,.3);animation:pulse 1.4s ease-in-out infinite}
+.rl-outreach .led.queue::after {background:var(--signal-dim);box-shadow:0 0 5px 1px rgba(176,189,95,.5);animation:pulse 1.8s ease-in-out infinite}
+.rl-outreach .status {display:flex;align-items:center;gap:8px}
+.rl-outreach .status .label {font-size:.58rem;font-weight:700;letter-spacing:.10em;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+.rl-outreach .status.done .label {color:var(--done);text-shadow:0 0 7px rgba(127,143,106,.7)}
+.rl-outreach .status.run .label {color:var(--signal-glow);text-shadow:0 0 7px rgba(190,203,98,.6),0 0 13px rgba(144,155,61,.35)}
+.rl-outreach .status.queue .label {color:var(--signal-dim);text-shadow:0 0 6px rgba(176,189,95,.4)}
+.rl-outreach .status.err .label {color:#d4c07d;text-shadow:0 0 7px rgba(212,192,125,.5)}
+/* Animated queue sweep bar */
+.rl-outreach .queue-strip {
+  grid-column:1/-1;margin-top:14px;padding:14px 18px;border-radius:10px;
+  background:linear-gradient(180deg,var(--tray-top),var(--tray-bot));
+  display:flex;align-items:center;gap:14px;
+  box-shadow:inset 0 3px 8px var(--tray-recess),inset 0 -2px 1px var(--tray-lip);
+  transition:background 280ms ease;
+}
+.rl-outreach .qlabel {
+  font-size:.6rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cream-300);flex:0 0 auto;min-width:280px;white-space:nowrap;
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+.rl-outreach .qlabel .rot {color:var(--signal-glow);font-weight:700;transition:opacity 240ms ease;text-shadow:0 0 8px rgba(176,189,95,.5)}
+.rl-outreach .track {
+  flex:1;height:6px;border-radius:3px;
+  background:#0e0d0b;
+  box-shadow:inset 0 2px 3px rgba(0,0,0,.7),inset 0 -1px 0 var(--edge-light);
+  overflow:hidden;position:relative;
+}
+.rl-outreach .track .sweep {
+  position:absolute;top:0;left:-32%;height:100%;width:32%;border-radius:3px;
+  background:linear-gradient(90deg,transparent,var(--signal-glow),transparent);
+  box-shadow:0 0 10px 1px rgba(176,189,95,.5);
+  animation:sweep 1.6s linear infinite;
+}
+/* ── Running-job console ───────────────────────────────────── */
+.rl-outreach .console {position:relative;border-radius:14px;padding:16px 18px;margin-bottom:18px;overflow:hidden;
+  background:linear-gradient(180deg,#14160c,#0d0704);
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.92),inset 0 1px 2px rgba(0,0,0,.9),inset 0 -1px 0 rgba(192,211,124,.12),0 1px 0 rgba(255,248,235,.05);}
+.rl-outreach .console::before {content:"";position:absolute;inset:0;top:0;left:0;right:0;height:46%;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.06),transparent)}
+.rl-outreach .con-glow {position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:radial-gradient(ellipse 80% 130% at 28% 55%,rgba(176,189,95,.2),transparent 68%);animation:lamp-bloom 6s ease-in-out infinite}
+.rl-outreach .con-scan {position:absolute;inset:0;pointer-events:none;border-radius:inherit;opacity:.45;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px)}
+.rl-outreach .con-in {position:relative;z-index:1}
+.rl-outreach .con-top {display:flex;justify-content:space-between;align-items:center;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
+.rl-outreach .con-tag {color:#ccdb94;display:flex;align-items:center;gap:7px}
+.rl-outreach .con-tag i {width:8px;height:8px;border-radius:50%;background:#ccdb94;box-shadow:0 0 8px 1px rgba(189,206,109,.9);animation:pulse 1.4s ease-in-out infinite;font-style:normal;display:inline-block;flex-shrink:0}
+.rl-outreach .con-meta {color:rgba(203,214,131,.55);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase}
+.rl-outreach .con-title {font-size:1.5rem;font-weight:800;letter-spacing:.04em;color:#d2e0a3;margin:8px 0 12px;text-shadow:0 0 14px rgba(176,189,95,.7),0 0 4px rgba(207,221,154,.6);animation:filament-flicker 7s linear infinite}
+.rl-outreach .meter {height:13px;border-radius:3px;position:relative;overflow:hidden;background:#0a0503;box-shadow:inset 0 1px 3px rgba(0,0,0,.95)}
+.rl-outreach .meter-fill {position:absolute;top:0;left:0;bottom:0;background:linear-gradient(90deg,#666d2f,#afb966 78%,#d3e2a7);box-shadow:0 0 12px rgba(176,189,95,.7);animation:level 5s ease-in-out infinite;transition:width .3s linear}
+.rl-outreach .meter-segs {position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 8px,#0a0503 8px 10px)}
+.rl-outreach .con-bot {display:flex;justify-content:space-between;align-items:center;margin-top:11px;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(204,216,139,.6);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+.rl-outreach .con-bot b {color:#d3e2a7;font-variant-numeric:tabular-nums}
+.rl-outreach .con-rot {color:#c8d685;text-shadow:0 0 8px rgba(176,189,95,.5);transition:opacity .24s ease}
+/* ── Jobs well (recessed table) ────────────────────────────── */
+.rl-outreach .well {position:relative;border-radius:14px;overflow:hidden;
+  background:linear-gradient(180deg,#1d1b18,#211f1b);
+  box-shadow:inset 0 5px 13px rgba(0,0,0,.82),inset 0 2px 3px rgba(0,0,0,.7),inset 0 -2px 1px rgba(255,248,235,.05),0 1px 0 rgba(255,248,235,.05);}
+.rl-outreach .well-head {display:grid;gap:12px;padding:14px 20px 11px;font-size:.58rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+.rl-outreach .jrow {display:grid;gap:12px;align-items:center;padding:16px 20px}
+.rl-outreach .jrow+.jrow {border-top:1px solid var(--edge-dark);box-shadow:inset 0 1px 0 var(--edge-light)}
+.rl-outreach .jcols {grid-template-columns:1.6fr 1.2fr .9fr .5fr .9fr .65fr}
+@media(max-width:760px){.rl-outreach .jcols {grid-template-columns:1fr 1fr;}.rl-outreach .well-head {display:none}.rl-outreach .jrow {row-gap:6px}}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.rl-outreach .jrow:nth-child(1) {animation:rise 220ms ease-out 40ms both}
+.rl-outreach .jrow:nth-child(2) {animation:rise 220ms ease-out 90ms both}
+.rl-outreach .jrow:nth-child(3) {animation:rise 220ms ease-out 140ms both}
+.rl-outreach .jrow:nth-child(4) {animation:rise 220ms ease-out 190ms both}
+.rl-outreach .jrow:nth-child(5) {animation:rise 220ms ease-out 240ms both}
+.rl-outreach .jrow:nth-child(6) {animation:rise 220ms ease-out 290ms both}
+.rl-outreach .jrow:nth-child(7) {animation:rise 220ms ease-out 340ms both}
+.rl-outreach .jrow:nth-child(8) {animation:rise 220ms ease-out 390ms both}
+.rl-outreach .jrow:nth-child(n+9) {animation:rise 220ms ease-out 430ms both}
+.rl-outreach .j-ind {display:flex;flex-direction:column;gap:3px}
+.rl-outreach .j-ind .jname {font-weight:700;font-size:.92rem;color:var(--cream-100);text-transform:capitalize}
+.rl-outreach .j-ind .jloc {font-size:.65rem;color:var(--cream-300);display:flex;align-items:center;gap:5px}
+.rl-outreach .j-ind .jloc::before {content:"";width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--panel-900);box-shadow:0 1px 1px var(--edge-light),inset 0 1px 2px var(--edge-dark)}
+.rl-outreach .j-leads {font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;color:var(--cream-100)}
+.rl-outreach .j-date {font-size:.65rem;color:var(--cream-300);font-variant-numeric:tabular-nums}
+.rl-outreach .j-actions {display:flex;gap:5px;justify-content:flex-end}
+/* ── Leads well grid ───────────────────────────────────────── */
+.rl-outreach .lcols-all {grid-template-columns:.32fr 1.8fr .85fr 1.3fr .8fr .7fr .55fr}
+.rl-outreach .lcols-ig {grid-template-columns:1.8fr .8fr .65fr 1.3fr .8fr .7fr 1.1fr}
+.rl-outreach .lcols-maps {grid-template-columns:1.8fr .85fr 1.3fr .9fr .85fr .7fr .36fr}
+@media(max-width:760px){.rl-outreach .lcols-all, .rl-outreach .lcols-ig, .rl-outreach .lcols-maps {grid-template-columns:1fr 1fr;}}
+.rl-outreach .l-cell {font-size:.74rem;font-variant-numeric:tabular-nums;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rl-outreach .l-link {color:var(--teal);text-decoration:none}
+.rl-outreach .l-link:hover {text-decoration:underline}
+.rl-outreach .l-dim {color:var(--cream-500)}
+/* ── Sign out key ──────────────────────────────────────────── */
+/* ── User email chip ───────────────────────────────────────── */
+/* ── Nav layout helpers ─────────────────────────────────────── */
+/* ── Inputs — debossed into surface ──────────────────────────────── */
+.rl-outreach input, .rl-outreach select, .rl-outreach textarea {
+  background:var(--panel-900);border:1px solid var(--edge-dark);color:var(--cream-100);
+  border-radius:6px;padding:11px 14px;font-size:14px;outline:none;height:auto;
+  transition:border-color .2s,box-shadow .2s,background 280ms ease;font-family:inherit;
+  box-shadow:inset 0 2px 5px var(--tray-recess),inset 0 -1px 0 var(--edge-light);
+}
+.rl-outreach input:focus, .rl-outreach select:focus, .rl-outreach textarea:focus {
+  border-color:var(--signal);
+  box-shadow:inset 0 2px 5px var(--tray-recess),0 0 0 2px rgba(152,160,81,.18);
+}
+/* appearance:none sidesteps a Chromium bug where the page-wide CSS zoom
+   clips the top of native <select> text; the chevron replaces the arrow
+   that removes. */
+.rl-outreach select {
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  padding-right:36px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23877f70' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  background-size:12px 12px;
+}
+.rl-outreach .chip-select {
+  padding-right:4px;background-image:none;
+}
+/* ── Hardware fader (range input) ──────────────────────────── */
+.rl-outreach input[type="range"] {
+  -webkit-appearance:none;appearance:none;
+  height:7px;width:100%;padding:0;border:none;
+  /* glowing amber filament that fades at the left tip, sunk into a dark recessed channel */
+  background:linear-gradient(90deg,
+    rgba(195,208,115,.28) 0%,
+    rgba(195,211,122,.95) calc(var(--fill,10%) - 2%),
+    rgba(207,221,154,.85) var(--fill,10%),
+    #0b0705 calc(var(--fill,10%) + 1%),
+    #0b0705 100%);
+  border-radius:4px;outline:none;cursor:pointer;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.78),inset 0 -1px 0 rgba(255,248,235,.05),0 0 9px -1px rgba(189,201,92,.38);
+}
+.rl-outreach input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance:none;appearance:none;
+  width:15px;height:26px;border-radius:5px;
+  background:linear-gradient(180deg,var(--panel-500) 0%,var(--panel-600) 55%,var(--panel-700) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,235,.16),
+    inset 0 -1px 0 rgba(0,0,0,.52),
+    0 3px 7px -1px rgba(0,0,0,.55);
+  cursor:pointer;
+}
+.rl-outreach input[type="range"]::-webkit-slider-thumb:active {
+  background:linear-gradient(180deg,var(--panel-600),var(--panel-700));
+  box-shadow:inset 0 2px 3px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,248,235,.06);
+}
+.rl-outreach input[type="range"]::-moz-range-thumb {
+  width:15px;height:26px;border-radius:5px;border:none;
+  background:linear-gradient(180deg,var(--panel-500) 0%,var(--panel-600) 55%,var(--panel-700) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,248,235,.16),inset 0 -1px 0 rgba(0,0,0,.52),0 3px 7px -1px rgba(0,0,0,.55);
+  cursor:pointer;
+}
+.rl-outreach input[type="range"]::-moz-range-track {
+  height:7px;background:var(--panel-900);border-radius:4px;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.65);
+}
+/* ── Star LED indicator ─────────────────────────────────────── */
+.rl-outreach .star-led {
+  display:inline-block;width:18px;height:18px;line-height:18px;
+  font-size:17px;cursor:pointer;user-select:none;
+  /* Unlit: sunken into the panel — same family as the panel, carved with a dark top wall + lit bottom lip */
+  color:#2a2825;
+  text-shadow:0 1px 0 rgba(255,248,235,.07),0 -1px 1px rgba(0,0,0,.6),0 0 1px rgba(0,0,0,.5);
+  transition:color .14s ease,text-shadow .14s ease,filter .14s ease;
+}
+.rl-outreach .star-led:hover {color:#5a534a;text-shadow:0 1px 0 rgba(255,248,235,.05),0 -1px 1px rgba(0,0,0,.5)}
+.rl-outreach .star-led.lit {
+  color:#d2e0a3;
+  text-shadow:
+    0 0 3px rgba(219,234,191,.98),
+    0 0 8px rgba(184,206,109,.92),
+    0 0 16px rgba(154,164,64,.75),
+    0 0 26px rgba(144,153,60,.45);
+  filter:drop-shadow(0 0 5px rgba(190,203,98,.65));
+  animation:filament-flicker 4.2s linear infinite;
+}
+.rl-outreach select option {background:var(--panel-700)}
+.rl-outreach input::placeholder {color:var(--faint)}
+/* ── Content Buttons ─────────────────────────────────────────────── */
+.rl-outreach button {cursor:pointer;border:none;border-radius:5px;font-size:13px;font-weight:600;transition:all .1s;font-family:inherit;letter-spacing:.02em}
+.rl-outreach .btn {
+  background:linear-gradient(180deg,#242018,#181511);
+  color:var(--dim);padding:10px 18px;
+  border:1px solid rgba(0,0,0,.55);
+  box-shadow:0 2px 5px rgba(0,0,0,.5),inset 0 1px 0 rgba(184,216,139,.06),inset 0 -1px 0 rgba(0,0,0,.35);
+}
+.rl-outreach .btn:hover:not(:disabled) {background:linear-gradient(180deg,#302A1E,#241E16);color:var(--text);border-color:rgba(0,0,0,.6)}
+.rl-outreach .btn:active:not(:disabled) {background:linear-gradient(180deg,#0A0906,#111009);box-shadow:inset 0 2px 6px rgba(0,0,0,.8),inset 0 -1px 0 rgba(184,216,139,.02)}
+/* btn-teal — smoked plastic primary action, internal amber LED */
+.rl-outreach .btn-teal {
+  color:#d6e7b8;
+  padding:15px 22px;border-radius:7px;line-height:1;
+  background:
+    radial-gradient(ellipse 75% 80% at 50% 70%,rgba(165,188,85,.88) 0%,rgba(149,155,61,.72) 20%,rgba(98,99,37,.50) 44%,rgba(37,37,13,.26) 68%,transparent 84%),
+    radial-gradient(ellipse 50% 35% at 50% 22%,rgba(186,198,85,.16) 0%,transparent 70%),
+    linear-gradient(180deg,rgba(40,37,33,.97),rgba(24,22,18,.99));
+  border:none;
+  box-shadow:
+    inset 0 1px 0 rgba(198,220,150,.24),
+    inset 0 3px 8px rgba(12,4,1,.62),
+    inset 0 -2px 6px rgba(144,151,59,.17),
+    inset 0 -1px 0 rgba(0,0,0,.88),
+    0 4px 0 rgba(10,4,1,.88),
+    0 8px 18px -4px rgba(0,0,0,.6),
+    0 0 22px -2px rgba(144,155,61,.62),
+    0 0 10px -1px rgba(189,201,92,.48);
+  filter:drop-shadow(0 0 4px rgba(142,151,60,.38));
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  animation:filament-flicker 6.3s linear infinite 2.2s;
+}
+.rl-outreach .btn-teal:hover:not(:disabled) {
+  filter:drop-shadow(0 0 7px rgba(142,151,60,.58));color:#dcecc8;
+}
+.rl-outreach .btn-teal:active:not(:disabled) {
+  transform:translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(198,220,150,.15),
+    inset 0 4px 10px rgba(12,4,1,.72),
+    inset 0 -1px 4px rgba(144,151,59,.14),
+    inset 0 -1px 0 rgba(0,0,0,.92),
+    0 1px 0 rgba(10,4,1,.88),
+    0 0 15px -2px rgba(144,155,61,.52);
+  filter:none;
+}
+.rl-outreach .btn-purple {background:linear-gradient(180deg,#AA7AD4,#8B5CB8);color:#fff;padding:9px 18px;font-weight:700;border:1px solid rgba(0,0,0,.3);box-shadow:0 2px 6px rgba(155,110,196,.3)}
+.rl-outreach .btn-purple:hover:not(:disabled) {background:linear-gradient(180deg,#B888E0,#9B6EC4)}
+.rl-outreach .btn-sm {padding:5px 10px;font-size:11px}
+.rl-outreach .btn-ghost {background:transparent;color:var(--muted);padding:7px 12px;border:1px solid var(--border)}
+.rl-outreach .btn-ghost:hover {color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.03)}
+.rl-outreach .btn-danger {background:transparent;color:var(--red);border:1px solid rgba(190,173,116,.2);padding:6px 10px;font-size:11px}
+.rl-outreach .btn-danger:hover {background:rgba(190,173,116,.08);border-color:rgba(190,173,116,.35)}
+.rl-outreach .btn-stop {background:transparent;color:var(--signal-glow);border:1px solid rgba(152,160,81,.25);padding:5px 9px;font-size:11px;border-radius:6px;cursor:pointer;line-height:1;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.04em;transition:background .15s,border-color .15s}
+.rl-outreach .btn-stop:hover {background:rgba(152,160,81,.12);border-color:rgba(152,160,81,.45)}
+.rl-outreach button:disabled {opacity:.35;cursor:not-allowed}
+/* ── Orange realism — no flat orange: every fill embossed + glowing ──── */
+.rl-outreach .o-fill {
+  background:linear-gradient(180deg,#bac676 0%,#a0a956 46%,#828842 100%)!important;
+  color:#fff8f0!important;border:1px solid rgba(91,96,46,.65)!important;
+  text-shadow:0 1px 1px rgba(56,58,24,.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255,228,196,.6),
+    inset 0 -1px 1px rgba(0,0,0,.4),
+    0 1px 2px rgba(0,0,0,.45),
+    0 0 11px rgba(175,185,102,.42)!important;
+}
+.rl-outreach .o-badge {
+  background:linear-gradient(180deg,#bdcc7e 0%,#a0a956 52%,#7c823f 100%)!important;
+  color:#1f210f!important;border:1px solid rgba(91,96,46,.55)!important;
+  text-shadow:0 1px 0 rgba(222,234,191,.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255,231,200,.7),
+    inset 0 -1px 1px rgba(0,0,0,.32),
+    0 1px 2px rgba(0,0,0,.4),
+    0 0 8px rgba(175,185,102,.4)!important;
+}
+.rl-outreach .o-square {
+  background:linear-gradient(155deg,#bdcb7e 0%,#a0a956 48%,#7c813e 100%)!important;
+  border:1px solid rgba(91,96,46,.6)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,231,200,.6),
+    inset 0 -2px 3px rgba(0,0,0,.42),
+    0 2px 5px rgba(0,0,0,.45),
+    0 0 13px rgba(175,185,102,.42)!important;
+}
+.rl-outreach .o-dot {
+  background:radial-gradient(circle at 38% 30%,#e4edca 0%,#afb966 46%,#8a9143 100%)!important;
+  box-shadow:0 0 6px 1px rgba(175,185,102,.75),inset 0 1px 1px rgba(255,236,214,.5)!important;
+}
+.rl-outreach .o-seg {
+  background:linear-gradient(180deg,#afb966 0%,#98a051 55%,#7e8543 100%)!important;
+  color:#fff8f0!important;text-shadow:0 1px 1px rgba(56,58,24,.5);
+  box-shadow:
+    inset 0 1px 0 rgba(230,239,208,.5),
+    inset 0 -1px 2px rgba(0,0,0,.35),
+    0 0 10px rgba(175,185,102,.4)!important;
+}
+.rl-outreach .o-glow {text-shadow:0 0 8px rgba(175,185,102,.5)}
+/* Orange text links read as luminous filaments, never flat ink */
+/* Orange contact links — analog glowing filament: text emits warm light, underline reads as a lit recessed channel */
+.rl-outreach a[href^="tel:"], .rl-outreach a[href^="mailto:"], .rl-outreach a[href*="instagram.com"] {
+  text-shadow:0 0 7px rgba(190,203,98,.5),0 0 14px rgba(144,155,61,.32);
+  text-decoration-line:underline;text-decoration-color:rgba(190,203,98,.55);
+  text-decoration-thickness:1.5px;text-underline-offset:3px;
+}
+.rl-outreach a[href^="tel:"]:hover, .rl-outreach a[href^="mailto:"]:hover, .rl-outreach a[href*="instagram.com"]:hover {
+  text-shadow:0 0 9px rgba(189,206,109,.7),0 0 18px rgba(144,155,61,.45);text-decoration-color:rgba(190,209,116,.85);
+}
+.rl-outreach .web-link {text-shadow:0 0 7px rgba(190,203,98,.45),0 0 13px rgba(144,155,61,.3)}
+/* Orange checkmarks — backlit analog glow */
+.rl-outreach .feat-check {text-shadow:0 0 6px rgba(190,203,98,.6),0 0 12px rgba(144,155,61,.4);animation:filament-flicker 3.7s linear infinite}
+/* Lit rating star in tables — glowing analog filament with its own flicker */
+.rl-outreach .rating-star {color:#ccdb94;text-shadow:0 0 6px rgba(190,203,98,.65),0 0 12px rgba(144,155,61,.42),0 0 2px rgba(213,229,176,.8);animation:filament-flicker 4.6s linear infinite}
+/* ── Leads source tabs — keycap segmented control ───────────────────── */
+.rl-outreach .src-tabs {display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap}
+.rl-outreach .src-tab {
+  position:relative;border:none;cursor:pointer;
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:.05em;
+  display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:11px;
+  color:var(--cream-300);
+  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot));
+  transition:transform 70ms ease,box-shadow 70ms ease,color 120ms ease,background 280ms ease;
+  box-shadow:
+    inset 0 1.5px 0 var(--k-top),
+    inset 0 3px 5px var(--k-sheen),
+    inset 0 -3px 8px var(--k-under),
+    inset 0 -1.5px 0 var(--k-botline),
+    0 4px 0 var(--key-wall),
+    0 7px 14px -3px rgba(0,0,0,.55),
+    0 13px 20px -6px rgba(0,0,0,.4);
+}
+.rl-outreach .src-tab svg {display:block;width:15px;height:15px;pointer-events:none;opacity:.8}
+.rl-outreach .src-tab:hover:not(.active) {color:var(--cream-100)}
+.rl-outreach .src-tab:active:not(.active) {transform:translateY(3px);box-shadow:inset 0 1px 0 var(--k-top),inset 0 -2px 5px var(--k-under),inset 0 -1px 0 var(--k-botline),0 1px 0 var(--key-wall),0 2px 4px -2px rgba(0,0,0,.6)}
+.rl-outreach .src-tab.active {
+  color:#d6e7b8;
+  background:
+    radial-gradient(ellipse 72% 78% at 50% 68%,rgba(180,202,95,.92) 0%,rgba(154,162,64,.78) 20%,rgba(105,107,39,.54) 44%,rgba(45,45,16,.28) 66%,transparent 84%),
+    radial-gradient(ellipse 50% 35% at 50% 22%,rgba(185,199,86,.22) 0%,transparent 70%),
+    linear-gradient(180deg,rgba(40,37,33,.97) 0%,rgba(25,23,20,.99) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(200,221,154,.28),
+    inset 0 3px 10px rgba(12,4,1,.72),
+    inset 0 -2px 7px rgba(144,153,60,.22),
+    inset 0 -1px 0 rgba(0,0,0,.88),
+    0 4px 0 #0d0906,
+    0 8px 16px -4px rgba(0,0,0,.7),
+    0 0 20px -1px rgba(146,157,63,.7),
+    0 0 9px -1px rgba(189,201,94,.55);
+  filter:drop-shadow(0 0 5px rgba(144,153,62,.45));
+}
+.rl-outreach .src-tab.active svg {filter:drop-shadow(0 0 4px rgba(190,208,112,.85));stroke:rgba(201,224,161,.95);opacity:1}
+/* ── Source icon cell (All Leads) — recessed instrument well ─────────── */
+.rl-outreach .src-cell {
+  display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;
+  color:var(--cream-300);
+  background:linear-gradient(180deg,#22201d,#171512);
+  box-shadow:inset 0 1px 0 var(--edge-light),inset 0 2px 5px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,240,220,.04),0 1px 1px rgba(0,0,0,.4);
+}
+.rl-outreach .src-cell svg {width:15px;height:15px;display:block;filter:drop-shadow(0 0 3px currentColor)}
+.rl-outreach .src-cell.sm {width:22px;height:22px;border-radius:6px}
+.rl-outreach .src-cell.sm svg {width:12px;height:12px}
+.rl-outreach .src-cell.ig {color:#aeb966}
+.rl-outreach .src-cell.maps {color:#6ea0d8}
+.rl-outreach .src-cell.web {color:#b3bda5}
+/* ── Website cell ───────────────────────────────────────────────────── */
+.rl-outreach .web-link {font-size:12px;color:var(--accent2);text-decoration:none;border-bottom:1px dotted rgba(175,185,102,.4);transition:color .15s,border-color .15s}
+.rl-outreach .web-link:hover {color:#d5e0a3;border-bottom-color:rgba(175,185,102,.7)}
+/* NO WEBSITE — analog debossed light: tag pressed INTO the panel, amber glow emitting from the recess */
+.rl-outreach .tag-nowebsite {display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:5px;color:#cad592;
+  background:linear-gradient(180deg,rgba(14,9,6,.6),rgba(27,28,16,.34));
+  border:1px solid rgba(161,165,73,.30);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.6),inset 0 1px 2px rgba(0,0,0,.5),inset 0 -1px 0 rgba(201,217,142,.13),inset 0 0 7px rgba(161,165,73,.20),0 0 12px rgba(161,165,73,.20),0 0 22px rgba(144,155,61,.10);
+  text-shadow:0 0 6px rgba(190,203,98,.55),0 0 12px rgba(144,155,61,.35);
+  animation:filament-flicker 5.1s linear infinite}
+/* ── Filter panel instrument labels ─────────────────────────────────── */
+.rl-outreach .filter-col {display:flex;flex-direction:column;gap:6px}
+.rl-outreach .filter-cap {font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.rl-outreach .fchk {display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;user-select:none;color:var(--dim)}
+.rl-outreach .fchk input {accent-color:var(--accent);width:14px;height:14px}
+/* ── Tags ────────────────────────────────────────────────────────── */
+.rl-outreach .tag {display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.rl-outreach .tag-green {background:rgba(82,168,120,.12);color:var(--green);border:1px solid rgba(82,168,120,.25)}
+.rl-outreach .tag-yellow {background:rgba(148,179,107,.12);color:var(--yellow);border:1px solid rgba(148,179,107,.25)}
+.rl-outreach .tag-red {background:rgba(190,173,116,.12);color:var(--red);border:1px solid rgba(190,173,116,.25)}
+.rl-outreach .tag-teal {background:var(--accent-glow);color:var(--accent);border:1px solid rgba(163,175,86,.28)}
+.rl-outreach .tag-gray {background:rgba(122,116,110,.12);color:var(--faint);border:1px solid rgba(122,116,110,.25)}
+.rl-outreach .tag-purple {background:rgba(155,110,196,.12);color:var(--purple);border:1px solid rgba(155,110,196,.25)}
+.rl-outreach .dot {width:5px;height:5px;border-radius:50%;display:inline-block;background:currentColor}
+/* ── Auth ────────────────────────────────────────────────────────── */
+.rl-outreach .auth-wrap {display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:var(--bg)}
+.rl-outreach .auth-card {
+  background:var(--panel-700);border-radius:14px;overflow:hidden;
+  padding:48px;width:100%;max-width:420px;position:relative;
+  box-shadow:0 1px 0 var(--edge-light) inset,0 -1px 0 var(--edge-dark) inset,0 22px 48px -14px var(--cast-soft);
+}
+.rl-outreach .auth-logo {font-size:22px;font-weight:900;text-align:center;margin-bottom:28px;letter-spacing:.18em;text-transform:uppercase}
+.rl-outreach .auth-logo span {color:var(--accent)}
+.rl-outreach .field {margin-bottom:16px}
+.rl-outreach .field label {display:block;font-size:.58rem;font-weight:700;color:var(--cream-500);margin-bottom:6px;text-transform:uppercase;letter-spacing:.12em;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+.rl-outreach .field input, .rl-outreach .field select {width:100%}
+.rl-outreach .auth-tabs {
+  display:flex;margin-bottom:24px;background:var(--bg);border-radius:6px;padding:3px;
+  border:1px solid var(--border);box-shadow:var(--sh-debossed);
+}
+.rl-outreach .auth-tab {flex:1;padding:7px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;color:var(--faint);border:none;background:transparent;transition:all .12s;border-radius:4px;letter-spacing:.06em;text-transform:uppercase}
+.rl-outreach .auth-tab.active {
+  background:linear-gradient(180deg,#2F2D2A,#222020);
+  color:var(--text);
+  box-shadow:0 2px 4px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);
+  border:1px solid rgba(0,0,0,.4);
+}
+.rl-outreach .err-bar {background:rgba(190,173,116,.08);border:1px solid rgba(190,173,116,.2);border-radius:5px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:16px}
+.rl-outreach .ok-bar {background:rgba(82,168,120,.08);border:1px solid rgba(82,168,120,.2);border-radius:5px;padding:10px 14px;font-size:12px;color:var(--green);margin-bottom:16px}
+/* ── Tables ──────────────────────────────────────────────────────── */
+.rl-outreach table {width:100%;border-collapse:collapse}
+.rl-outreach thead th {text-align:left;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--cream-500);padding:14px 20px;border-bottom:1px solid var(--edge-dark);box-shadow:0 1px 0 var(--edge-light);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+.rl-outreach tbody tr {border-bottom:1px solid var(--edge-dark);box-shadow:0 1px 0 var(--edge-light);transition:background .1s}
+.rl-outreach tbody tr:last-child {border-bottom:none}
+.rl-outreach tbody tr:hover {background:rgba(255,248,235,.03)}
+.rl-outreach tbody td {padding:16px 20px;font-size:13px;vertical-align:middle}
+.rl-outreach .td-main {font-weight:600;color:var(--text)}
+.rl-outreach .td-sub {font-size:11px;color:var(--muted);margin-top:3px}
+.rl-outreach .table-wrap {border-radius:14px;overflow:hidden;background:linear-gradient(176deg,var(--metal-top) 0%,var(--metal-mid) 44%,var(--metal-bot) 100%);position:relative;box-shadow:0 1px 0 var(--metal-edge) inset,0 -1px 0 var(--edge-dark) inset,0 22px 48px -14px var(--cast-soft)}
+/* ── Panels ──────────────────────────────────────────────────────── */
+.rl-outreach .glass {
+  background:linear-gradient(176deg,var(--metal-top) 0%,var(--metal-mid) 44%,var(--metal-bot) 100%);
+  border-radius:14px;overflow:hidden;
+  box-shadow:
+    0 1px 0 var(--metal-edge) inset,
+    0 -1px 0 var(--edge-dark) inset,
+    0 22px 48px -14px var(--cast-soft);
+  position:relative;transition:background 280ms ease;
+}
+/* Panel top sheen — brushed-metal highlight + soft material depth across all surfaces */
+.rl-outreach .glass::before, .rl-outreach .table-wrap::before, .rl-outreach .auth-card::before {
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(255,248,235,.09) 0%,rgba(255,248,235,.02) 3%,transparent 7%),
+    radial-gradient(ellipse 130% 60% at 50% 0%,var(--k-sheen),transparent 70%),
+    radial-gradient(ellipse 80% 40% at 85% 4%,rgba(255,248,235,.045),transparent 60%);
+  z-index:0;
+}
+.rl-outreach .glass2 {
+  background:var(--panel-600);border-radius:10px;
+  box-shadow:
+    0 1px 0 var(--edge-light) inset,
+    0 -1px 0 var(--edge-dark) inset,
+    0 8px 20px -8px var(--cast-mid);
+  transition:background 280ms ease;
+}
+/* ── Search ──────────────────────────────────────────────────────── */
+.rl-outreach .search-grid {display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:620px){.rl-outreach .search-grid {grid-template-columns:1fr}}
+/* ── Multi-chip inputs ───────────────────────────────────────────── */
+.rl-outreach .chip-box {
+  display:flex;flex-wrap:wrap;gap:6px;min-height:38px;
+  background:var(--panel-900);border:1px solid var(--edge-dark);border-radius:6px;
+  padding:8px 12px;align-items:center;
+  transition:border-color .2s,box-shadow .2s,background 280ms ease;
+  box-shadow:inset 0 2px 5px var(--tray-recess),inset 0 -1px 0 var(--edge-light);
+}
+.rl-outreach .chip-box:focus-within {border-color:var(--signal);box-shadow:inset 0 2px 5px var(--tray-recess),0 0 0 2px rgba(152,160,81,.18)}
+.rl-outreach .chip {
+  display:inline-flex;align-items:center;gap:3px;
+  background:var(--accent-glow);color:var(--accent);
+  border:1px solid rgba(163,175,86,.28);border-radius:3px;
+  padding:3px 10px 3px 11px;font-size:11px;font-weight:700;white-space:nowrap;letter-spacing:.04em;
+  text-shadow:0 0 6px rgba(175,185,102,.35);
+  box-shadow:inset 0 1px 0 rgba(255,228,196,.14),inset 0 -1px 1px rgba(0,0,0,.22);
+}
+.rl-outreach .chip-x {background:none;border:none;color:var(--accent);font-size:16px;line-height:1;padding:0 0 0 4px;cursor:pointer;opacity:.6;transition:opacity .1s;font-weight:300}
+.rl-outreach .chip-x:hover {opacity:1}
+.rl-outreach .chip-input {flex:1;min-width:100px;background:transparent;border:none;color:var(--text);font-size:13px;padding:3px 4px;outline:none;box-shadow:none}
+.rl-outreach .chip-select {flex:1;min-width:100px;background:transparent;border:none;color:var(--faint);font-size:13px;padding:2px 4px;outline:none;cursor:pointer;box-shadow:none}
+/* ── Pills ───────────────────────────────────────────────────────── */
+.rl-outreach .pill-group {display:flex;flex-wrap:wrap;gap:6px}
+.rl-outreach .pill {
+  padding:7px 16px;border-radius:5px;font-size:11px;font-weight:700;letter-spacing:.07em;
+  cursor:pointer;transition:all .12s;
+  background:linear-gradient(180deg,#242018,#181511);
+  color:var(--faint);border:1px solid rgba(0,0,0,.6);
+  box-shadow:0 2px 5px rgba(0,0,0,.5),inset 0 1px 0 rgba(184,216,139,.05),inset 0 -1px 0 rgba(0,0,0,.3);
+}
+.rl-outreach .pill:hover {color:var(--dim);background:linear-gradient(180deg,#2E2A1E,#221E17)}
+.rl-outreach .pill:active, .rl-outreach .pill.active {
+  background:
+    radial-gradient(ellipse 80% 90% at 50% 65%,rgba(155,174,77,.78) 0%,rgba(127,133,51,.62) 26%,rgba(74,76,28,.40) 54%,transparent 78%),
+    linear-gradient(180deg,rgba(38,35,31,.97),rgba(24,22,19,.99));
+  color:#cee5b0;
+  border-color:rgba(0,0,0,.7);
+  box-shadow:
+    inset 0 1px 0 rgba(198,220,150,.2),
+    inset 0 2px 7px rgba(12,4,1,.65),
+    inset 0 -1px 4px rgba(144,151,58,.16),
+    inset 0 -1px 0 rgba(0,0,0,.85),
+    0 0 13px -2px rgba(145,155,61,.58),
+    0 0 5px -1px rgba(189,201,92,.42);
+  text-shadow:0 0 8px rgba(157,174,77,.55);
+  filter:drop-shadow(0 0 3px rgba(142,151,58,.38));
+  animation:filament-flicker 4.8s linear infinite 0.3s;
+}
+/* Filter pills inside job rows — small non-interactive read-only tags */
+.rl-outreach .filter-pill {
+  background:linear-gradient(180deg,#121110,#191714);
+  color:var(--cream-300);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.8),inset 0 -1px 0 var(--edge-light);
+  cursor:default;
+}
+.rl-outreach .filter-pill:hover {background:linear-gradient(180deg,#121110,#191714);color:var(--cream-300)}
+/* ── Toggles ─────────────────────────────────────────────────────── */
+.rl-outreach .toggle-row {display:flex;gap:8px;flex-wrap:wrap}
+.rl-outreach .toggle {
+  display:flex;align-items:center;gap:8px;
+  padding:7px 12px;border-radius:5px;
+  background:linear-gradient(180deg,#2F2D2A,#222020);
+  border:1px solid rgba(0,0,0,.5);
+  cursor:pointer;transition:all .1s;user-select:none;
+  box-shadow:0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.rl-outreach .toggle:hover {background:linear-gradient(180deg,#363432,#2A2826)}
+.rl-outreach .toggle.on {background:linear-gradient(180deg,#181716,#212020);border-color:rgba(0,0,0,.65);box-shadow:inset 0 2px 5px rgba(0,0,0,.65)}
+.rl-outreach .toggle input {display:none}
+.rl-outreach .toggle-dot {width:34px;height:18px;border-radius:10px;position:relative;flex-shrink:0;
+  background:linear-gradient(180deg,var(--tray-top),var(--tray-bot));
+  box-shadow:inset 0 2px 5px var(--tray-recess),inset 0 -1px 0 var(--tray-lip),0 1px 0 var(--edge-light);
+  transition:box-shadow .22s cubic-bezier(.45,0,.2,1);}
+.rl-outreach .toggle-dot::after {content:'';position:absolute;top:2.5px;left:2.5px;width:13px;height:13px;border-radius:50%;
+  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot));
+  box-shadow:inset 0 1px 0 var(--k-top),inset 0 -1px 2px var(--k-under),0 2px 3px rgba(0,0,0,.45);
+  transition:transform .22s cubic-bezier(.45,0,.2,1);}
+.rl-outreach .toggle.on .toggle-dot {box-shadow:inset 0 2px 5px var(--tray-recess),inset 0 -1px 0 var(--tray-lip),0 1px 0 var(--edge-light)}
+.rl-outreach .toggle.on .toggle-dot::after {transform:translateX(16px);}
+.rl-outreach .toggle.on .toggle-dot::before {content:'';position:absolute;top:50%;left:7px;transform:translateY(-50%);
+  width:4px;height:4px;border-radius:50%;background:var(--signal-glow);box-shadow:0 0 5px 1px rgba(176,189,95,.7);}
+.rl-outreach .toggle span {font-size:12px;font-weight:600;color:var(--faint);letter-spacing:.04em;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+.rl-outreach .toggle.on span {color:var(--signal)}
+/* ── Leads bar ───────────────────────────────────────────────────── */
+.rl-outreach .leads-bar {display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.rl-outreach .leads-count {font-size:10px;color:var(--faint);margin-left:auto;letter-spacing:.12em;text-transform:uppercase;font-weight:800;padding:4px 10px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:4px;box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
+.rl-outreach .pagination {display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:center}
+.rl-outreach .pagination span {font-size:12px;color:var(--muted)}
+/* ── Billing ─────────────────────────────────────────────────────── */
+.rl-outreach .billing-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:20px}
+@media(max-width:860px){.rl-outreach .billing-grid {grid-template-columns:1fr;max-width:340px}}
+.rl-outreach .plan-card {
+  background:linear-gradient(176deg,var(--metal-top) 0%,var(--metal-mid) 44%,var(--metal-bot) 100%);border-radius:12px;
+  padding:32px 28px;position:relative;overflow:hidden;
+  box-shadow:0 1px 0 var(--metal-edge) inset,0 -1px 0 var(--edge-dark) inset,0 18px 40px -12px var(--cast-soft);
+  transition:box-shadow .2s;
+  display:flex;flex-direction:column;
+}
+.rl-outreach .plan-card::before {
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,248,235,.09) 0%,transparent 7%),radial-gradient(ellipse 120% 55% at 50% 0%,var(--k-sheen),transparent 70%),radial-gradient(ellipse 70% 36% at 82% 4%,rgba(255,248,235,.04),transparent 60%);
+}
+.rl-outreach .plan-card:hover {box-shadow:0 1px 0 var(--edge-light) inset,0 -1px 0 var(--edge-dark) inset,0 26px 56px -10px var(--cast-soft);}
+.rl-outreach .plan-card.current {box-shadow:0 1px 0 rgba(197,221,154,.1) inset,0 -1px 0 var(--edge-dark) inset,0 18px 40px -12px var(--cast-soft),0 0 0 1.5px rgba(152,160,81,.4);}
+.rl-outreach .plan-cur-badge {position:absolute;top:-1px;right:16px;background:linear-gradient(180deg,#bac676,#a0a956 50%,#828842);color:#fff8f0;font-size:9px;font-weight:800;padding:3px 9px;border-radius:0 0 4px 4px;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 1px 1px rgba(56,58,24,.5);box-shadow:inset 0 1px 0 rgba(255,228,196,.55),inset 0 -1px 1px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.4),0 0 9px rgba(175,185,102,.4)}
+.rl-outreach .plan-name {font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--faint);margin-bottom:10px}
+.rl-outreach .plan-price {font-size:36px;font-weight:800;line-height:1;letter-spacing:-.02em;color:var(--text)}
+.rl-outreach .plan-price sup {font-size:16px;font-weight:600;vertical-align:top;margin-top:5px;color:var(--dim)}
+.rl-outreach .plan-price sub {font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0}
+/* ── Stats ───────────────────────────────────────────────────────── */
+.rl-outreach .stats-row {display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.rl-outreach .stat-card {
+  background:linear-gradient(176deg,var(--metal-top) 0%,var(--metal-mid) 44%,var(--metal-bot) 100%);border-radius:10px;padding:20px 24px;
+  position:relative;overflow:hidden;
+  box-shadow:0 1px 0 var(--metal-edge) inset,0 -1px 0 var(--edge-dark) inset,0 12px 28px -8px var(--cast-soft);
+}
+.rl-outreach .stat-card::before {
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,248,235,.09) 0%,transparent 7%),radial-gradient(ellipse 120% 55% at 50% 0%,var(--k-sheen),transparent 70%),radial-gradient(ellipse 70% 36% at 82% 4%,rgba(255,248,235,.04),transparent 60%);
+}
+.rl-outreach .stat-n {font-size:28px;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-.03em;text-shadow:0 0 10px rgba(175,185,102,.45),0 1px 0 rgba(0,0,0,.3)}
+.rl-outreach .stat-l {font-size:9px;color:var(--faint);margin-top:5px;text-transform:uppercase;letter-spacing:.14em;font-weight:700}
+/* ── Modal ───────────────────────────────────────────────────────── */
+.rl-outreach .modal-overlay {position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px}
+.rl-outreach .modal {
+  background:var(--panel-700);border-radius:14px;overflow:hidden;
+  padding:28px;width:100%;max-width:420px;position:relative;
+  box-shadow:0 1px 0 var(--edge-light) inset,0 -1px 0 var(--edge-dark) inset,0 32px 80px -16px rgba(0,0,0,.75);
+}
+.rl-outreach .modal::before {
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(ellipse 110% 55% at 50% 0%,var(--k-sheen),transparent 72%);
+}
+.rl-outreach .modal h3 {font-size:16px;font-weight:700;margin-bottom:20px;letter-spacing:-.01em}
+/* ── Section head ────────────────────────────────────────────────── */
+.rl-outreach .section-head {display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.rl-outreach .section-head h2 {
+  font-size:30px;font-weight:900;letter-spacing:-.03em;color:var(--text);
+  text-shadow:0 1px 0 rgba(0,0,0,.5);
+}
+/* ── Settings page ────────────────────────────────────────────── */
+.rl-outreach .set-stack {display:flex;flex-direction:column;gap:18px;max-width:640px}
+.rl-outreach .set-card {padding:22px 24px}
+.rl-outreach .set-card .cap {position:relative;z-index:1;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--faint);margin-bottom:4px}
+.rl-outreach .set-row {position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 0;border-top:1px solid var(--edge-dark);box-shadow:inset 0 1px 0 var(--edge-light)}
+.rl-outreach .set-row:first-of-type {border-top:none;box-shadow:none;padding-top:6px}
+.rl-outreach .set-label {font-size:.9rem;font-weight:600;color:var(--text)}
+.rl-outreach .set-sub {font-size:.72rem;color:var(--muted);margin-top:3px}
+/* ── Reduced motion (OS preference + manual toggle in Settings) ── */
+@media (prefers-reduced-motion:reduce){.rl-outreach * {animation:none!important;transition:none!important}}
+.rl-outreach [data-reduce-motion="1"] * {animation:none!important;transition:none!important}
+/* ── Spinner ─────────────────────────────────────────────────────── */
+.rl-outreach .spin {width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* ── Empty ───────────────────────────────────────────────────────── */
+.rl-outreach .empty {text-align:center;padding:60px 24px;color:var(--faint)}
+.rl-outreach .empty p {font-size:13px}
+/* ── Job panel ───────────────────────────────────────────────────── */
+.rl-outreach .job-panel {background:var(--panel-800);border-top:1px solid var(--edge-dark);overflow:hidden;box-shadow:inset 0 3px 10px rgba(0,0,0,.4),inset 0 1px 0 rgba(0,0,0,.6);}
+.rl-outreach .job-panel-head {
+  padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  background:var(--surf);color:var(--dim);
+}
+/* ── Usage bar ───────────────────────────────────────────────────── */
+/* Usage fader — debossed channel cut into the panel, glowing amber filament inside */
+.rl-outreach .usage-bar {height:5px;background:linear-gradient(180deg,#080605,#12130e);border-radius:3px;overflow:hidden;margin:10px 0 4px;box-shadow:inset 0 2px 4px rgba(0,0,0,.8),inset 0 -1px 0 rgba(199,216,139,.08)}
+.rl-outreach .usage-fill {height:100%;background:linear-gradient(180deg,#d3e2a7,#c3d073 42%,#a3ac57);border-radius:3px;transition:width .4s;box-shadow:0 0 9px 1px rgba(189,201,92,.75),0 0 4px rgba(192,211,124,.6),inset 0 1px 0 rgba(255,230,200,.6)}
+/* ── Filter section ──────────────────────────────────────────────── */
+.rl-outreach .filter-section {padding-top:16px;margin-top:0;border-top:1px solid var(--edge-dark);box-shadow:inset 0 1px 0 var(--edge-light);}
+.rl-outreach .filter-label {font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--faint);margin-bottom:12px}
+.rl-outreach .filter-group {margin-bottom:14px}
+.rl-outreach .filter-group:last-child {margin-bottom:0}
+/* Compact control-panel grid — packs the top filters into rows of instrument cells */
+.rl-outreach .filter-grid {
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:16px 22px;margin-bottom:14px;
+  padding-bottom:14px;border-bottom:1px solid var(--edge-dark);
+  box-shadow:0 1px 0 var(--edge-light);
+}
+.rl-outreach .filter-grid .filter-group {margin-bottom:0}
+@media(max-width:900px){.rl-outreach .filter-grid {grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.rl-outreach .filter-grid {grid-template-columns:1fr}}
+/* ── Scrollbar ───────────────────────────────────────────────────── */
+.rl-outreach ::-webkit-scrollbar {width:5px;height:5px}
+.rl-outreach ::-webkit-scrollbar-track {background:var(--bg)}
+.rl-outreach ::-webkit-scrollbar-thumb {background:var(--border2);border-radius:3px}
+.rl-outreach ::-webkit-scrollbar-thumb:hover {background:var(--faint)}
+/* ── Light Mode Token Overrides ─────────────────────────────── */
+[data-theme="light"] .rl-outreach{
+  --panel-900:#cfc4af; --panel-800:#d8ddd1; --panel-700:#ece5d8;
+  --panel-600:#f2ece1; --panel-500:#f7f3ea;
+  --cream-100:#24271b; --cream-300:#5a4d3b; --cream-500:#8a7c66;
+  --signal:#5d622a; --signal-dim:#8a9152; --signal-glow:#7c8340; --done:#5d622a;
+  --edge-light:rgba(255,253,247,0.95); --edge-dark:rgba(120,104,80,0.30);
+  --cast-soft:rgba(150,135,110,0.34); --cast-mid:rgba(140,124,100,0.38);
+  --bg-1:#dfe4d9; --bg-2:#d6cebb;
+  --metal-top:#f6f2e9; --metal-mid:#eee7d9; --metal-bot:#d8ddd1; --metal-edge:rgba(255,255,255,0.9);
+  --chassis-top:#e0e4db; --chassis-mid:#e1dacb; --chassis-bot:#d6cebd;
+  --k-face-top:#f6f2e9; --k-face-bot:#d8ddd1;
+  --k-top:rgba(255,255,255,0.95); --k-sheen:rgba(255,255,255,0.5);
+  --k-under:rgba(120,108,90,0.30); --k-botline:rgba(120,108,90,0.32);
+  --key-wall:#cfc4af;
+  --tray-top:#d3cbba; --tray-bot:#ded6c5;
+  --tray-recess:rgba(120,108,90,0.55); --tray-lip:rgba(255,255,255,0.95);
+  --bg:#d6cebb; --surf:#ece5d8; --surf2:#f2ece1; --surf3:#f7f3ea;
+  --border:rgba(120,108,90,0.28); --border2:rgba(120,108,90,0.45);
+  --text:#24271b; --dim:#323628; --muted:#6e6152; --faint:#8a7c66;
+  --accent:#5d622a; --accent2:#7c8340;
+  --accent-glow:rgba(93,98,42,0.14); --accent-glow2:rgba(93,98,42,0.24);
+  --teal:#5d622a; --teal2:#404332;
+  --green:#5d622a; --red:#95885b;
+}
+[data-theme="light"] .rl-outreach{
+  background:transparent;
+}
+/* Light room — warm grey surround so the eggshell instrument still reads as lit */
+/* Light rail — bright brushed lip */
+/* Light vignette — soft warm-grey corners instead of black */
+[data-theme="light"] .rl-outreach .track {background:#bcb4a3;box-shadow:inset 0 1px 2px rgba(120,108,90,.25),inset 0 -1px 0 rgba(255,255,252,.75)}
+/* Light mode — jobs/leads well (was hardcoded #1d1b18) */
+[data-theme="light"] .rl-outreach .well {
+  background:linear-gradient(180deg,var(--panel-600),var(--panel-700));
+  box-shadow:inset 0 2px 5px rgba(120,108,90,.15),inset 0 -1px 0 rgba(255,255,252,.8),0 1px 0 rgba(255,255,252,.5);
+}
+/* Light mode — running-job progress meter */
+[data-theme="light"] .rl-outreach .meter {background:rgba(120,108,90,.14);box-shadow:inset 0 1px 2px rgba(120,108,90,.2)}
+[data-theme="light"] .rl-outreach .meter-segs {background:repeating-linear-gradient(90deg,transparent 0 8px,rgba(120,108,90,.1) 8px 10px)}
+/* Light mode — running-job console (keep dark terminal feel, soften shadows) */
+[data-theme="light"] .rl-outreach .console {
+  background:linear-gradient(180deg,#2e261e,#211a14);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.35),inset 0 -1px 0 rgba(192,211,124,.18),0 2px 10px -3px rgba(120,108,90,.35);
+}
+/* Light mode — expanded job-panel inset shadow */
+[data-theme="light"] .rl-outreach .job-panel {box-shadow:inset 0 2px 5px rgba(120,108,90,.18),inset 0 1px 0 rgba(255,255,252,.6)}
+/* Light mode — table row hover */
+[data-theme="light"] .rl-outreach tbody tr:hover {background:rgba(120,108,90,.06)!important}
+/* Light mode input wells */
+[data-theme="light"] .rl-outreach input, [data-theme="light"] .rl-outreach select, [data-theme="light"] .rl-outreach textarea, [data-theme="light"] .rl-outreach .chip-box {
+  color:var(--cream-100) !important;
+}
+[data-theme="light"] .rl-outreach input::placeholder {color:var(--cream-500) !important}
+[data-theme="light"] .rl-outreach select option {background:var(--panel-600)}
+/* Light mode buttons */
+[data-theme="light"] .rl-outreach .btn {
+  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot)) !important;
+  color:var(--cream-300) !important;
+}
+[data-theme="light"] .rl-outreach .btn:hover:not(:disabled) {color:var(--cream-100) !important}
+/* Light mode pills/toggles */
+[data-theme="light"] .rl-outreach .pill {
+  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot)) !important;
+  color:var(--cream-300) !important;
+}
+[data-theme="light"] .rl-outreach .filter-pill {
+  background:linear-gradient(180deg,var(--panel-600),var(--panel-700)) !important;
+  color:var(--cream-500) !important;
+  box-shadow:inset 0 1px 2px rgba(120,108,90,.2),inset 0 -1px 0 rgba(255,255,252,.7) !important;
+}
+[data-theme="light"] .rl-outreach .filter-pill:hover {background:linear-gradient(180deg,var(--panel-600),var(--panel-700)) !important;color:var(--cream-500) !important}
+[data-theme="light"] .rl-outreach .pill.active, [data-theme="light"] .rl-outreach .pill:active {
+  color:var(--signal) !important;
+}
+[data-theme="light"] .rl-outreach .toggle {
+  background:linear-gradient(180deg,var(--k-face-top),var(--k-face-bot)) !important;
+}
+/* Light mode chips */
+[data-theme="light"] .rl-outreach .chip {
+  background:rgba(152,160,81,.1) !important;
+  color:var(--signal) !important;
+  border-color:rgba(152,160,81,.3) !important;
+}
+/* Light mode tags */
+[data-theme="light"] .rl-outreach .tag-gray {background:rgba(100,95,88,.08) !important;color:var(--cream-500) !important;border-color:rgba(100,95,88,.2) !important}
+/* Light mode stat/plan cards */
+[data-theme="light"] .rl-outreach .stat-card, [data-theme="light"] .rl-outreach .plan-card {
+  background:var(--panel-600) !important;
+  box-shadow:0 1px 0 var(--edge-light) inset,0 -1px 0 var(--edge-dark) inset,0 8px 20px -8px var(--cast-mid) !important;
+}
+[data-theme="light"] .rl-outreach .plan-card.current {
+  border:1.5px solid rgba(152,160,81,.5) !important;
+}
+/* Light mode scrollbar */
+[data-theme="light"] .rl-outreach ::-webkit-scrollbar-track {background:var(--bg-2)}
+[data-theme="light"] .rl-outreach ::-webkit-scrollbar-thumb {background:var(--tray-recess)}
+/* ── Theme Toggle Switch (panel-mounted, physically throws) ── */
+.rl-outreach .tmode {
+  font-size:.55rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--cream-500);width:30px;text-align:right;
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+.rl-outreach .switch.on::after {
+  content:"";position:absolute;top:50%;left:8px;transform:translateY(-50%);
+  width:5px;height:5px;border-radius:50%;
+  background:var(--signal-glow);
+  box-shadow:0 0 6px 1px rgba(176,189,95,.7);
+}
+/* Legacy theme-toggle classes — map to new switch */
+.rl-outreach .theme-toggle {display:none}
+.rl-outreach .theme-toggle-body, .rl-outreach .theme-toggle-thumb, .rl-outreach .theme-toggle-led, .rl-outreach .theme-toggle-label {display:none}
+/* ── Mobile optimisation ──────────────────────────────────────────────────── */
+@media(max-width:768px){/* Builder panels stack vertically */.rl-outreach .builder-grid {grid-template-columns:1fr !important}/* Tables scroll horizontally instead of clipping */.rl-outreach .well {overflow-x:auto;-webkit-overflow-scrolling:touch}/* Tighten page padding */.rl-outreach .page {padding:12px 10px !important}/* Leads/jobs rows wrap tighter */.rl-outreach .jcols, .rl-outreach .lcols-all, .rl-outreach .lcols-ig, .rl-outreach .lcols-maps {grid-template-columns:1fr 1fr !important}/* Nav bar icons only on mobile to save space *//* Inputs full width */.rl-outreach .search-grid {grid-template-columns:1fr !important}/* Billing cards single column */.rl-outreach .billing-grid {grid-template-columns:1fr !important;max-width:100% !important}/* Modal full width */.rl-outreach .modal-box {width:calc(100vw - 24px) !important;max-width:100% !important;padding:20px 16px !important}}
+@media(max-width:480px){/* Extra small: single col everywhere */.rl-outreach .jcols, .rl-outreach .lcols-all, .rl-outreach .lcols-ig, .rl-outreach .lcols-maps {grid-template-columns:1fr !important}.rl-outreach .filter-grid {grid-template-columns:1fr !important}/* Hide less important table columns */.rl-outreach .well-head {display:none}.rl-outreach .jrow {row-gap:4px}}
