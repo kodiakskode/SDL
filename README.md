@@ -270,8 +270,17 @@ separate **Xero Developer portal**, and there are two ways to authorise one:
    URL can be anything real (e.g. the dashboard's GitHub Pages URL); OAuth 2.0
    redirect URI must be **`http://localhost:5000/callback`** — that's what
    `scripts/xero_oauth_bootstrap.js` listens on. Scopes:
-   `offline_access accounting.transactions.read accounting.contacts.read
+   `offline_access accounting.invoices.read accounting.contacts.read
    accounting.settings.read`.
+
+   Xero's current portal issues **granular** scopes. The umbrella
+   `accounting.transactions.read` that older docs and examples use no longer
+   validates — requesting it fails the authorize step with `invalid_scope`,
+   which surfaces as a Xero *"Sorry, something went wrong / Error code: 500"*
+   page rather than a useful message. Use `accounting.invoices.read`; it
+   covers both ACCREC (sales invoices) and ACCPAY (bills), which is
+   everything the metrics need. Also note `offline_access` is only valid
+   *alongside* a resource scope — requested on its own it's rejected too.
 2. Copy the app's `client_id` / `client_secret`, then run, on your own
    machine (needs Node, and a browser it can open):
    ```bash

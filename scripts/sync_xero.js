@@ -43,9 +43,15 @@
    a 400 from /connect/token; re-run scripts/xero_oauth_bootstrap.js to
    recover.
 
-   Scopes to grant: accounting.transactions.read, accounting.contacts.read,
-   accounting.settings.read (add accounting.reports.read only if you later
-   pull Xero's own report endpoints instead of computing from raw invoices).
+   Scopes to grant: accounting.invoices.read, accounting.contacts.read,
+   accounting.settings.read — plus offline_access, which is what makes Xero
+   issue a refresh token at all.
+
+   Xero's current portal issues GRANULAR scopes. The older umbrella scope
+   accounting.transactions.read no longer validates — requesting it makes the
+   authorize endpoint fail with invalid_scope (a 500 page in the browser), so
+   don't reintroduce it. accounting.settings.read is what exposes Tracking
+   Categories, which is where job names live.
 */
 "use strict";
 

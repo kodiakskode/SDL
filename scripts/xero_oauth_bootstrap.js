@@ -31,7 +31,12 @@ const { execFile } = require("child_process");
 
 const PORT = 5000;
 const REDIRECT_URI = `http://localhost:${PORT}/callback`;
-const SCOPES = "offline_access accounting.transactions.read accounting.contacts.read accounting.settings.read";
+/* Xero's current developer portal issues GRANULAR scopes — accounting.invoices.read
+   etc. The older umbrella scope accounting.transactions.read is rejected outright
+   (the authorize endpoint 500s with "invalid_scope"), so don't reintroduce it.
+   accounting.settings.read is what exposes Tracking Categories, i.e. job names.
+   Note offline_access is only valid alongside at least one resource scope. */
+const SCOPES = "offline_access accounting.invoices.read accounting.contacts.read accounting.settings.read";
 
 function need(name) {
   const v = process.env[name];
