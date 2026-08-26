@@ -1,0 +1,35 @@
+{
+  "generated": "2026-08-26T04:00:00Z",
+  "source": "sample",
+  "sample": true,
+  "currency": "AUD",
+  "note": "Placeholder shape only — no real SDL figures. Replaced wholesale by scripts/sync_xero.js once the Xero connection is live.",
+  "current": {
+    "revenueMTD": 128400,
+    "revenueMTDPrev": 96200,
+    "outstanding": 214800,
+    "overdue": 38600,
+    "billsDue": 47300,
+    "openInvoices": 23
+  },
+  "months": [
+    { "m": "2025-09", "invoiced": 84200,  "paid": 79100 },
+    { "m": "2025-10", "invoiced": 96500,  "paid": 88300 },
+    { "m": "2025-11", "invoiced": 112300, "paid": 94700 },
+    { "m": "2025-12", "invoiced": 138900, "paid": 121400 },
+    { "m": "2026-01", "invoiced": 71400,  "paid": 108200 },
+    { "m": "2026-02", "invoiced": 93800,  "paid": 82600 },
+    { "m": "2026-03", "invoiced": 118600, "paid": 99300 },
+    { "m": "2026-04", "invoiced": 127200, "paid": 113800 },
+    { "m": "2026-05", "invoiced": 104900, "paid": 118400 },
+    { "m": "2026-06", "invoiced": 141700, "paid": 106200 },
+    { "m": "2026-07", "invoiced": 152300, "paid": 131900 },
+    { "m": "2026-08", "invoiced": 128400, "paid": 117500 }
+  ],
+  "ageing": [
+    { "bucket": "Current", "amount": 121400 },
+    { "bucket": "1–30",    "amount": 52800 },
+    { "bucket": "31–60",   "amount": 21900 },
+    { "bucket": "60+",     "amount": 18700 }
+  ]
+}
