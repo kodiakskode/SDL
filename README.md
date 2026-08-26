@@ -250,41 +250,55 @@ chart history comes from.
 
 ### Setting it up
 
-Custom Connections are **not** created in the Xero accounting app. The
-*Connected apps* page there (`apps.xero.com/.../connected`) only lists what is
-already connected to the org — it has no "add custom connection" option. They
-live in the separate **Xero Developer portal**.
+Xero's own **Connected apps** page (`apps.xero.com/.../connected`) only lists
+what is already connected to the org — apps are created and managed in the
+separate **Xero Developer portal**, and there are two ways to authorise one:
 
-1. Go to **[developer.xero.com/app/manage](https://developer.xero.com/app/manage)**
-   and sign in with the Xero login. → **New app** → name it → integration type
-   **Custom connection**.
-2. Choose the scope `accounting.transactions.read` (add `accounting.reports.read`
-   only if you later pull Xero's own report endpoints), and pick the Xero user
-   who will authorise it — that must be someone with admin on the SDL org.
-3. That user gets an email with an authorisation link. Completing it activates
-   the connection, and is where the org takes on the Custom Connection
-   subscription: **A$10/month inc GST** per connection, AU/NZ/UK/US only.
-   It is free against the **Xero Demo Company**, so the whole pipeline can be
-   tested end to end before anything is paid for.
-4. Back in **My Apps**, copy the `client_id` and `client_secret` into repository
-   secrets (**Settings → Secrets and variables → Actions**) as `XERO_CLIENT_ID`
-   and `XERO_CLIENT_SECRET`.
-5. Run the workflow from the **Actions** tab, then let the daily schedule take over.
+- **Custom Connection** — machine-to-machine, no login screen, but the org
+  needs an extra paid subscription for it: **A$10/month inc GST**, AU/NZ/UK/US
+  only. Free to test against the **Xero Demo Company** first.
+- **Web app** (what's actually wired up here) — completely free, standard
+  OAuth2. The tradeoff: it needs one human login to start (not machine-to-
+  machine), and its refresh token rotates every time it's used and expires
+  after 60 days of not being used — so the scheduled sync has to write the
+  new one back into the GitHub secret after every run, or the *next* run
+  fails. `scripts/sync_xero.js` does that automatically; the steps below are
+  what makes it possible.
 
-`XERO_TENANT_ID` is **optional and normally unnecessary**: a Custom Connection is
-bound to exactly one organisation, so the token identifies it and the
-`Xero-Tenant-Id` header is not required. The script still sends it when the
-secret exists, so the same code works against a standard multi-org OAuth2 app,
-where that header *is* required.
+1. **[developer.xero.com/app/manage](https://developer.xero.com/app/manage)**
+   → **New app** → name it → integration type **Web app**. Company/application
+   URL can be anything real (e.g. the dashboard's GitHub Pages URL); OAuth 2.0
+   redirect URI must be **`http://localhost:5000/callback`** — that's what
+   `scripts/xero_oauth_bootstrap.js` listens on. Scopes:
+   `offline_access accounting.transactions.read accounting.contacts.read
+   accounting.settings.read`.
+2. Copy the app's `client_id` / `client_secret`, then run, on your own
+   machine (needs Node, and a browser it can open):
+   ```bash
+   npm install
+   XERO_CLIENT_ID=xxx XERO_CLIENT_SECRET=xxx node scripts/xero_oauth_bootstrap.js
+   ```
+   It opens Xero's login in your browser — log in and click Allow once —
+   then prints a `refresh_token` and the connected org's `tenantId`.
+3. Create a **fine-grained personal access token**
+   ([github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)):
+   scope it to **this repository only**, and under *Repository permissions*
+   grant **Secrets: Read and write** — nothing else. This is what lets the
+   scheduled sync save its own rotated refresh token; without it the sync
+   still runs, it just can't renew itself and will stop working after 60
+   idle days (see the comment at the top of `sync_xero.js`).
+4. In the repo's **Settings → Secrets and variables → Actions**, add five
+   repository secrets: `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`,
+   `XERO_REFRESH_TOKEN` and `XERO_TENANT_ID` (all printed by the bootstrap
+   script), and `GH_SECRETS_PAT` (the PAT from step 3).
+5. Run the workflow from the **Actions** tab, then let the daily schedule
+   take over. `xero_oauth_bootstrap.js` isn't needed again unless the
+   connection gets revoked or the refresh token expires from the schedule
+   not running for 60+ days.
 
-**If the A$10/month is not wanted**, the alternative is a standard OAuth2 web app
-(free), but its refresh tokens rotate on every use and expire after 60 days — so
-a scheduled job has to write each new refresh token back into a secret to stay
-alive. That is meaningfully more moving parts for the saving.
-
-Until those secrets exist the page serves the placeholder `data/metrics.json` and
-shows a **Sample data** flag in the header, so the figures are never mistaken for
-SDL's real numbers.
+Until those secrets exist the page serves the placeholder `data/metrics.json`
+and shows a **Sample data** flag in the header, so the figures are never
+mistaken for SDL's real numbers.
 
 ### Chart colours are validated, not chosen
 

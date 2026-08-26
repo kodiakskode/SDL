@@ -29,13 +29,21 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Install dependencies
+        run: npm install --omit=dev
+
       - name: Fetch from Xero
         env:
           XERO_CLIENT_ID: ${{ secrets.XERO_CLIENT_ID }}
           XERO_CLIENT_SECRET: ${{ secrets.XERO_CLIENT_SECRET }}
-          # Optional — a Custom Connection is bound to one org, so the token
-          # alone identifies it. Only needed for a multi-org OAuth2 app.
+          XERO_REFRESH_TOKEN: ${{ secrets.XERO_REFRESH_TOKEN }}
           XERO_TENANT_ID: ${{ secrets.XERO_TENANT_ID }}
+          # Lets the script write its own rotated refresh token back into
+          # XERO_REFRESH_TOKEN above — a fine-grained PAT scoped to just this
+          # repo's Secrets (read+write), nothing else. Script runs fine
+          # without it, it just can't save the new token (see its own
+          # comment for what that means for the *next* run).
+          GH_SECRETS_PAT: ${{ secrets.GH_SECRETS_PAT }}
         run: node scripts/sync_xero.js
 
       - name: Commit if anything changed

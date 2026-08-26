@@ -4,3 +4,7 @@ server/.env
 server/*.db
 server/*.db-shm
 server/*.db-wal
+
+# scripts/sync_xero.js's one dependency (libsodium-wrappers, for rotating
+# its own GitHub secret) — installed fresh by the workflow each run
+node_modules/

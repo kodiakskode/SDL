@@ -1,0 +1,8 @@
+{
+  "name": "sdl-dashboard-tooling",
+  "private": true,
+  "description": "Not the dashboard itself (that's static, no build step) — just the one dependency scripts/sync_xero.js needs to rotate its own GitHub secret.",
+  "dependencies": {
+    "libsodium-wrappers": "^0.7.15"
+  }
+}
