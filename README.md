@@ -181,28 +181,32 @@ don't publish the server's URL if that trade-off ever needs to change (or
 put it behind auth at the network level, and swap `no-auth` back for
 `auth` in `server/index.js`).
 
-GitHub Pages can't run Node, so this backend runs elsewhere — any small VPS
-reachable over HTTPS works. `outreach.html` calls whatever `SDL_OUTREACH_API_BASE`
-resolves to (a `localStorage.sdl-outreach-api` override, falling back to
-`http://localhost:3021/rawleads/api` for local development); the server's CORS
-allowlist (`OUTREACH_ALLOWED_ORIGIN`) must include the dashboard's real origin.
+GitHub Pages can't run Node, so this backend runs elsewhere —
+**https://sdl.helixsolution.au**, in production. `outreach.html` and
+`leads.html` both call whatever `SDL_OUTREACH_API_BASE` resolves to: a
+`localStorage.sdl-outreach-api` override if you've set one on that browser,
+falling back to that domain otherwise. The server's CORS allowlist
+(`OUTREACH_ALLOWED_ORIGIN`) must be the dashboard's real GitHub Pages
+origin — `https://kodiakskode.github.io`, no path — or the browser blocks
+every request.
 
 ```bash
 cd server
 npm install
-cp .env.example .env      # fill in OUTREACH_SECRET, OUTREACH_ALLOWED_ORIGIN
+cp .env.example .env      # fill in OUTREACH_SECRET at minimum
 npm start
 ```
 
-Then, on the dashboard itself, set the API base once per browser:
+See `server/.env.example` for every variable (the deploy runbook covers
+running it persistently behind nginx on that domain), and the comment at
+the top of each `server/*.js` file for whether it's verbatim from rawleads
+or new. Open the Outreach tab — it talks to the server directly, no
+sign-in step. To point a browser at a different backend (e.g. while
+developing locally), run:
 
 ```js
-localStorage.setItem('sdl-outreach-api', 'https://your-server.example.com/rawleads/api');
+localStorage.setItem('sdl-outreach-api', 'http://localhost:3021/rawleads/api');
 ```
-
-Open the Outreach tab — it talks to the server directly, no sign-in step.
-See `server/.env.example` for every variable, and the comment at the top of
-each `server/*.js` file for whether it's verbatim from rawleads or new.
 
 ## Publishing
 

@@ -17,7 +17,7 @@ const { useState, useEffect, useRef } = React;
 // wherever the backend in server/ is actually deployed — GitHub Pages can't
 // run it, so in production this is a different origin than the dashboard
 // itself.
-const API_BASE = window.SDL_OUTREACH_API_BASE || 'http://localhost:3021/rawleads/api';
+const API_BASE = window.SDL_OUTREACH_API_BASE || 'https://sdl.helixsolution.au/rawleads/api';
 
 // Verbatim contract from rawleads' own public/outreach.html: every outreach
 // call goes through this wrapper.
