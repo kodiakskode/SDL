@@ -33,6 +33,8 @@ jobs:
         env:
           XERO_CLIENT_ID: ${{ secrets.XERO_CLIENT_ID }}
           XERO_CLIENT_SECRET: ${{ secrets.XERO_CLIENT_SECRET }}
+          # Optional — a Custom Connection is bound to one org, so the token
+          # alone identifies it. Only needed for a multi-org OAuth2 app.
           XERO_TENANT_ID: ${{ secrets.XERO_TENANT_ID }}
         run: node scripts/sync_xero.js
 

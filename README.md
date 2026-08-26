@@ -250,14 +250,37 @@ chart history comes from.
 
 ### Setting it up
 
-1. In Xero: **Settings → Connected apps → Custom Connection**. Custom Connections
-   are machine-to-machine (client-credentials OAuth2) — one organisation, no
-   consent screen. Grant scopes `accounting.reports.read` and
-   `accounting.transactions.read`.
-2. Add three repository secrets (**Settings → Secrets and variables → Actions**):
-   `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`, `XERO_TENANT_ID`.
-3. Run the workflow once from the **Actions** tab to confirm, then let the daily
-   schedule take over.
+Custom Connections are **not** created in the Xero accounting app. The
+*Connected apps* page there (`apps.xero.com/.../connected`) only lists what is
+already connected to the org — it has no "add custom connection" option. They
+live in the separate **Xero Developer portal**.
+
+1. Go to **[developer.xero.com/app/manage](https://developer.xero.com/app/manage)**
+   and sign in with the Xero login. → **New app** → name it → integration type
+   **Custom connection**.
+2. Choose the scope `accounting.transactions.read` (add `accounting.reports.read`
+   only if you later pull Xero's own report endpoints), and pick the Xero user
+   who will authorise it — that must be someone with admin on the SDL org.
+3. That user gets an email with an authorisation link. Completing it activates
+   the connection, and is where the org takes on the Custom Connection
+   subscription: **A$10/month inc GST** per connection, AU/NZ/UK/US only.
+   It is free against the **Xero Demo Company**, so the whole pipeline can be
+   tested end to end before anything is paid for.
+4. Back in **My Apps**, copy the `client_id` and `client_secret` into repository
+   secrets (**Settings → Secrets and variables → Actions**) as `XERO_CLIENT_ID`
+   and `XERO_CLIENT_SECRET`.
+5. Run the workflow from the **Actions** tab, then let the daily schedule take over.
+
+`XERO_TENANT_ID` is **optional and normally unnecessary**: a Custom Connection is
+bound to exactly one organisation, so the token identifies it and the
+`Xero-Tenant-Id` header is not required. The script still sends it when the
+secret exists, so the same code works against a standard multi-org OAuth2 app,
+where that header *is* required.
+
+**If the A$10/month is not wanted**, the alternative is a standard OAuth2 web app
+(free), but its refresh tokens rotate on every use and expire after 60 days — so
+a scheduled job has to write each new refresh token back into a secret to stay
+alive. That is meaningfully more moving parts for the saving.
 
 Until those secrets exist the page serves the placeholder `data/metrics.json` and
 shows a **Sample data** flag in the header, so the figures are never mistaken for
