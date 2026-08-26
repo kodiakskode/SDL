@@ -7,9 +7,10 @@
  *
  * Safe to call on every boot: leads are upserted by id, so re-running after
  * editing data/leads.json updates existing rows and adds new ones. Each of
- * the two built-in lists also gets a row in `lead_lists` (id 'architects' /
- * 'designers') so the Outreach tab's list filter has a real label to show,
- * the same way an uploaded CSV/Excel list does (see server/leads.js).
+ * the three built-in lists also gets a row in `lead_lists` (id 'architects' /
+ * 'designers' / 'builders') so the Outreach tab's list filter has a real
+ * label to show, the same way an uploaded CSV/Excel list does (see
+ * server/leads.js).
  */
 const fs   = require('fs');
 const path = require('path');
@@ -48,6 +49,7 @@ module.exports = function seedLeads(db, dataPath) {
   const rows = [
     ...rowsFrom(data.architects?.rows || [], 'arch', 'architects'),
     ...rowsFrom(data.designers?.rows || [], 'land', 'designers'),
+    ...rowsFrom(data.builders?.rows  || [], 'bld',  'builders'),
   ];
 
   const upsertList = db.prepare(`
@@ -56,6 +58,7 @@ module.exports = function seedLeads(db, dataPath) {
   `);
   upsertList.run({ id: 'architects', user_id: ADMIN_USER_ID, label: data.architects?.label || 'Landscape Architects' });
   upsertList.run({ id: 'designers',  user_id: ADMIN_USER_ID, label: data.designers?.label  || 'Landscape Designers' });
+  upsertList.run({ id: 'builders',   user_id: ADMIN_USER_ID, label: data.builders?.label   || 'Sydney Project Builders' });
 
   const upsert = db.prepare(`
     INSERT INTO leads

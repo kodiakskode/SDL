@@ -51,6 +51,7 @@
 <div class="stats">
   <div class="stat"><div class="v" id="h-arch">66</div><div class="k">Landscape architects</div></div>
   <div class="stat"><div class="v" id="h-land">110</div><div class="k">Designers</div></div>
+  <div class="stat"><div class="v" id="h-bld">250</div><div class="k">Project builders</div></div>
   <div class="stat"><div class="v" id="h-email">&mdash;</div><div class="k">With email</div></div>
   <div class="stat ink"><div class="v">12,132</div><div class="k">Pool leads</div></div>
   <div class="stat ink"><div class="v">1,532</div><div class="k">Mail-ready</div></div>
@@ -59,8 +60,8 @@
 <div class="cards">
   <a class="card" href="leads.html">
     <h2>Leads</h2>
-    <p>Sydney landscape architects and landscape designers. Switch list, filter,
-      tick rows, copy emails or CSV.</p>
+    <p>Sydney landscape architects, landscape designers and project builders.
+      Switch list, filter, tick rows, copy emails or CSV.</p>
     <span class="go">Open &rarr;</span>
   </a>
   <a class="card" href="pool.html">
@@ -87,6 +88,12 @@
       unrelated trades like mowing and excavation swept up by a broad category)
       have both been replaced with these narrower, verified sets — see each
       list's note in the Leads page for how it was built.</p>
+    <p><b>Sydney Project Builders</b> — 250 Sydney builders and head contractors,
+      researched from public sources. 18 have a confirmed direct email for the
+      target Project Manager / Supervisor / Construction Manager role, 19 more
+      have a verified non-target-role email, and 213 have none published — no
+      masked or guessed addresses. See the list's note in the Leads page for
+      the full breakdown.</p>
     <p><b>Pool Finder</b> — the tool as built, carried across whole. Same data, same
       scoring, same filters, with address copying added.</p>
     <p><b>Storage</b> — lead status, notes and your light/dark choice live in this
@@ -100,8 +107,9 @@
 fetch("data/leads.json").then(function(r){return r.json();}).then(function(d){
   document.getElementById("h-arch").textContent = d.architects.stats.total.toLocaleString();
   document.getElementById("h-land").textContent = d.designers.stats.total.toLocaleString();
+  document.getElementById("h-bld").textContent = d.builders.stats.total.toLocaleString();
   document.getElementById("h-email").textContent =
-    (d.architects.stats.withEmail + d.designers.stats.withEmail).toLocaleString();
+    (d.architects.stats.withEmail + d.designers.stats.withEmail + d.builders.stats.withEmail).toLocaleString();
 }).catch(function(){ /* tiles keep their static fallbacks */ });
 
 /* Business metrics — Xero, via the sync Action. See scripts/sync_xero.js. */

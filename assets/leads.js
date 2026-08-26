@@ -1,18 +1,19 @@
 /* Leads table: any number of lists behind one dropdown, filtered and sorted
-   client-side. architects/designers come from data/leads.json; anything
-   imported via "Import CSV / Excel…" is parsed in the browser, kept in this
-   device's localStorage (matching how the rest of the dashboard stores
-   things), and — best effort, if the Outreach backend is reachable — synced
-   there too so it shows up as a filterable list on the Outreach tab. */
+   client-side. architects/designers/builders come from data/leads.json;
+   anything imported via "Import CSV / Excel…" is parsed in the browser,
+   kept in this device's localStorage (matching how the rest of the
+   dashboard stores things), and — best effort, if the Outreach backend is
+   reachable — synced there too so it shows up as a filterable list on the
+   Outreach tab. */
 (function () {
   "use strict";
 
   var CUSTOM_KEY = "sdl-custom-leads"; // localStorage: { [listId]: {label, note, rows, stats} }
 
-  var DB = null;                 // { architects:{...}, designers:{...}, [customId]:{...} }
+  var DB = null;                 // { architects:{...}, designers:{...}, builders:{...}, [customId]:{...} }
   // "all" is a virtual list — every real list merged — not a real DB entry;
   // reserved here too so an imported title can't collide with it.
-  var BUILTIN = { all: 1, architects: 1, designers: 1 };
+  var BUILTIN = { all: 1, architects: 1, designers: 1, builders: 1 };
   var listKey = "all";
   var view = [];                 // row objects passing the current filters
   var sel = Object.create(null); // key -> true, kept across filter changes

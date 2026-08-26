@@ -9,7 +9,7 @@ below.
 | Page | File | What it does |
 | --- | --- | --- |
 | Home | `index.html` | Overview, live counts, links into the other pages |
-| Leads | `leads.html` | 66 Sydney landscape architects + 110 Sydney landscape designers + anything you import, behind one dropdown (with an All Lists option) |
+| Leads | `leads.html` | 66 Sydney landscape architects + 110 Sydney landscape designers + 250 Sydney project builders + anything you import, behind one dropdown (with an All Lists option) |
 | Pool Finder | `pool.html` | 12,132 Sydney properties with a pool confirmed 20+ years old |
 | Mail List | `mail-list.html` | The mail-ready set in two value bands, reached from Pool Finder |
 | Outreach | `outreach.html` | Email templates, SMTP settings, sending and history — a RawLeads outreach tab wired to the leads above |
@@ -140,9 +140,22 @@ since been replaced by hand:
   this is a from-scratch list of 66 landscape architecture/design practices
   in Sydney, compiled from public directories and each firm's own site.
 
+- **`builders`** — 250 Sydney builders and head contractors, researched from
+  public sources from an uploaded spreadsheet
+  (`Sydney_Builder_Project_Manager_Contacts_UPDATED.xlsx`, its "250 Target
+  Queue" sheet, enriched with location/builder-type from its "Direct
+  Contacts" sheet for the 18 highest-confidence rows). 18 have a confirmed
+  direct email for the target Project Manager / Supervisor / Construction
+  Manager role (`status: "Direct contact"`), 19 more have a verified but
+  non-target-role company or named contact email (`"Non-direct contact"`),
+  and 213 have no public email located (`"Unverified"`). No masked or
+  guessed emails — every email is published text, with its source URL kept
+  in the row.
+
 Don't run `build_leads.py` against `data/leads.json` — it would overwrite
-both curated lists with the original, uncurated ones. Each list's `note`
-field (shown on the Leads page) documents exactly how it was built.
+the curated lists with the original, uncurated ones (and drop `builders`
+entirely, which it doesn't know about). Each list's `note` field (shown on
+the Leads page) documents exactly how it was built.
 
 **Pool Finder and Mail List** — `pool.html` and `mail-list.html` are vendored
 from [ddeonmadeit/pool](https://github.com/ddeonmadeit/pool). The markup,
