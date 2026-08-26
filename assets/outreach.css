@@ -311,13 +311,27 @@
 /* ── Inputs — debossed into surface ──────────────────────────────── */
 .rl-outreach input, .rl-outreach select, .rl-outreach textarea {
   background:var(--panel-900);border:1px solid var(--edge-dark);color:var(--cream-100);
-  border-radius:6px;padding:11px 14px;font-size:14px;outline:none;
+  border-radius:6px;padding:11px 14px;font-size:14px;outline:none;height:auto;
   transition:border-color .2s,box-shadow .2s,background 280ms ease;font-family:inherit;
   box-shadow:inset 0 2px 5px var(--tray-recess),inset 0 -1px 0 var(--edge-light);
 }
 .rl-outreach input:focus, .rl-outreach select:focus, .rl-outreach textarea:focus {
   border-color:var(--signal);
   box-shadow:inset 0 2px 5px var(--tray-recess),0 0 0 2px rgba(152,160,81,.18);
+}
+/* appearance:none sidesteps a Chromium bug where the page-wide CSS zoom
+   clips the top of native <select> text; the chevron replaces the arrow
+   that removes. */
+.rl-outreach select {
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  padding-right:36px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23877f70' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  background-size:12px 12px;
+}
+.rl-outreach .chip-select {
+  padding-right:4px;background-image:none;
 }
 /* ── Hardware fader (range input) ──────────────────────────── */
 .rl-outreach input[type="range"] {
