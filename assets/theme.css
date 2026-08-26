@@ -128,8 +128,7 @@ body::after{
    lines up with the content below it at every width. */
 .topbar{
   position:sticky;top:0;z-index:300;
-  background:repeating-linear-gradient(90deg,var(--m-hi-faint) 0 1px,transparent 1px 3px),
-             linear-gradient(180deg,var(--m-chassis-top) 0%,var(--m-chassis-mid) 26%,var(--m-chassis-bot) 100%);
+  background:linear-gradient(180deg,var(--m-chassis-top) 0%,var(--m-chassis-mid) 26%,var(--m-chassis-bot) 100%);
   box-shadow:var(--sh-chassis);
 }
 .topbar-in{

@@ -11,8 +11,18 @@
  * OUTREACH_ALLOWED_ORIGIN below).
  *
  * server/outreach.js, schema.js, auth.js and helpers.js are carried over
- * verbatim from kodiakskode/rawleads. server/leads.js, seed-leads.js and
- * bootstrap-auth.js are new — see the comment at the top of each for why.
+ * verbatim from kodiakskode/rawleads. server/leads.js and seed-leads.js are
+ * new — see the comment at the top of each for why.
+ *
+ * There's no login anywhere on this dashboard, and the owner chose to run
+ * Outreach the same way — no access key, no gate. server/no-auth.js treats
+ * every request as the same single admin user instead of server/auth.js's
+ * JWT check. That means anyone who finds this API's URL can send mail
+ * through the configured SMTP account and read the send history; keep
+ * OUTREACH_ALLOWED_ORIGIN narrow and don't publish this URL anywhere public
+ * if that trade-off ever stops being acceptable. Swap the `auth` require
+ * below back to './auth' (and reintroduce a login step in outreach.html) to
+ * restore the JWT gate.
  */
 require('dotenv').config();
 const express  = require('express');
@@ -20,20 +30,17 @@ const cors     = require('cors');
 const path     = require('path');
 const Database = require('better-sqlite3');
 
-const applySchema        = require('./schema');
-const auth                = require('./auth');
-const mountOutreach       = require('./outreach');
-const mountLeads          = require('./leads');
-const mountBootstrapAuth  = require('./bootstrap-auth');
-const seedLeads            = require('./seed-leads');
+const applySchema  = require('./schema');
+const auth         = require('./no-auth');
+const mountOutreach = require('./outreach');
+const mountLeads    = require('./leads');
+const seedLeads     = require('./seed-leads');
 
 const PORT     = process.env.PORT || 3021;
 const API_BASE = process.env.OUTREACH_API_BASE || '/rawleads/api';
 const DB_PATH  = process.env.DB_PATH || path.join(__dirname, '..', 'outreach.db');
 
-if (!process.env.JWT_SECRET)       console.warn('[SECURITY] JWT_SECRET not set — using insecure default. Set it in .env.');
 if (!process.env.OUTREACH_SECRET)  console.warn('[SECURITY] OUTREACH_SECRET not set — SMTP passwords using insecure default key.');
-if (!process.env.OUTREACH_ACCESS_KEY) console.warn('[SECURITY] OUTREACH_ACCESS_KEY not set — the Outreach tab has no way to sign in.');
 
 const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
@@ -57,7 +64,6 @@ app.use(cors({
 
 app.use(express.json({ limit: '5mb' }));
 
-mountBootstrapAuth(app, { apiBase: API_BASE });
 mountOutreach(app, { db, auth, apiBase: API_BASE });
 mountLeads(app, { db, auth, apiBase: API_BASE });
 

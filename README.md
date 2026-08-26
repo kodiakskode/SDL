@@ -9,7 +9,7 @@ below.
 | Page | File | What it does |
 | --- | --- | --- |
 | Home | `index.html` | Overview, live counts, links into the other pages |
-| Leads | `leads.html` | 750 NSW architects + 750 NSW landscape designers behind one dropdown |
+| Leads | `leads.html` | 66 Sydney landscape architects + 110 Sydney landscape designers behind one dropdown |
 | Pool Finder | `pool.html` | 12,132 Sydney properties with a pool confirmed 20+ years old |
 | Mail List | `mail-list.html` | The mail-ready set in two value bands, reached from Pool Finder |
 | Outreach | `outreach.html` | Email templates, SMTP settings, sending and history — a RawLeads outreach tab wired to the leads above |
@@ -78,7 +78,7 @@ data/    leads.json                  cleaned lead lists
 scripts/ build_leads.py build_pool.py
          _head.html _nav.html _foot.html  pages/*.body.html
 server/  outreach.js schema.js auth.js helpers.js   verbatim from rawleads
-         leads.js seed-leads.js bootstrap-auth.js   new — see Outreach backend
+         leads.js seed-leads.js no-auth.js           new — see Outreach backend
          index.js  package.json  .env.example
 mail_merge.csv  leads_full.csv        Pool Finder downloads
 ```
@@ -90,18 +90,24 @@ does the two vendored ones.
 
 ## Regenerating
 
-**Leads** — `data/leads.json` is built from the two source spreadsheets:
+**Leads** — `data/leads.json` no longer matches `scripts/build_leads.py`.
+That script builds the *original* two 750-row spreadsheets (NSW-registered
+architects, and a loosely-categorised "landscape" list that turned out to be
+full of unrelated trades — excavation, mowing, fencing). Both lists have
+since been replaced by hand:
 
-```bash
-pip install openpyxl
-python3 scripts/build_leads.py     # edit the SRC path at the top first
-```
+- **`designers`** — the original 750 filtered down to 110 confirmed landscape
+  *design* businesses in Sydney (excavation/mowing/paving/fencing/concreting
+  and other non-design trades removed, regional-NSW rows dropped).
+- **`architects`** — the original 750 general architects replaced entirely.
+  The NSW Architects Registration Board doesn't register landscape
+  architects at all (0 of the original 750 were landscape specialists), so
+  this is a from-scratch list of 66 landscape architecture/design practices
+  in Sydney, compiled from public directories and each firm's own site.
 
-It normalises phone numbers to Australian formats, validates emails, drops
-placeholder values, title-cases shouted names, derives a suburb and postcode
-from free-text addresses, maps postcodes onto NSW regions, and marks LDI/AILDM
-membership only where the source carried separate evidence (28 of 750 —
-the rest are labelled unverified rather than claimed as members).
+Don't run `build_leads.py` against `data/leads.json` — it would overwrite
+both curated lists with the original, uncurated ones. Each list's `note`
+field (shown on the Leads page) documents exactly how it was built.
 
 **Pool Finder and Mail List** — `pool.html` and `mail-list.html` are vendored
 from [ddeonmadeit/pool](https://github.com/ddeonmadeit/pool). The markup,
@@ -131,14 +137,23 @@ under `.rl-outreach`, with rawleads' own page chrome (its topbar/nav/theme
 toggle) dropped in favour of this dashboard's, and its design tokens remapped
 to the palette above.
 
-Three files are new, not from rawleads, because a static dashboard with no
+Two files are new, not from rawleads, because a static dashboard with no
 accounts needed a bit more glue than "drop it into your Express app":
 
 | File | Why |
 | --- | --- |
 | `server/leads.js` | Lists leads for the send picker — the route existed in RawLeads' full server.js but wasn't part of the outreach extraction. |
 | `server/seed-leads.js` | Idempotently imports `data/leads.json` into the SQL `leads` table `server/outreach.js` sends from — the dashboard's leads are a static JSON file, not a database. |
-| `server/bootstrap-auth.js` | Trades one shared secret (`OUTREACH_ACCESS_KEY`) for the JWT every other route expects. There are no user accounts anywhere on this dashboard. |
+
+**No login.** There are no user accounts anywhere on this dashboard, and the
+owner chose to run Outreach the same way: `server/no-auth.js` treats every
+request as the same single admin user instead of `server/auth.js`'s JWT
+check. That means anyone who can reach the API can send mail through the
+configured SMTP account and read the send history — acceptable for a
+low-traffic personal tool, but keep `OUTREACH_ALLOWED_ORIGIN` narrow and
+don't publish the server's URL if that trade-off ever needs to change (or
+put it behind auth at the network level, and swap `no-auth` back for
+`auth` in `server/index.js`).
 
 GitHub Pages can't run Node, so this backend runs elsewhere — any small VPS
 reachable over HTTPS works. `outreach.html` calls whatever `SDL_OUTREACH_API_BASE`
@@ -149,7 +164,7 @@ allowlist (`OUTREACH_ALLOWED_ORIGIN`) must include the dashboard's real origin.
 ```bash
 cd server
 npm install
-cp .env.example .env      # fill in JWT_SECRET, OUTREACH_SECRET, OUTREACH_ACCESS_KEY
+cp .env.example .env      # fill in OUTREACH_SECRET, OUTREACH_ALLOWED_ORIGIN
 npm start
 ```
 
@@ -159,8 +174,7 @@ Then, on the dashboard itself, set the API base once per browser:
 localStorage.setItem('sdl-outreach-api', 'https://your-server.example.com/rawleads/api');
 ```
 
-Open the Outreach tab and enter `OUTREACH_ACCESS_KEY` when prompted — it's
-remembered on that device from then on (`localStorage.rl_token`, a 30-day JWT).
+Open the Outreach tab — it talks to the server directly, no sign-in step.
 See `server/.env.example` for every variable, and the comment at the top of
 each `server/*.js` file for whether it's verbatim from rawleads or new.
 
@@ -173,11 +187,13 @@ GitHub Pages, project site, free and ad-free. In the repository:
 
 ## Data
 
-Lead lists are compiled from public professional listings — NSW Architects
-Registration Board profiles, and public NSW landscape/garden design business
-listings. Email coverage on the landscape list is thin (18 of 750); phone
-coverage is near total, because most of those businesses publish a contact
-form rather than an address.
+Lead lists are compiled from public business directories (Yellow Pages, True
+Local, Houzz and similar) and each firm's own website — 66 landscape
+architecture practices and 110 landscape design businesses, both scoped to
+the Sydney metro area. Every row with an email has that email confirmed as
+published text on the firm's own site (never guessed or pattern-generated);
+rows without one are phone/website-only. See each list's `note` field
+(shown on the Leads page) for exactly how it was filtered.
 
 Pool data: OpenStreetMap contributors (ODbL) · NSW Spatial Services,
 Department of Customer Service (CC BY 4.0).

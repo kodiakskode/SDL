@@ -4,8 +4,12 @@
 // OutreachTab.jsx" marker) are carried over unmodified from
 // kodiakskode/rawleads src/OutreachTab.jsx. Everything above and below that
 // block is new glue: the api() fetch wrapper the README asks the host
-// dashboard to provide, plus a one-time sign-in gate since SDL Creations has
-// no user accounts of its own (see server/bootstrap-auth.js).
+// dashboard to provide, and the mount call.
+//
+// There's no login here — no accounts exist anywhere on this dashboard, and
+// the backend (server/no-auth.js) doesn't require one either. Anyone who can
+// reach OUTREACH_API_BASE can use this tab; see the note at the top of
+// server/index.js for that trade-off.
 'use strict';
 const { useState, useEffect, useRef } = React;
 
@@ -16,22 +20,16 @@ const { useState, useEffect, useRef } = React;
 const API_BASE = window.SDL_OUTREACH_API_BASE || 'http://localhost:3021/rawleads/api';
 
 // Verbatim contract from rawleads' own public/outreach.html: every outreach
-// call goes through this wrapper, which attaches the bearer token.
+// call goes through this wrapper.
 async function api(path, opts = {}) {
-  const token = localStorage.getItem('rl_token');
   const res = await fetch(API_BASE + path, {
     ...opts,
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: 'Bearer ' + token } : {}),
       ...(opts.headers || {}),
     },
     body: opts.body ? JSON.stringify(opts.body) : undefined,
   });
-  if (res.status === 401) {
-    localStorage.removeItem('rl_token');
-    window.dispatchEvent(new Event('rl-unauthorized'));
-  }
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: 'Request failed' }));
     const e = new Error(err.error || 'Request failed');
@@ -1765,66 +1763,4 @@ function OutreachSettings({ smtp, setSmtp }) {
 // END verbatim OutreachTab.jsx
 // ─────────────────────────────────────────────────────────────────────────
 
-// Sign-in gate — new, not part of the rawleads extraction. There's no login
-// system anywhere else on this dashboard, so this exchanges the one shared
-// OUTREACH_ACCESS_KEY (server/.env) for the JWT every other outreach route
-// expects, once, and remembers it in localStorage.
-function OutreachGate() {
-  const [ready, setReady] = useState(!!localStorage.getItem('rl_token'));
-  const [key, setKey]     = useState('');
-  const [err, setErr]     = useState('');
-  const [busy, setBusy]   = useState(false);
-
-  useEffect(() => {
-    const onUnauthorized = () => setReady(false);
-    window.addEventListener('rl-unauthorized', onUnauthorized);
-    return () => window.removeEventListener('rl-unauthorized', onUnauthorized);
-  }, []);
-
-  async function signIn(e) {
-    e.preventDefault();
-    setBusy(true); setErr('');
-    try {
-      const res = await fetch(API_BASE + '/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'Sign-in failed');
-      localStorage.setItem('rl_token', data.token);
-      setKey('');
-      setReady(true);
-    } catch (e2) {
-      setErr(e2.message || 'Could not reach the outreach server');
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (!ready) {
-    return (
-      <div style={{ maxWidth: 360, margin: '40px auto', textAlign: 'center' }}>
-        <p style={{ marginBottom: 16, color: 'var(--muted)', fontSize: 13 }}>
-          This tab talks to the outreach server directly — enter its access key
-          to unlock it on this device.
-        </p>
-        <form onSubmit={signIn} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <input
-            className="inp" type="password" autoFocus value={key}
-            onChange={e => setKey(e.target.value)}
-            placeholder="Outreach access key"
-          />
-          <button className="btn-teal" disabled={busy || !key.trim()}>
-            {busy ? <span className="spin" /> : 'Unlock Outreach'}
-          </button>
-        </form>
-        {err && <div className="err-bar" style={{ marginTop: 12 }}>{err}</div>}
-      </div>
-    );
-  }
-
-  return <OutreachTab />;
-}
-
-ReactDOM.render(<OutreachGate />, document.getElementById('outreach-root'));
+ReactDOM.render(<OutreachTab />, document.getElementById('outreach-root'));

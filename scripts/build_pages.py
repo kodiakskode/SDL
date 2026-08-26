@@ -14,7 +14,7 @@ PAGES = [
     ("index.html", "Dashboard",
      "SDL Creations dashboard — leads, pool finder and outreach."),
     ("leads.html", "Leads",
-     "NSW architects and landscape designers — filter, tick and copy contact details."),
+     "Sydney landscape architects and landscape designers — filter, tick and copy contact details."),
     ("outreach.html", "Outreach",
      "SDL Creations outreach — email templates, SMTP settings, sending and history."),
 ]
