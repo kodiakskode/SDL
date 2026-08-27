@@ -1,35 +1,267 @@
 {
-  "generated": "2026-08-26T04:00:00Z",
-  "source": "sample",
-  "sample": true,
+  "generated": "2026-08-27T00:09:25.631Z",
+  "source": "xero",
+  "sample": false,
   "currency": "AUD",
-  "note": "Placeholder shape only — no real SDL figures. Replaced wholesale by scripts/sync_xero.js once the Xero connection is live.",
   "current": {
-    "revenueMTD": 128400,
-    "revenueMTDPrev": 96200,
-    "outstanding": 214800,
-    "overdue": 38600,
-    "billsDue": 47300,
-    "openInvoices": 23
+    "revenueMTD": 82135,
+    "revenueMTDPrev": 95360,
+    "outstanding": 12287,
+    "overdue": 12287,
+    "billsDue": 23444,
+    "openInvoices": 4
   },
   "months": [
-    { "m": "2025-09", "invoiced": 84200,  "paid": 79100 },
-    { "m": "2025-10", "invoiced": 96500,  "paid": 88300 },
-    { "m": "2025-11", "invoiced": 112300, "paid": 94700 },
-    { "m": "2025-12", "invoiced": 138900, "paid": 121400 },
-    { "m": "2026-01", "invoiced": 71400,  "paid": 108200 },
-    { "m": "2026-02", "invoiced": 93800,  "paid": 82600 },
-    { "m": "2026-03", "invoiced": 118600, "paid": 99300 },
-    { "m": "2026-04", "invoiced": 127200, "paid": 113800 },
-    { "m": "2026-05", "invoiced": 104900, "paid": 118400 },
-    { "m": "2026-06", "invoiced": 141700, "paid": 106200 },
-    { "m": "2026-07", "invoiced": 152300, "paid": 131900 },
-    { "m": "2026-08", "invoiced": 128400, "paid": 117500 }
+    {
+      "m": "2025-09",
+      "invoiced": 104698,
+      "paid": 104698
+    },
+    {
+      "m": "2025-10",
+      "invoiced": 200522,
+      "paid": 200522
+    },
+    {
+      "m": "2025-11",
+      "invoiced": 153862,
+      "paid": 153862
+    },
+    {
+      "m": "2025-12",
+      "invoiced": 187911,
+      "paid": 182465
+    },
+    {
+      "m": "2026-01",
+      "invoiced": 23826,
+      "paid": 23826
+    },
+    {
+      "m": "2026-02",
+      "invoiced": 38581,
+      "paid": 36311
+    },
+    {
+      "m": "2026-03",
+      "invoiced": 131273,
+      "paid": 131273
+    },
+    {
+      "m": "2026-04",
+      "invoiced": 60169,
+      "paid": 60169
+    },
+    {
+      "m": "2026-05",
+      "invoiced": 49050,
+      "paid": 44479
+    },
+    {
+      "m": "2026-06",
+      "invoiced": 7579,
+      "paid": 7579
+    },
+    {
+      "m": "2026-07",
+      "invoiced": 95360,
+      "paid": 95360
+    },
+    {
+      "m": "2026-08",
+      "invoiced": 82135,
+      "paid": 82135
+    }
   ],
   "ageing": [
-    { "bucket": "Current", "amount": 121400 },
-    { "bucket": "1–30",    "amount": 52800 },
-    { "bucket": "31–60",   "amount": 21900 },
-    { "bucket": "60+",     "amount": 18700 }
-  ]
+    {
+      "bucket": "Current",
+      "amount": 0
+    },
+    {
+      "bucket": "1–30",
+      "amount": 0
+    },
+    {
+      "bucket": "31–60",
+      "amount": 0
+    },
+    {
+      "bucket": "60+",
+      "amount": 12287
+    }
+  ],
+  "jobs": {
+    "category": "Jobs",
+    "totalJobs": 15,
+    "taggedInvoices": 63,
+    "untaggedInvoices": 69,
+    "untaggedAmount": 613568,
+    "top": [
+      {
+        "name": "5 Bellevue St, Chatswood",
+        "invoiced": 168774,
+        "outstanding": 0,
+        "invoices": 24
+      },
+      {
+        "name": "22 Leinster Avenue, Killarney Heights",
+        "invoiced": 77553,
+        "outstanding": 0,
+        "invoices": 5
+      },
+      {
+        "name": "30 Samuel St, Ryde",
+        "invoiced": 64247,
+        "outstanding": 0,
+        "invoices": 7
+      },
+      {
+        "name": "9 City Rd, Camperdown - Job 2",
+        "invoiced": 42970,
+        "outstanding": 0,
+        "invoices": 5
+      },
+      {
+        "name": "7 Taleeban Rd, Riverview Job 2",
+        "invoiced": 40660,
+        "outstanding": 0,
+        "invoices": 5
+      },
+      {
+        "name": "7 Monteith Place, Baulkham Hills",
+        "invoiced": 33028,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
+        "name": "7 Raidell Place, Nth Epping",
+        "invoiced": 30376,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
+        "name": "94 Mansfield St, Rozelle",
+        "invoiced": 12256,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
+        "name": "9 City Rd, Camperdown Job 3",
+        "invoiced": 11658,
+        "outstanding": 0,
+        "invoices": 2
+      },
+      {
+        "name": "114 Blackbutts Rd, Frenchs Forest",
+        "invoiced": 10538,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "12 Hanks St, Ashfield",
+        "invoiced": 2614,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "42 Hunter St, St Ives",
+        "invoiced": 2200,
+        "outstanding": 0,
+        "invoices": 1
+      }
+    ],
+    "all": [
+      {
+        "name": "5 Bellevue St, Chatswood",
+        "invoiced": 168774,
+        "outstanding": 0,
+        "invoices": 24
+      },
+      {
+        "name": "22 Leinster Avenue, Killarney Heights",
+        "invoiced": 77553,
+        "outstanding": 0,
+        "invoices": 5
+      },
+      {
+        "name": "30 Samuel St, Ryde",
+        "invoiced": 64247,
+        "outstanding": 0,
+        "invoices": 7
+      },
+      {
+        "name": "9 City Rd, Camperdown - Job 2",
+        "invoiced": 42970,
+        "outstanding": 0,
+        "invoices": 5
+      },
+      {
+        "name": "7 Taleeban Rd, Riverview Job 2",
+        "invoiced": 40660,
+        "outstanding": 0,
+        "invoices": 5
+      },
+      {
+        "name": "7 Monteith Place, Baulkham Hills",
+        "invoiced": 33028,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
+        "name": "7 Raidell Place, Nth Epping",
+        "invoiced": 30376,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
+        "name": "94 Mansfield St, Rozelle",
+        "invoiced": 12256,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
+        "name": "9 City Rd, Camperdown Job 3",
+        "invoiced": 11658,
+        "outstanding": 0,
+        "invoices": 2
+      },
+      {
+        "name": "114 Blackbutts Rd, Frenchs Forest",
+        "invoiced": 10538,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "12 Hanks St, Ashfield",
+        "invoiced": 2614,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "42 Hunter St, St Ives",
+        "invoiced": 2200,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "20 Cormorant St, Marsden Park",
+        "invoiced": 1634,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "32A Lasseter Ave, Chifley",
+        "invoiced": 1155,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "2 Rocher Ave, Hunters Hill",
+        "invoiced": 805,
+        "outstanding": 0,
+        "invoices": 1
+      }
+    ]
+  }
 }
