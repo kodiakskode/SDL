@@ -239,3 +239,27 @@ tr[data-s="won"] .addr{color:var(--accent-3);}
 .jobrow .val{font-family:var(--font-num);color:var(--accent);font-weight:700;}
 .joblist .empty{padding:var(--s3);font-size:.72rem;text-align:left;}
 .pagetag,.brand{display:none;}
+
+/* iOS zooms the page when a focused field's text is under 16px. This sheet
+   loads after theme.css, so its .78rem would otherwise win the cascade and
+   reintroduce the zoom the theme's mobile rule exists to prevent. */
+@media (max-width:820px){
+  input[type=search],input[type=number],input[type=text],select,textarea{font-size:16px;}
+
+  /* The filter bar is a flat wrapping row of label,control,label,control…
+     At phone width it wrapped mid-pair, stranding "Condition" beside the
+     search box and "Built" beside the suburb menu. Stacking the row into a
+     column re-pairs them for free, because the DOM already orders each
+     label immediately before the control it names. */
+  .controls{flex-direction:column;align-items:stretch;}
+  .controls > input[type=search],
+  .controls > select,
+  .controls > input[type=number]{width:100%;max-width:none;flex:none;}
+  .controls .ctl-label{margin-top:var(--s1);}
+  .controls .ctl-group{flex-wrap:wrap;}
+
+  /* 13 columns will never fit a phone; scroll them sideways in the well
+     rather than crushing every one to unreadable width. */
+  .scroller table{min-width:980px;}
+  .scroller{-webkit-overflow-scrolling:touch;}
+}

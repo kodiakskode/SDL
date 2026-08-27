@@ -227,7 +227,7 @@ def vendor(src_name, out_name, short_title, desc, page_title):
     head = (open(os.path.join(FRAG, "_head.html"), encoding="utf-8").read()
             .replace("__TITLE__", page_title).replace("__DESC__", desc))
     head = head.replace("</head>", upstream_style +
-                        '\n<link rel="stylesheet" href="assets/pool-skin.css?v=3">\n</head>')
+                        '\n<link rel="stylesheet" href="assets/pool-skin.css?v=4">\n</head>')
     nav = open(os.path.join(FRAG, "_nav.html"), encoding="utf-8").read()
 
     out = os.path.join(ROOT, out_name)

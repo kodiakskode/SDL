@@ -62,6 +62,46 @@ namespaced `--m-*` because the vendored Pool Finder stylesheet defines its own
 one.
 
 
+## On a phone
+
+Below 820px the same markup re-lays itself out as a native app shell — there
+is no second copy of the nav in the HTML, the three sidebar children are just
+pinned individually:
+
+| Desktop | Phone |
+| --- | --- |
+| left rail, 208px | bottom tab bar, icon over label |
+| logo at the top of the rail | title bar across the top, spanning the notch |
+| theme toggle at the rail's foot | top-right of the title bar |
+| `--zoom: 1.25` | `--zoom: 1` — a phone is already dense |
+
+Details that matter on iOS specifically:
+
+- **Fields are 16px on mobile.** Below that, Safari zooms the whole page when
+  a field takes focus, yanking the layout sideways on every tap into a search
+  box. `outreach.css` needs `!important` for this because several of its
+  fields are sized by an inline `style` attribute in the JSX.
+- **`viewport-fit=cover` plus `env(safe-area-inset-*)`** — the bars paint into
+  the notch and home-indicator areas, then pad themselves back off them.
+- **`100dvh` alongside `100vh`** so the layout tracks Safari's collapsing
+  toolbars instead of standing 100px too tall.
+- **Wide tables scroll inside their panel**, not the page: a `min-width` on the
+  table (660px for Leads, 980px for the Pool Finder's 13 columns) beats
+  crushing every column into unreadable stubs.
+
+### Add to Home Screen
+
+`manifest.webmanifest` installs it as **SDL Dashboard** in `standalone` display
+mode. iOS ignores the manifest's icons and needs its own `apple-touch-icon`,
+so both are declared.
+
+Icons are generated, not hand-made — `node scripts/make_icons.js` re-renders
+them from `assets/logo-light.svg` whenever the mark changes. They are flat
+PNGs on the taupe ground (`--m-ground`): iOS does not composite transparency,
+so an icon with an alpha channel comes out on a black square. iOS applies its
+own rounded corners, hence no radius baked in; the `maskable` variant carries
+extra padding so Android's circular crop cannot clip the mark.
+
 ## Copying data out
 
 Both tables share the same rule: **tick rows to narrow it; with nothing ticked,

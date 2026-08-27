@@ -117,12 +117,21 @@
 [hidden]{display:none!important;}
 
 /* Whole dashboard scaled up 125% — zoom scales layout, text and px sizes
-   together, so nothing needs converting to rem to keep it uniform. */
-html{zoom:var(--zoom);}
+   together, so nothing needs converting to rem to keep it uniform.
+   (Phones drop --zoom back to 1; see the mobile block near the end.) */
+html{
+  zoom:var(--zoom);
+  /* stop iOS inflating text in landscape, which breaks the tuned scale */
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;
+}
 
 body{
   margin:0;
   min-height:100vh;
+  /* dvh tracks Safari's collapsing toolbars; vh above is the fallback */
+  min-height:100dvh;
+  /* no grey flash on tap — the keys have their own :active state */
+  -webkit-tap-highlight-color:transparent;
   background-color:var(--m-ground);
   /* the fine vertical mill line that makes the ground read as brushed metal */
   background-image:linear-gradient(90deg,var(--mill) 25%,transparent 0);
@@ -146,11 +155,11 @@ body::after{
    clicking it opens/closes the nav panel below it (data-sidebar="collapsed"
    on <html>, set before first paint by the inline snippet in _head.html so
    it never flashes open then shut). */
-.app-shell{display:flex;align-items:stretch;min-height:100vh;}
+.app-shell{display:flex;align-items:stretch;min-height:100vh;min-height:100dvh;}
 
 .sidebar{
   flex:none;width:208px;position:sticky;top:0;align-self:flex-start;
-  height:calc(100vh / var(--zoom));display:flex;flex-direction:column;overflow:hidden;
+  height:calc(100vh / var(--zoom));height:calc(100dvh / var(--zoom));display:flex;flex-direction:column;overflow:hidden;
   background:linear-gradient(180deg,var(--m-chassis-top) 0%,var(--m-chassis-mid) 26%,var(--m-chassis-bot) 100%);
   box-shadow:inset -1px 0 0 var(--m-ring),4px 0 18px var(--m-drop);
   transition:width .2s ease;
@@ -496,14 +505,103 @@ code{font-family:var(--font-mono);font-size:.75rem;background:var(--accent-wash)
 }
 .site-foot a{color:var(--accent);text-decoration:none;}
 
+/* ── phones: native-app shell ──────────────────────────────────────
+   A side rail is a desktop idiom; on a 393px screen it ate a quarter of
+   the width to show four icons. Below 820px the same markup is re-laid
+   out as the arrangement a native app would use — a slim title bar up
+   top, a thumb-reachable tab bar along the bottom — with no duplicate
+   nav in the HTML. The three sidebar children are simply lifted out of
+   the flex column and pinned individually. */
 @media (max-width:820px){
-  :root{--gutter:14px;}
-  /* Narrow screens: always a slim icon-only rail, whatever the stored
-     open/closed preference — 208px would swallow most of the viewport. */
-  .sidebar,[data-sidebar="collapsed"] .sidebar{width:72px;}
-  .sidebar-nav .navlink{justify-content:center;padding:0;}
-  .sidebar-nav .navlink .lbl{display:none;}
+  /* The 125% zoom is a desktop preference — a phone is already dense,
+     and at 1.25 every tile was one-per-screen. */
+  :root{--zoom:1;--gutter:14px;}
+
+  .app-shell{display:block;}
+  .main-col{width:100%;}
+
+  /* the mark becomes the title bar, spanning the notch */
+  .sidebar-brand{
+    position:fixed;top:0;left:0;right:0;z-index:500;
+    height:calc(46px + env(safe-area-inset-top));
+    padding:env(safe-area-inset-top) var(--s3) 0;
+    justify-content:flex-start;
+    background:linear-gradient(180deg,var(--m-chassis-top),var(--m-chassis-mid));
+    box-shadow:0 1px 0 var(--m-ring),0 2px 10px var(--m-drop);
+  }
+  .sidebar-brand img{height:24px;}
+
+  /* theme toggle rides in the title bar's right edge */
+  .sidebar-foot{
+    position:fixed;z-index:501;
+    top:env(safe-area-inset-top);right:var(--s2);
+    height:46px;padding:0;align-items:center;
+  }
+
+  /* the rail itself becomes the bottom tab bar */
+  .sidebar,[data-sidebar="collapsed"] .sidebar{
+    position:fixed;top:auto;bottom:0;left:0;right:0;
+    width:100%;height:auto;flex-direction:row;align-self:auto;
+    padding-bottom:env(safe-area-inset-bottom);
+    background:linear-gradient(180deg,var(--m-chassis-mid),var(--m-chassis-bot));
+    box-shadow:0 -1px 0 var(--m-ring),0 -2px 14px var(--m-drop);
+    z-index:500;
+  }
+  .sidebar-nav{flex-direction:row;padding:4px var(--s1) 2px;gap:2px;}
+  /* icon over label, each tab an equal share — and the label comes back
+     even when the desktop preference is "collapsed", which is meaningless here */
+  .sidebar-nav .navlink,
+  [data-sidebar="collapsed"] .sidebar-nav .navlink{
+    flex:1;min-width:0;height:auto;padding:6px 2px 5px;
+    flex-direction:column;justify-content:center;gap:3px;
+    background:none;box-shadow:none;
+  }
+  .sidebar-nav .navlink .lbl,
+  [data-sidebar="collapsed"] .sidebar-nav .navlink .lbl{
+    display:block;font-size:.5rem;letter-spacing:.06em;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;
+  }
+  .sidebar-nav .navlink .ico{width:21px;height:21px;}
+  /* the debossed key look doesn't belong on a tab bar — colour marks the
+     active tab instead, as iOS does */
+  .sidebar-nav .navlink[aria-current="page"],
+  [data-theme="dark"] .sidebar-nav .navlink[aria-current="page"]{
+    background:none;box-shadow:none;color:var(--accent);
+  }
+  [data-theme="dark"] .sidebar-nav .navlink[aria-current="page"]{color:var(--accent-2);}
+  .sidebar-nav .navlink[aria-current="page"] .ico{transform:translateY(-1px);}
+
+  /* clear both bars; 62px is the tab bar, and the inset is added on top */
+  .shell{
+    padding-top:calc(46px + env(safe-area-inset-top) + var(--s3));
+    padding-bottom:calc(62px + env(safe-area-inset-bottom) + var(--s4));
+  }
+
   h1{font-size:1.25rem;}
+  .page-title{font-size:.95rem;}
+  /* two up rather than one — five KPIs were five full screens of scrolling */
+  .stats{grid-template-columns:repeat(2,1fr);}
+  /* The strip fakes its dividers with a 1px gap over a dark background, so
+     an empty cell in the last row shows up as a solid dark block. An odd
+     final tile spans the full width instead — no hole to show through. */
+  .stats .stat:last-child:nth-child(odd){grid-column:1/-1;}
+  .stat .v{font-size:1.15rem;}
+  .scroller{height:min(58vh,520px)!important;}
+  /* A 7-column table cannot fit 393px — squeezed, every cell truncated to
+     "360 Co…" and Status fell off the edge. Give it a real minimum and let
+     the panel scroll sideways instead, so the columns stay readable. */
+  .panel .scroller table{min-width:660px;}
+  .scroller{-webkit-overflow-scrolling:touch;}
+  .panel-head{gap:var(--s1);}
+  select{max-width:none;}
+}
+
+/* iOS zooms the whole page when a focused field's text is under 16px, which
+   yanks the layout around on every tap into a search box. 16px is the
+   documented threshold, so fields hit it exactly on touch devices. */
+@media (max-width:820px){
+  input[type=search],input[type=text],input[type=number],input[type=email],
+  input[type=password],select,textarea{font-size:16px;}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
 

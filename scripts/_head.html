@@ -2,11 +2,30 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- viewport-fit=cover lets the page paint into the notch/home-indicator
+     areas; the layout pays that back with env(safe-area-inset-*) padding so
+     nothing actually sits under them. -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>__TITLE__ · SDL Creations</title>
 <meta name="description" content="__DESC__">
 <link rel="icon" href="assets/logo-light.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/theme.css?v=6">
+
+<!-- Add to Home Screen. iOS ignores the manifest's icons and needs its own
+     apple-touch-icon (a flat PNG — it does not composite alpha), so both are
+     declared. -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="SDL Dashboard">
+<meta name="application-name" content="SDL Dashboard">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- "default" keeps dark status-bar text, which is the readable choice over
+     this cream ground; black-translucent would force white text onto it. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#e3dbcb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#242220" media="(prefers-color-scheme: dark)">
+
+<link rel="stylesheet" href="assets/theme.css?v=7">
 <script>
 /* Resolve the theme and sidebar open/closed state before first paint so the
    page never flashes the wrong one. */

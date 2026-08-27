@@ -149,9 +149,14 @@
       svg.appendChild(lab);
     });
 
-    // x labels — every other month so they never collide
+    /* x labels — every other month so they never collide. The stride is
+       anchored to the LAST row, not the first: anchoring to the first and
+       then force-adding the final label (the previous approach) puts two
+       labels side by side whenever the count is even, which overlapped
+       "Jul 26" and "Aug 26" at phone widths. This way the newest month is
+       always labelled and spacing stays even. */
     cfg.rows.forEach(function (r, i) {
-      if (i % 2 !== 0 && i !== cfg.rows.length - 1) return;
+      if ((cfg.rows.length - 1 - i) % 2 !== 0) return;
       var lab = el("text", {
         x: x(i), y: H - 8, "text-anchor": "middle", class: "chart-axis"
       });
