@@ -1,15 +1,15 @@
 {
-  "generated": "2026-08-27T00:09:25.631Z",
+  "generated": "2026-08-28T02:23:13.703Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
-    "revenueMTD": 82135,
+    "revenueMTD": 88195,
     "revenueMTDPrev": 95360,
-    "outstanding": 12287,
-    "overdue": 12287,
-    "billsDue": 23444,
-    "openInvoices": 4
+    "outstanding": 18347,
+    "overdue": 13481,
+    "billsDue": 16333,
+    "openInvoices": 6
   },
   "months": [
     {
@@ -69,18 +69,18 @@
     },
     {
       "m": "2026-08",
-      "invoiced": 82135,
+      "invoiced": 88195,
       "paid": 82135
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 0
+      "amount": 4866
     },
     {
       "bucket": "1–30",
-      "amount": 0
+      "amount": 1194
     },
     {
       "bucket": "31–60",
@@ -93,8 +93,8 @@
   ],
   "jobs": {
     "category": "Jobs",
-    "totalJobs": 15,
-    "taggedInvoices": 63,
+    "totalJobs": 16,
+    "taggedInvoices": 65,
     "untaggedInvoices": 69,
     "untaggedAmount": 613568,
     "top": [
@@ -159,14 +159,14 @@
         "invoices": 1
       },
       {
-        "name": "12 Hanks St, Ashfield",
-        "invoiced": 2614,
-        "outstanding": 0,
-        "invoices": 1
+        "name": "30 Samuel St, Ryde - Job 2",
+        "invoiced": 6060,
+        "outstanding": 6060,
+        "invoices": 2
       },
       {
-        "name": "42 Hunter St, St Ives",
-        "invoiced": 2200,
+        "name": "12 Hanks St, Ashfield",
+        "invoiced": 2614,
         "outstanding": 0,
         "invoices": 1
       }
@@ -231,6 +231,12 @@
         "invoiced": 10538,
         "outstanding": 0,
         "invoices": 1
+      },
+      {
+        "name": "30 Samuel St, Ryde - Job 2",
+        "invoiced": 6060,
+        "outstanding": 6060,
+        "invoices": 2
       },
       {
         "name": "12 Hanks St, Ashfield",
