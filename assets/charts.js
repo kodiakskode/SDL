@@ -88,8 +88,9 @@
       var row = document.createElement("div");
       row.className = "chart-tip-row";
       var key = document.createElement("span");
-      key.className = "chart-tip-key";
-      key.style.background = r.color;
+      key.className = "chart-tip-key" + (r.dash ? " dash" : "");
+      key.style.color = r.color;
+      if (!r.dash) key.style.background = r.color;
       var val = document.createElement("b");
       val.textContent = r.value;              // value leads
       var name = document.createElement("span");
@@ -170,14 +171,17 @@
     });
     svg.appendChild(crosshair);
 
-    // lines: 2px, round join/cap
-    cfg.series.forEach(function (s) {
+    // lines: 2px, round join/cap. Every series here is a shade of the same
+    // green, so the second line also carries a dash pattern — a channel
+    // besides hue for telling two close or crossing lines apart.
+    cfg.series.forEach(function (s, si) {
       var d = cfg.rows.map(function (r, i) {
         return (i ? "L" : "M") + x(i) + " " + y(r[s.key]);
       }).join(" ");
       svg.appendChild(el("path", {
         d: d, fill: "none", stroke: css(s.color), "stroke-width": 2,
-        "stroke-linejoin": "round", "stroke-linecap": "round"
+        "stroke-linejoin": "round", "stroke-linecap": "round",
+        "stroke-dasharray": si % 2 ? "6 4" : null
       }));
     });
 
@@ -223,8 +227,8 @@
         crosshair.setAttribute("x2", x(i));
         var box = host.getBoundingClientRect();
         var scale = box.width / W;
-        showTip(cfg.series.map(function (s) {
-          return { name: s.name, value: moneyFull(r[s.key]), color: css(s.color) };
+        showTip(cfg.series.map(function (s, si) {
+          return { name: s.name, value: moneyFull(r[s.key]), color: css(s.color), dash: si % 2 === 1 };
         }), monthLabel(r.m),
           box.left + x(i) * scale,
           box.top + Math.min(y(r[cfg.series[0].key]), y(r[cfg.series[1].key])) * scale);

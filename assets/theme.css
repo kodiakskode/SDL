@@ -608,18 +608,25 @@ code{font-family:var(--font-mono);font-size:.75rem;background:var(--accent-wash)
 /* ==========================================================================
    Charts
    Every colour below was checked with the dataviz validator, not chosen by
-   eye. The brand green #5d622a fails the chroma floor (0.079 — it reads gray
-   as a data mark) and collapses against rust under protanopia (ΔE 2.9), so
-   the chart palette re-steps it: a higher-chroma olive of the same family,
-   paired with a blue that clears CVD separation in both modes.
-     light categorical  #6f7a1f / #2a78d6  — worst adjacent ΔE 26.1 protan
-     dark  categorical  #8a9445 / #4a90d0  — worst adjacent ΔE 20.4 protan
-     ordinal ageing ramps: monotone L, adjacent ΔL >= 0.06, light end >= 2:1
+   eye. Green only, per request — no blue anywhere on these charts.
+
+   The brand green #5d622a fails the chroma floor (0.079 — it reads gray as a
+   data mark), so the palette re-steps it to a higher-chroma olive. The two
+   line-chart series are now one hue at two lightness steps (--c-cat-1/-2),
+   the same species of pair as the ordinal ageing ramp rather than an 8-hue
+   categorical set — validated with --ordinal (monotone L, ΔL >= 0.06,
+   light-end contrast) since that is the check that actually applies to a
+   same-hue duo. A same-hue pair reads closer than two different hues would,
+   so the line chart also carries a stroke-dasharray as a second channel
+   (solid vs dashed) alongside the always-on end labels — color is never the
+   only way to tell the two lines apart.
+     light  #6f7a1f / #414717   dark  #8a9445 / #c6cf90
+     ordinal ageing ramp: monotone L, adjacent ΔL >= 0.06, light end >= 2:1
    ========================================================================== */
 :root{
   --c-surface:var(--panel-top);
   --c-cat-1:#6f7a1f;
-  --c-cat-2:#2a78d6;
+  --c-cat-2:#414717;
   --c-ord-1:#9aa663;
   --c-ord-2:#7d8a3c;
   --c-ord-3:#5f6a28;
@@ -628,7 +635,7 @@ code{font-family:var(--font-mono);font-size:.75rem;background:var(--accent-wash)
 }
 [data-theme="dark"]{
   --c-cat-1:#8a9445;
-  --c-cat-2:#4a90d0;
+  --c-cat-2:#c6cf90;
   --c-ord-1:#646d2c;
   --c-ord-2:#8a9445;
   --c-ord-3:#a9b366;
@@ -661,7 +668,20 @@ code{font-family:var(--font-mono);font-size:.75rem;background:var(--accent-wash)
   display:inline-flex;align-items:center;gap:6px;
   font-size:.7rem;color:var(--ink-2);
 }
-.chart-legend i{width:14px;height:2px;border-radius:1px;display:block;}
+.chart-legend i{
+  width:14px;height:2px;display:block;flex:none;
+  background:currentColor;border-radius:1px;
+}
+/* Dash pattern mirrors the line it keys — a shade of green tied only to hue
+   is easy to lose against its neighbour, so the swatch carries the same
+   secondary channel the mark does. */
+.chart-legend i.dash{
+  background:repeating-linear-gradient(to right,currentColor 0 4px,transparent 4px 7px);
+  border-radius:0;
+}
+.chart-tip-key.dash{
+  background:repeating-linear-gradient(to right,currentColor 0 3px,transparent 3px 5px) !important;
+}
 
 /* axis and direct labels wear text tokens, never the series colour */
 .chart-axis{
