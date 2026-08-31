@@ -1,15 +1,15 @@
 {
-  "generated": "2026-08-30T21:43:32.571Z",
+  "generated": "2026-08-31T23:04:21.949Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
     "revenueMTD": 88195,
     "revenueMTDPrev": 95360,
-    "outstanding": 18347,
-    "overdue": 13481,
-    "billsDue": 16333,
-    "openInvoices": 6
+    "outstanding": 12287,
+    "overdue": 12287,
+    "billsDue": 18838,
+    "openInvoices": 4
   },
   "months": [
     {
@@ -70,17 +70,17 @@
     {
       "m": "2026-08",
       "invoiced": 88195,
-      "paid": 82135
+      "paid": 88195
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 4866
+      "amount": 0
     },
     {
       "bucket": "1–30",
-      "amount": 1194
+      "amount": 0
     },
     {
       "bucket": "31–60",
@@ -161,7 +161,7 @@
       {
         "name": "30 Samuel St, Ryde - Job 2",
         "invoiced": 6060,
-        "outstanding": 6060,
+        "outstanding": 0,
         "invoices": 2
       },
       {
@@ -235,7 +235,7 @@
       {
         "name": "30 Samuel St, Ryde - Job 2",
         "invoiced": 6060,
-        "outstanding": 6060,
+        "outstanding": 0,
         "invoices": 2
       },
       {
