@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-08T21:30:50.498Z",
+  "generated": "2026-09-09T21:22:30.223Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
@@ -9,7 +9,7 @@
     "outstanding": 59519,
     "overdue": 12287,
     "billsDue": 18167,
-    "openInvoices": 7
+    "openInvoices": 8
   },
   "months": [
     {
@@ -95,7 +95,7 @@
     "category": "Jobs",
     "totalJobs": 13,
     "taggedInvoices": 54,
-    "untaggedInvoices": 68,
+    "untaggedInvoices": 69,
     "untaggedAmount": 547789,
     "top": [
       {
