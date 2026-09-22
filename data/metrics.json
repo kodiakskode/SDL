@@ -1,15 +1,15 @@
 {
-  "generated": "2026-09-21T22:22:25.934Z",
+  "generated": "2026-09-22T21:43:36.843Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
-    "revenueMTD": 99556,
+    "revenueMTD": 103172,
     "revenueMTDPrev": 88195,
-    "outstanding": 30197,
+    "outstanding": 33813,
     "overdue": 30197,
     "billsDue": 23983,
-    "openInvoices": 7
+    "openInvoices": 8
   },
   "months": [
     {
@@ -69,14 +69,14 @@
     },
     {
       "m": "2026-09",
-      "invoiced": 99556,
+      "invoiced": 103172,
       "paid": 81645
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 0
+      "amount": 3616
     },
     {
       "bucket": "1–30",
@@ -93,8 +93,8 @@
   ],
   "jobs": {
     "category": "Jobs",
-    "totalJobs": 13,
-    "taggedInvoices": 54,
+    "totalJobs": 14,
+    "taggedInvoices": 55,
     "untaggedInvoices": 72,
     "untaggedAmount": 565699,
     "top": [
@@ -165,9 +165,9 @@
         "invoices": 2
       },
       {
-        "name": "42 Hunter St, St Ives",
-        "invoiced": 2200,
-        "outstanding": 0,
+        "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
+        "invoiced": 3616,
+        "outstanding": 3616,
         "invoices": 1
       }
     ],
@@ -237,6 +237,12 @@
         "invoiced": 6060,
         "outstanding": 0,
         "invoices": 2
+      },
+      {
+        "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
+        "invoiced": 3616,
+        "outstanding": 3616,
+        "invoices": 1
       },
       {
         "name": "42 Hunter St, St Ives",
