@@ -1,15 +1,15 @@
 {
-  "generated": "2026-09-22T21:43:36.843Z",
+  "generated": "2026-09-23T21:53:25.742Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
     "revenueMTD": 103172,
     "revenueMTDPrev": 88195,
-    "outstanding": 33813,
-    "overdue": 30197,
-    "billsDue": 23983,
-    "openInvoices": 8
+    "outstanding": 23962,
+    "overdue": 23962,
+    "billsDue": 23131,
+    "openInvoices": 5
   },
   "months": [
     {
@@ -70,17 +70,17 @@
     {
       "m": "2026-09",
       "invoiced": 103172,
-      "paid": 81645
+      "paid": 91496
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 3616
+      "amount": 0
     },
     {
       "bucket": "1–30",
-      "amount": 17911
+      "amount": 11675
     },
     {
       "bucket": "31–60",
@@ -167,7 +167,7 @@
       {
         "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
         "invoiced": 3616,
-        "outstanding": 3616,
+        "outstanding": 0,
         "invoices": 1
       }
     ],
@@ -241,7 +241,7 @@
       {
         "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
         "invoiced": 3616,
-        "outstanding": 3616,
+        "outstanding": 0,
         "invoices": 1
       },
       {
