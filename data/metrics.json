@@ -1,14 +1,14 @@
 {
-  "generated": "2026-09-23T21:53:25.742Z",
+  "generated": "2026-09-24T21:53:34.006Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
-    "revenueMTD": 103172,
+    "revenueMTD": 107225,
     "revenueMTDPrev": 88195,
-    "outstanding": 23962,
-    "overdue": 23962,
-    "billsDue": 23131,
+    "outstanding": 16341,
+    "overdue": 16341,
+    "billsDue": 21983,
     "openInvoices": 5
   },
   "months": [
@@ -69,8 +69,8 @@
     },
     {
       "m": "2026-09",
-      "invoiced": 103172,
-      "paid": 91496
+      "invoiced": 107225,
+      "paid": 103172
     }
   ],
   "ageing": [
@@ -80,7 +80,7 @@
     },
     {
       "bucket": "1–30",
-      "amount": 11675
+      "amount": 4054
     },
     {
       "bucket": "31–60",
@@ -93,10 +93,10 @@
   ],
   "jobs": {
     "category": "Jobs",
-    "totalJobs": 14,
-    "taggedInvoices": 55,
-    "untaggedInvoices": 72,
-    "untaggedAmount": 565699,
+    "totalJobs": 18,
+    "taggedInvoices": 68,
+    "untaggedInvoices": 60,
+    "untaggedAmount": 477698,
     "top": [
       {
         "name": "25 Howley Street, Rodd Point",
@@ -115,6 +115,12 @@
         "invoiced": 77553,
         "outstanding": 0,
         "invoices": 5
+      },
+      {
+        "name": "14 Walkom Ave, Forestville",
+        "invoiced": 76531,
+        "outstanding": 0,
+        "invoices": 10
       },
       {
         "name": "30 Samuel St, Ryde",
@@ -163,12 +169,6 @@
         "invoiced": 6060,
         "outstanding": 0,
         "invoices": 2
-      },
-      {
-        "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
-        "invoiced": 3616,
-        "outstanding": 0,
-        "invoices": 1
       }
     ],
     "all": [
@@ -191,6 +191,12 @@
         "invoices": 5
       },
       {
+        "name": "14 Walkom Ave, Forestville",
+        "invoiced": 76531,
+        "outstanding": 0,
+        "invoices": 10
+      },
+      {
         "name": "30 Samuel St, Ryde",
         "invoiced": 64247,
         "outstanding": 0,
@@ -239,6 +245,12 @@
         "invoices": 2
       },
       {
+        "name": "25 Howley St, Rodd Point Planting & Additional Work",
+        "invoiced": 4054,
+        "outstanding": 4054,
+        "invoices": 1
+      },
+      {
         "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
         "invoiced": 3616,
         "outstanding": 0,
@@ -247,6 +259,18 @@
       {
         "name": "42 Hunter St, St Ives",
         "invoiced": 2200,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "12 Hanks St, Ashfield",
+        "invoiced": 1894,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "7 Streatfield Rd, Bellevue Hill Job 2",
+        "invoiced": 1734,
         "outstanding": 0,
         "invoices": 1
       },
