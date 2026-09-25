@@ -1,15 +1,15 @@
 {
-  "generated": "2026-09-24T21:53:34.006Z",
+  "generated": "2026-09-25T21:54:16.497Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
     "revenueMTD": 107225,
     "revenueMTDPrev": 88195,
-    "outstanding": 16341,
-    "overdue": 16341,
-    "billsDue": 21983,
-    "openInvoices": 5
+    "outstanding": 12287,
+    "overdue": 12287,
+    "billsDue": 27179,
+    "openInvoices": 4
   },
   "months": [
     {
@@ -70,7 +70,7 @@
     {
       "m": "2026-09",
       "invoiced": 107225,
-      "paid": 103172
+      "paid": 107225
     }
   ],
   "ageing": [
@@ -80,7 +80,7 @@
     },
     {
       "bucket": "1–30",
-      "amount": 4054
+      "amount": 0
     },
     {
       "bucket": "31–60",
@@ -247,7 +247,7 @@
       {
         "name": "25 Howley St, Rodd Point Planting & Additional Work",
         "invoiced": 4054,
-        "outstanding": 4054,
+        "outstanding": 0,
         "invoices": 1
       },
       {
