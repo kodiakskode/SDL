@@ -1,15 +1,15 @@
 {
-  "generated": "2026-09-27T21:43:43.636Z",
+  "generated": "2026-09-28T23:35:58.844Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
-    "revenueMTD": 107225,
+    "revenueMTD": 132175,
     "revenueMTDPrev": 88195,
-    "outstanding": 12287,
+    "outstanding": 37237,
     "overdue": 12287,
-    "billsDue": 27179,
-    "openInvoices": 4
+    "billsDue": 33932,
+    "openInvoices": 6
   },
   "months": [
     {
@@ -69,14 +69,14 @@
     },
     {
       "m": "2026-09",
-      "invoiced": 107225,
+      "invoiced": 132175,
       "paid": 107225
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 0
+      "amount": 24950
     },
     {
       "bucket": "1–30",
@@ -94,7 +94,7 @@
   "jobs": {
     "category": "Jobs",
     "totalJobs": 18,
-    "taggedInvoices": 68,
+    "taggedInvoices": 70,
     "untaggedInvoices": 60,
     "untaggedAmount": 477698,
     "top": [
@@ -147,6 +147,18 @@
         "invoices": 3
       },
       {
+        "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
+        "invoiced": 21074,
+        "outstanding": 17458,
+        "invoices": 2
+      },
+      {
+        "name": "30 Samuel St, Ryde - Job 2",
+        "invoiced": 13552,
+        "outstanding": 7492,
+        "invoices": 3
+      },
+      {
         "name": "94 Mansfield St, Rozelle",
         "invoiced": 12256,
         "outstanding": 0,
@@ -155,18 +167,6 @@
       {
         "name": "9 City Rd, Camperdown Job 3",
         "invoiced": 11658,
-        "outstanding": 0,
-        "invoices": 2
-      },
-      {
-        "name": "114 Blackbutts Rd, Frenchs Forest",
-        "invoiced": 10538,
-        "outstanding": 0,
-        "invoices": 1
-      },
-      {
-        "name": "30 Samuel St, Ryde - Job 2",
-        "invoiced": 6060,
         "outstanding": 0,
         "invoices": 2
       }
@@ -221,6 +221,18 @@
         "invoices": 3
       },
       {
+        "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
+        "invoiced": 21074,
+        "outstanding": 17458,
+        "invoices": 2
+      },
+      {
+        "name": "30 Samuel St, Ryde - Job 2",
+        "invoiced": 13552,
+        "outstanding": 7492,
+        "invoices": 3
+      },
+      {
         "name": "94 Mansfield St, Rozelle",
         "invoiced": 12256,
         "outstanding": 0,
@@ -239,20 +251,8 @@
         "invoices": 1
       },
       {
-        "name": "30 Samuel St, Ryde - Job 2",
-        "invoiced": 6060,
-        "outstanding": 0,
-        "invoices": 2
-      },
-      {
         "name": "25 Howley St, Rodd Point Planting & Additional Work",
         "invoiced": 4054,
-        "outstanding": 0,
-        "invoices": 1
-      },
-      {
-        "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
-        "invoiced": 3616,
         "outstanding": 0,
         "invoices": 1
       },
