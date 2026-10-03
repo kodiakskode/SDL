@@ -1,15 +1,15 @@
 {
-  "generated": "2026-10-02T22:41:23.169Z",
+  "generated": "2026-10-03T21:53:42.458Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
-    "revenueMTD": 0,
+    "revenueMTD": 3638,
     "revenueMTDPrev": 132175,
-    "outstanding": 12287,
+    "outstanding": 15925,
     "overdue": 12287,
     "billsDue": 21834,
-    "openInvoices": 4
+    "openInvoices": 5
   },
   "months": [
     {
@@ -69,14 +69,14 @@
     },
     {
       "m": "2026-10",
-      "invoiced": 0,
+      "invoiced": 3638,
       "paid": 0
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 0
+      "amount": 3638
     },
     {
       "bucket": "1–30",
@@ -94,7 +94,7 @@
   "jobs": {
     "category": "Jobs",
     "totalJobs": 16,
-    "taggedInvoices": 50,
+    "taggedInvoices": 51,
     "untaggedInvoices": 60,
     "untaggedAmount": 477698,
     "top": [
@@ -252,9 +252,9 @@
       },
       {
         "name": "25 Howley St, Rodd Point Planting & Additional Work",
-        "invoiced": 4054,
-        "outstanding": 0,
-        "invoices": 1
+        "invoiced": 7692,
+        "outstanding": 3638,
+        "invoices": 2
       },
       {
         "name": "12 Hanks St, Ashfield",
