@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-06T22:50:17.470Z",
+  "generated": "2026-10-07T23:23:37.617Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
@@ -7,7 +7,7 @@
     "revenueMTD": 3638,
     "revenueMTDPrev": 132175,
     "outstanding": 15925,
-    "overdue": 12287,
+    "overdue": 15925,
     "billsDue": 22591,
     "openInvoices": 5
   },
@@ -76,11 +76,11 @@
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 3638
+      "amount": 0
     },
     {
       "bucket": "1–30",
-      "amount": 0
+      "amount": 3638
     },
     {
       "bucket": "31–60",
