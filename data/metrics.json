@@ -1,15 +1,15 @@
 {
-  "generated": "2026-10-26T22:56:11.035Z",
+  "generated": "2026-10-27T22:44:52.885Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
-    "revenueMTD": 50005,
+    "revenueMTD": 67929,
     "revenueMTDPrev": 132175,
-    "outstanding": 32532,
+    "outstanding": 50456,
     "overdue": 32532,
-    "billsDue": 28496,
-    "openInvoices": 5
+    "billsDue": 14340,
+    "openInvoices": 8
   },
   "months": [
     {
@@ -69,14 +69,14 @@
     },
     {
       "m": "2026-10",
-      "invoiced": 50005,
+      "invoiced": 67929,
       "paid": 29760
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 0
+      "amount": 17924
     },
     {
       "bucket": "1–30",
@@ -93,10 +93,10 @@
   ],
   "jobs": {
     "category": "Jobs",
-    "totalJobs": 16,
-    "taggedInvoices": 52,
-    "untaggedInvoices": 64,
-    "untaggedAmount": 521947,
+    "totalJobs": 17,
+    "taggedInvoices": 53,
+    "untaggedInvoices": 66,
+    "untaggedAmount": 537515,
     "top": [
       {
         "name": "25 Howley Street, Rodd Point",
@@ -255,6 +255,12 @@
         "invoiced": 7692,
         "outstanding": 0,
         "invoices": 2
+      },
+      {
+        "name": "83 Gowrie St, Newtown",
+        "invoiced": 2142,
+        "outstanding": 2356,
+        "invoices": 1
       },
       {
         "name": "12 Hanks St, Ashfield",
