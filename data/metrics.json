@@ -1,15 +1,15 @@
 {
-  "generated": "2026-10-27T22:44:52.885Z",
+  "generated": "2026-10-28T22:55:04.356Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
     "revenueMTD": 67929,
     "revenueMTDPrev": 132175,
-    "outstanding": 50456,
+    "outstanding": 48100,
     "overdue": 32532,
-    "billsDue": 14340,
-    "openInvoices": 8
+    "billsDue": 18587,
+    "openInvoices": 7
   },
   "months": [
     {
@@ -70,13 +70,13 @@
     {
       "m": "2026-10",
       "invoiced": 67929,
-      "paid": 29760
+      "paid": 32116
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 17924
+      "amount": 15568
     },
     {
       "bucket": "1–30",
@@ -259,7 +259,7 @@
       {
         "name": "83 Gowrie St, Newtown",
         "invoiced": 2142,
-        "outstanding": 2356,
+        "outstanding": 0,
         "invoices": 1
       },
       {
