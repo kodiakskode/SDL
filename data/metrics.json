@@ -1,22 +1,17 @@
 {
-  "generated": "2026-10-31T22:02:58.459Z",
+  "generated": "2026-11-01T22:31:43.221Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
-    "revenueMTD": 67929,
-    "revenueMTDPrev": 132175,
+    "revenueMTD": 0,
+    "revenueMTDPrev": 67929,
     "outstanding": 48100,
     "overdue": 48100,
     "billsDue": 22577,
     "openInvoices": 7
   },
   "months": [
-    {
-      "m": "2025-11",
-      "invoiced": 153862,
-      "paid": 153862
-    },
     {
       "m": "2025-12",
       "invoiced": 187911,
@@ -71,6 +66,11 @@
       "m": "2026-10",
       "invoiced": 67929,
       "paid": 32116
+    },
+    {
+      "m": "2026-11",
+      "invoiced": 0,
+      "paid": 0
     }
   ],
   "ageing": [
@@ -93,8 +93,8 @@
   ],
   "jobs": {
     "category": "Jobs",
-    "totalJobs": 17,
-    "taggedInvoices": 53,
+    "totalJobs": 12,
+    "taggedInvoices": 36,
     "untaggedInvoices": 66,
     "untaggedAmount": 537515,
     "top": [
@@ -111,32 +111,8 @@
         "invoices": 10
       },
       {
-        "name": "22 Leinster Avenue, Killarney Heights",
-        "invoiced": 39029,
-        "outstanding": 0,
-        "invoices": 2
-      },
-      {
         "name": "7 Monteith Place, Baulkham Hills",
         "invoiced": 33028,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "9 City Rd, Camperdown - Job 2",
-        "invoiced": 28985,
-        "outstanding": 0,
-        "invoices": 4
-      },
-      {
-        "name": "30 Samuel St, Ryde",
-        "invoiced": 27643,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "7 Taleeban Rd, Riverview Job 2",
-        "invoiced": 27311,
         "outstanding": 0,
         "invoices": 3
       },
@@ -148,111 +124,25 @@
       },
       {
         "name": "5 Bellevue St, Chatswood",
-        "invoiced": 21671,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "30 Samuel St, Ryde - Job 2",
-        "invoiced": 13552,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "94 Mansfield St, Rozelle",
-        "invoiced": 12256,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "9 City Rd, Camperdown Job 3",
-        "invoiced": 11658,
-        "outstanding": 0,
-        "invoices": 2
-      }
-    ],
-    "all": [
-      {
-        "name": "25 Howley Street, Rodd Point",
-        "invoiced": 134023,
-        "outstanding": 0,
-        "invoices": 8
-      },
-      {
-        "name": "14 Walkom Ave, Forestville",
-        "invoiced": 76531,
-        "outstanding": 0,
-        "invoices": 10
-      },
-      {
-        "name": "22 Leinster Avenue, Killarney Heights",
-        "invoiced": 39029,
-        "outstanding": 0,
-        "invoices": 2
-      },
-      {
-        "name": "7 Monteith Place, Baulkham Hills",
-        "invoiced": 33028,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "9 City Rd, Camperdown - Job 2",
-        "invoiced": 28985,
-        "outstanding": 0,
-        "invoices": 4
-      },
-      {
-        "name": "30 Samuel St, Ryde",
-        "invoiced": 27643,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "7 Taleeban Rd, Riverview Job 2",
-        "invoiced": 27311,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
-        "invoiced": 22999,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "5 Bellevue St, Chatswood",
-        "invoiced": 21671,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "30 Samuel St, Ryde - Job 2",
-        "invoiced": 13552,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "94 Mansfield St, Rozelle",
-        "invoiced": 12256,
-        "outstanding": 0,
-        "invoices": 3
-      },
-      {
-        "name": "9 City Rd, Camperdown Job 3",
-        "invoiced": 11658,
-        "outstanding": 0,
-        "invoices": 2
-      },
-      {
-        "name": "114 Blackbutts Rd, Frenchs Forest",
-        "invoiced": 10538,
+        "invoiced": 19866,
         "outstanding": 0,
         "invoices": 1
       },
       {
+        "name": "30 Samuel St, Ryde - Job 2",
+        "invoiced": 13552,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
         "name": "25 Howley St, Rodd Point Planting & Additional Work",
         "invoiced": 7692,
+        "outstanding": 0,
+        "invoices": 2
+      },
+      {
+        "name": "30 Samuel St, Ryde",
+        "invoiced": 4533,
         "outstanding": 0,
         "invoices": 2
       },
@@ -271,6 +161,86 @@
       {
         "name": "7 Streatfield Rd, Bellevue Hill Job 2",
         "invoiced": 1734,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "9 City Rd, Camperdown Job 3",
+        "invoiced": 1680,
+        "outstanding": 0,
+        "invoices": 1
+      }
+    ],
+    "all": [
+      {
+        "name": "25 Howley Street, Rodd Point",
+        "invoiced": 134023,
+        "outstanding": 0,
+        "invoices": 8
+      },
+      {
+        "name": "14 Walkom Ave, Forestville",
+        "invoiced": 76531,
+        "outstanding": 0,
+        "invoices": 10
+      },
+      {
+        "name": "7 Monteith Place, Baulkham Hills",
+        "invoiced": 33028,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
+        "name": "7 Streatfield Rd, Bellevue Hill Final Stage",
+        "invoiced": 22999,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
+        "name": "5 Bellevue St, Chatswood",
+        "invoiced": 19866,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "30 Samuel St, Ryde - Job 2",
+        "invoiced": 13552,
+        "outstanding": 0,
+        "invoices": 3
+      },
+      {
+        "name": "25 Howley St, Rodd Point Planting & Additional Work",
+        "invoiced": 7692,
+        "outstanding": 0,
+        "invoices": 2
+      },
+      {
+        "name": "30 Samuel St, Ryde",
+        "invoiced": 4533,
+        "outstanding": 0,
+        "invoices": 2
+      },
+      {
+        "name": "83 Gowrie St, Newtown",
+        "invoiced": 2142,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "12 Hanks St, Ashfield",
+        "invoiced": 1894,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "7 Streatfield Rd, Bellevue Hill Job 2",
+        "invoiced": 1734,
+        "outstanding": 0,
+        "invoices": 1
+      },
+      {
+        "name": "9 City Rd, Camperdown Job 3",
+        "invoiced": 1680,
         "outstanding": 0,
         "invoices": 1
       }
