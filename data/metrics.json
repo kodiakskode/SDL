@@ -1,15 +1,15 @@
 {
-  "generated": "2026-11-03T01:24:59.314Z",
+  "generated": "2026-11-03T23:46:42.366Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
-    "revenueMTD": 0,
+    "revenueMTD": 13026,
     "revenueMTDPrev": 67929,
-    "outstanding": 48100,
-    "overdue": 48100,
-    "billsDue": 24020,
-    "openInvoices": 7
+    "outstanding": 45558,
+    "overdue": 32532,
+    "billsDue": 25011,
+    "openInvoices": 6
   },
   "months": [
     {
@@ -65,22 +65,22 @@
     {
       "m": "2026-10",
       "invoiced": 67929,
-      "paid": 32116
+      "paid": 47684
     },
     {
       "m": "2026-11",
-      "invoiced": 0,
+      "invoiced": 13026,
       "paid": 0
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 0
+      "amount": 13026
     },
     {
       "bucket": "1–30",
-      "amount": 35813
+      "amount": 20245
     },
     {
       "bucket": "31–60",
@@ -95,8 +95,8 @@
     "category": "Jobs",
     "totalJobs": 12,
     "taggedInvoices": 36,
-    "untaggedInvoices": 66,
-    "untaggedAmount": 537515,
+    "untaggedInvoices": 67,
+    "untaggedAmount": 550541,
     "top": [
       {
         "name": "25 Howley Street, Rodd Point",
