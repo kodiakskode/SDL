@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-05T23:52:45.624Z",
+  "generated": "2026-11-06T23:35:19.943Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
@@ -8,7 +8,7 @@
     "revenueMTDPrev": 67929,
     "outstanding": 49740,
     "overdue": 32532,
-    "billsDue": 37438,
+    "billsDue": 37533,
     "openInvoices": 7
   },
   "months": [
