@@ -1,15 +1,15 @@
 {
-  "generated": "2026-11-08T22:35:22.299Z",
+  "generated": "2026-11-10T01:47:45.923Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
   "current": {
     "revenueMTD": 39658,
     "revenueMTDPrev": 67929,
-    "outstanding": 54287,
+    "outstanding": 32532,
     "overdue": 32532,
-    "billsDue": 37533,
-    "openInvoices": 8
+    "billsDue": 27777,
+    "openInvoices": 5
   },
   "months": [
     {
@@ -70,13 +70,13 @@
     {
       "m": "2026-11",
       "invoiced": 39658,
-      "paid": 17904
+      "paid": 39658
     }
   ],
   "ageing": [
     {
       "bucket": "Current",
-      "amount": 21755
+      "amount": 0
     },
     {
       "bucket": "1–30",
