@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-21T23:37:54.482Z",
+  "generated": "2026-11-22T23:56:18.376Z",
   "source": "xero",
   "sample": false,
   "currency": "AUD",
@@ -80,11 +80,11 @@
     },
     {
       "bucket": "1–30",
-      "amount": 20245
+      "amount": 0
     },
     {
       "bucket": "31–60",
-      "amount": 0
+      "amount": 20245
     },
     {
       "bucket": "60+",
